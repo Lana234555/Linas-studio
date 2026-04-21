@@ -1,0 +1,225 @@
+function toggleMenu() {
+  const m = document.getElementById("mobileMenu");
+  const h = document.getElementById("navHamburger");
+  m.classList.toggle("open");
+  h.classList.toggle("open");
+  document.body.style.overflow = m.classList.contains("open") ? "hidden" : "";
+}
+
+function enrollTeacher(val) {
+  const sel = document.getElementById("directionSelect");
+  if (sel) {
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === val || sel.options[i].text === val) {
+        sel.selectedIndex = i;
+        break;
+      }
+    }
+  }
+  const contact = document.getElementById("contact");
+  if (contact) contact.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// Dot grid
+const dg = document.getElementById("dotGrid");
+if (dg) {
+  const cols = 18, rows = 13;
+  dg.style.gridTemplateColumns = `repeat(${cols},1fr)`;
+  for (let i = 0; i < cols * rows; i++) {
+    const s = document.createElement("span");
+    dg.appendChild(s);
+  }
+}
+
+// Nav scroll
+const nav = document.getElementById("mainNav");
+window.addEventListener("scroll", () => {
+  nav.classList.toggle("scrolled", window.scrollY > 50);
+}, { passive: true });
+
+// Reveal
+const revs = document.querySelectorAll(".reveal");
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add("in"), i * 45);
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.07 });
+revs.forEach((el) => obs.observe(el));
+
+function filterTeachers(cat, btn) {
+  document.querySelectorAll(".ftab").forEach((b) => b.classList.remove("active"));
+  btn.classList.add("active");
+  document.querySelectorAll(".teacher-card").forEach((card) => {
+    if (cat === "all" || card.dataset.cat === cat) {
+      card.classList.remove("hidden");
+      setTimeout(() => card.classList.add("in"), 80);
+    } else {
+      card.classList.add("hidden");
+    }
+  });
+}
+
+function showPricing(id, btn) {
+  document.querySelectorAll(".ptab").forEach((b) => b.classList.remove("active"));
+  document.querySelectorAll(".pricing-panel").forEach((p) => p.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll("#" + id + " .reveal").forEach((el) => {
+    el.classList.remove("in");
+    setTimeout(() => el.classList.add("in"), 80);
+  });
+}
+
+// Gallery lightbox
+(function () {
+  const lb = document.getElementById("lightbox");
+  const lbImg = document.getElementById("lbImg");
+  const lbClose = document.getElementById("lbClose");
+  const lbPrev = document.getElementById("lbPrev");
+  const lbNext = document.getElementById("lbNext");
+  const lbCnt = document.getElementById("lbCounter");
+  let items = [];
+  let current = 0;
+
+  function init() {
+    const allItems = Array.from(document.querySelectorAll(".gallery-item"));
+    let pending = allItems.length;
+    function onSettle() {
+      pending--;
+      if (pending > 0) return;
+      items = allItems.filter((el) => el.style.display !== "none");
+      items.forEach((item, idx) => {
+        if (!item.querySelector(".gallery-zoom-icon")) {
+          const icon = document.createElement("span");
+          icon.className = "gallery-zoom-icon";
+          icon.innerHTML = "⤢";
+          item.appendChild(icon);
+        }
+        item.addEventListener("click", () => openLightbox(idx));
+      });
+    }
+    allItems.forEach((item) => {
+      const img = item.querySelector("img");
+      if (img.complete) {
+        if (!img.naturalWidth) item.style.display = "none";
+        onSettle();
+      } else {
+        img.addEventListener("load", () => onSettle());
+        img.addEventListener("error", () => { item.style.display = "none"; onSettle(); });
+      }
+    });
+  }
+
+  function getImgSrc(item) { return item.querySelector("img").src; }
+
+  function openLightbox(idx) {
+    current = idx;
+    lbImg.src = getImgSrc(items[current]);
+    lbImg.classList.remove("lb-fade");
+    lbCnt.textContent = current + 1 + " / " + items.length;
+    lb.classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeLightbox() {
+    lb.classList.remove("active");
+    document.body.style.overflow = "";
+  }
+
+  function navigate(dir) {
+    lbImg.classList.add("lb-fade");
+    setTimeout(() => {
+      current = (current + dir + items.length) % items.length;
+      lbImg.src = getImgSrc(items[current]);
+      lbCnt.textContent = current + 1 + " / " + items.length;
+      lbImg.classList.remove("lb-fade");
+    }, 200);
+  }
+
+  if (lb) {
+    lbClose.addEventListener("click", closeLightbox);
+    lbPrev.addEventListener("click", () => navigate(-1));
+    lbNext.addEventListener("click", () => navigate(1));
+    lb.addEventListener("click", (e) => { if (e.target === lb) closeLightbox(); });
+    document.addEventListener("keydown", (e) => {
+      if (!lb.classList.contains("active")) return;
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") navigate(-1);
+      if (e.key === "ArrowRight") navigate(1);
+    });
+    let touchStartX = 0;
+    lb.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    lb.addEventListener("touchend", (e) => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 50) navigate(dx < 0 ? 1 : -1);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+
+function adjustInstrGrid() {
+  const g = document.querySelector(".instr-prices-r");
+  if (g) g.style.gridTemplateColumns = window.innerWidth < 768 ? "1fr" : "1fr 1fr";
+}
+adjustInstrGrid();
+window.addEventListener("resize", adjustInstrGrid);
+
+// Form submission
+document.getElementById("submitBtn").addEventListener("click", function () {
+  const nameField = document.getElementById("nameField");
+  const phoneField = document.getElementById("phoneField");
+  const emailField = document.getElementById("emailField");
+
+  if (!nameField.value.trim()) {
+    alert(window.i18n ? window.i18n.t("validation.nameRequired") : "Пожалуйста, введите имя");
+    nameField.focus();
+    return;
+  }
+  if (!phoneField.value.trim()) {
+    alert(window.i18n ? window.i18n.t("validation.phoneRequired") : "Пожалуйста, введите телефон");
+    phoneField.focus();
+    return;
+  }
+  if (!emailField.value.trim()) {
+    alert(window.i18n ? window.i18n.t("validation.emailRequired") : "Пожалуйста, введите email");
+    emailField.focus();
+    return;
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(emailField.value.trim())) {
+    alert(window.i18n ? window.i18n.t("validation.emailInvalid") : "Пожалуйста, введите корректный email");
+    emailField.focus();
+    return;
+  }
+  showSuccessMessage();
+});
+
+function showSuccessMessage() {
+  const t = (k, fb) => window.i18n ? window.i18n.t(k) : fb;
+  const modal = document.createElement("div");
+  modal.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:10000;backdrop-filter:blur(8px);";
+  const modalContent = document.createElement("div");
+  modalContent.style.cssText = "background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:40px 32px;max-width:500px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5);";
+  modalContent.innerHTML = `
+    <div style="font-size:3rem;margin-bottom:20px">🎉</div>
+    <h3 style="font-family:'Alice',serif;font-size:1.8rem;color:var(--white);margin-bottom:16px;line-height:1.3">${t("modal.title", "Спасибо за заявку!")}</h3>
+    <p style="color:var(--text);line-height:1.6;margin-bottom:24px;font-size:1rem">${t("modal.body", "Мы обязательно ответим Вам в рабочее время.")}</p>
+    <a href="https://www.instagram.com/linas_music_studio?igsh=MWpycjZiZ3Awdnp3Mw==" target="_blank" class="btn-pill btn-teal" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none">
+      <span>📸</span><span>${t("modal.igBtn", "Перейти в Instagram")}</span>
+    </a>
+  `;
+  modal.appendChild(modalContent);
+  document.body.appendChild(modal);
+  modal.addEventListener("click", (e) => { if (e.target === modal) modal.remove(); });
+  document.addEventListener("keydown", function closeOnEscape(e) {
+    if (e.key === "Escape") { modal.remove(); document.removeEventListener("keydown", closeOnEscape); }
+  });
+}
