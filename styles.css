@@ -26,7 +26,7 @@
 
 /* ── PAPER BACKGROUND ── */
 #founder, #vocal, #pricing, #halls, #contact, #cert, #instruments {
-  background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url("https://raw.githubusercontent.com/Lana234555/Linas-studio/main/192714840_8397bc01-eada-4b94-a8be-bfbf9ef01118.jpg");
+  background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url("https://raw.githubusercontent.com/Lana234555/Linas-studio/main/192714840_8397bc01-eada-4b94-a8be-bfbf9ef01118.jpg");
   background-attachment: fixed, fixed;
   background-size: cover;
   background-position: center;
