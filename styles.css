@@ -79,7 +79,15 @@ body {
   animation-delay: var(--d, 0s);
   transform: rotate(var(--r, 0deg));
   user-select: none;
+  will-change: transform, opacity;
 }
+
+/* ── PAUSE ANIMATIONS OUT OF VIEWPORT ── */
+.hero:not(.in-view) .hero-bg img { animation-play-state: paused; }
+.hero:not(.in-view) .badge { animation-play-state: paused; }
+.hero:not(.in-view) .btn-hero-primary::after { animation-play-state: paused; }
+.anim-section:not(.in-view) .mn { animation-play-state: paused; }
+.marquee-outer:not(.in-view) .marquee-track { animation-play-state: paused; }
 
 /* ── AMBIENT ORBS ── */
 .orb { display: none; }
@@ -93,7 +101,7 @@ body {
   position: fixed; top: 0; left: 0; right: 0; z-index: 200;
   display: flex; align-items: center; justify-content: center;
   padding: 0; height: 68px;
-  transition: background 0.5s, backdrop-filter 0.5s, box-shadow 0.5s;
+  transition: background 0.5s, box-shadow 0.5s;
 }
 #mainNav > * { flex-shrink: 0; }
 .nav-inner {
@@ -101,9 +109,7 @@ body {
   width: 100%; max-width: 1280px; padding: 0 48px;
 }
 #mainNav.scrolled {
-  background: rgba(10,10,10,0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(10,10,10,0.97);
   box-shadow: 0 1px 0 rgba(255,255,255,0.06);
 }
 .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
@@ -156,7 +162,7 @@ body {
 .btn-pill:hover { background: #1a1a18; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.18); }
 .btn-pill-outline {
   display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(10,10,10,0.3); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  background: rgba(10,10,10,0.75);
   color: var(--white);
   font-family: "Geologica", sans-serif; font-size: 0.82rem; font-weight: 400;
   padding: 9px 22px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.25);
@@ -172,7 +178,7 @@ body {
 /* ── HERO PRIMARY BUTTON ── */
 .btn-hero-primary {
   position: relative; display: inline-flex; align-items: center; gap: 10px;
-  background: rgba(10,10,10,0.35); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  background: rgba(10,10,10,0.75);
   font-family: "Geologica", sans-serif;
   font-size: 0.9rem; font-weight: 500; padding: 14px 28px;
   border-radius: 100px; text-decoration: none; border: 1.5px solid var(--teal);
@@ -220,6 +226,7 @@ body {
 .hero-bg img {
   width: 100%; height: 100%; object-fit: cover; object-position: center 30%;
   animation: heroZoom 12s ease-in-out infinite;
+  will-change: transform;
 }
 .hero::before {
   content: "";
@@ -270,10 +277,10 @@ body {
 .badge {
   position: absolute; background: rgba(10,10,10,0.82);
   border: 1px solid rgba(0,196,179,0.25); border-radius: var(--radius-sm);
-  padding: 12px 16px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  padding: 12px 16px;
   display: flex; align-items: center; gap: 10px; z-index: 5;
   white-space: nowrap; font-size: 0.76rem;
-  animation: float 4s ease-in-out infinite; box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  animation: float 4s ease-in-out infinite; box-shadow: 0 8px 32px rgba(0,0,0,0.3); will-change: transform;
 }
 .b1 { top: 18%; left: 5%; animation-delay: 0s; }
 .b2 { top: 55%; left: 2%; animation-delay: 1.2s; }
@@ -314,16 +321,18 @@ body {
   border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
   position: relative; z-index: 1;
 }
-.trusted-in { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; gap: 36px; flex-wrap: wrap; }
-.trusted-label { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; }
-.trusted-logos { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; flex: 1; }
-.tlogo { font-size: 0.82rem; color: rgba(0,0,0,0.25); font-weight: 400; letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.2s; cursor: default; }
-.tlogo:hover { color: rgba(0,0,0,0.55); }
+.trusted-marquee-wrap { overflow: hidden; width: 100%; }
+@keyframes marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.trusted-marquee-track { display: flex; align-items: center; white-space: nowrap; width: max-content; animation: marquee-scroll 36s linear infinite; will-change: transform; }
+.trusted-marquee-track:hover { animation-play-state: paused; }
+.tlogo { font-size: 1.65rem; color: rgba(255,255,255,0.5); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 0 20px; cursor: default; transition: color 0.2s; }
+.tlogo:hover { color: rgba(255,255,255,0.85); }
+.tlogo-sep { font-size: 1.4rem; color: var(--teal); opacity: 0.3; }
 
 /* ── GLASS CARDS ── */
 .glass-card {
   background: var(--card); border: 1px solid var(--border);
-  border-radius: var(--radius); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--radius);
   transition: background 0.3s, border-color 0.3s, transform 0.3s, box-shadow 0.3s;
 }
 .glass-card:hover { background: var(--card2); border-color: rgba(0,0,0,0.2); transform: translateY(-5px); box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
@@ -336,7 +345,7 @@ body {
 .founder-badge {
   position: absolute; bottom: 22px; left: 22px;
   background: rgba(5,14,13,0.88); border: 1px solid var(--teal-border);
-  border-radius: var(--radius-sm); padding: 14px 18px; backdrop-filter: blur(12px);
+  border-radius: var(--radius-sm); padding: 14px 18px;
 }
 .founder-badge-title { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal); margin-bottom: 4px; }
 .founder-badge-val { font-size: 0.88rem; color: var(--white); font-weight: 500; }
@@ -505,7 +514,7 @@ body {
 
 /* ── MARQUEE ── */
 .marquee-outer { overflow: hidden; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 14px 0; margin: 44px 0; }
-.marquee-track { display: inline-block; animation: mq 22s linear infinite; white-space: nowrap; }
+.marquee-track { display: inline-block; animation: mq 22s linear infinite; white-space: nowrap; will-change: transform; }
 .marquee-track span { display: inline-block; font-size: 0.74rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal); margin: 0 28px; opacity: 0.7; }
 .marquee-track span::before { content: "◆ "; opacity: 0.4; margin-right: 6px; }
 @keyframes mq {
