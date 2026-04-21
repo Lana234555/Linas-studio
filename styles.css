@@ -33,6 +33,29 @@ body {
   font-family: "Geologica", "DM Sans", sans-serif;
   font-weight: 300;
   overflow-x: hidden;
+  position: relative;
+}
+
+/* ── MUSIC DECO ── */
+@keyframes mnFloat {
+  0%,100% { transform: translateY(0) rotate(var(--r)); opacity: 0.08; text-shadow: 0 0 6px rgba(196,160,122,0); }
+  50%      { transform: translateY(-16px) rotate(var(--r)); opacity: 0.18; text-shadow: 0 0 18px rgba(196,160,122,0.55), 0 0 36px rgba(245,166,35,0.25); }
+}
+.music-deco {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;
+}
+.mn-section {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+}
+.mn {
+  position: absolute;
+  color: #c4a07a;
+  opacity: 0.08;
+  font-family: serif;
+  animation: mnFloat 8s ease-in-out infinite;
+  animation-delay: var(--d, 0s);
+  transform: rotate(var(--r, 0deg));
+  user-select: none;
 }
 
 /* ── AMBIENT ORBS ── */
@@ -147,19 +170,42 @@ body {
 }
 
 /* ── HERO ── */
+@keyframes heroFadeIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes heroZoom {
+  0%,100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}
 .hero {
   min-height: 100vh; display: flex; flex-direction: column;
   justify-content: center; padding: 100px 48px 0;
   position: relative; overflow: hidden;
+  background: #0a0a0a;
 }
+.hero-bg {
+  position: absolute; inset: 0; z-index: 0; overflow: hidden;
+}
+.hero-bg img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center 30%;
+  animation: heroZoom 12s ease-in-out infinite;
+}
+.hero::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(10,10,10,0.45) 0%, rgba(10,10,10,0.3) 50%, rgba(10,10,10,0.75) 100%);
+  pointer-events: none; z-index: 1;
+}
+.hero-inner { animation: heroFadeIn 1s ease 0.2s both; }
 #dotGrid {
   position: absolute; right: 48px; top: 80px;
   display: grid; gap: 18px; pointer-events: none; z-index: 1; opacity: 0.5;
 }
 #dotGrid span { width: 2px; height: 2px; background: rgba(0,0,0,0.08); border-radius: 50%; display: block; }
 .hero-inner {
-  display: grid; grid-template-columns: 1fr 580px; gap: 0;
-  align-items: center; max-width: 1400px; margin: 0 auto;
+  display: flex; flex-direction: column; justify-content: center;
+  max-width: 700px; margin: 0 auto;
   width: 100%; position: relative; z-index: 2;
 }
 .hero-left { padding-bottom: 0; }
@@ -603,7 +649,7 @@ footer {
 .footer-right { display: flex; flex-direction: column; gap: 0.9rem; align-items: flex-start; }
 .footer-contact-item { display: flex; align-items: center; gap: 9px; color: rgba(255,255,255,0.45); font-size: 0.84rem; }
 .footer-contact-item svg { flex-shrink: 0; width: 28px; height: 28px; padding: 7px; background: rgba(0,196,179,0.08); border: 1px solid rgba(0,196,179,0.18); border-radius: 8px; color: var(--teal); }
-.footer-contact-item a { color: inherit; text-decoration: none; transition: color 0.2s; }
+.footer-contact-item a { display: flex; align-items: center; gap: 9px; color: inherit; text-decoration: none; transition: color 0.2s; }
 .footer-contact-item a:hover { color: var(--teal); }
 .footer-support-block {
   display: flex; align-items: center; gap: 6px; margin-top: 4px;
@@ -724,6 +770,7 @@ footer {
   .support-btn { width: 48px; height: 48px; }
 }
 @media (max-width: 768px) {
+  .mn-m { display: none; }
   .nav-links { display: none; }
   .halls-grid, .pricing-panel.active, .events-grid, .instr-teachers-grid { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
