@@ -16,35 +16,10 @@
     <div class="orb orb-3"></div>
     <div class="orb orb-4"></div>
 
-    <!-- Music note decorations -->
-    <div class="music-deco" aria-hidden="true">
-      <span class="mn" style="left:4%;top:8%;font-size:4.5rem;--d:0s;--r:-15deg">𝄞</span>
-      <span class="mn" style="left:18%;top:22%;font-size:3rem;--d:1.2s;--r:10deg">♩</span>
-      <span class="mn" style="left:32%;top:5%;font-size:3.5rem;--d:2.4s;--r:-8deg">♪</span>
-      <span class="mn" style="left:48%;top:14%;font-size:2.5rem;--d:0.6s;--r:20deg">♫</span>
-      <span class="mn" style="left:62%;top:3%;font-size:5rem;--d:3.1s;--r:-12deg">𝄢</span>
-      <span class="mn" style="left:76%;top:18%;font-size:3.2rem;--d:1.8s;--r:5deg">♩</span>
-      <span class="mn" style="left:88%;top:7%;font-size:2.8rem;--d:2.9s;--r:-20deg">♬</span>
-
-      <span class="mn" style="left:8%;top:38%;font-size:3.6rem;--d:0.9s;--r:14deg">♫</span>
-      <span class="mn" style="left:23%;top:52%;font-size:5.5rem;--d:2.2s;--r:-6deg">𝄞</span>
-      <span class="mn" style="left:40%;top:44%;font-size:2.6rem;--d:3.5s;--r:18deg">♪</span>
-      <span class="mn" style="left:55%;top:60%;font-size:4rem;--d:1s;--r:-10deg">♩</span>
-      <span class="mn" style="left:70%;top:40%;font-size:3rem;--d:4s;--r:8deg">♬</span>
-      <span class="mn" style="left:85%;top:55%;font-size:4.8rem;--d:0.4s;--r:-18deg">𝄢</span>
-      <span class="mn" style="left:93%;top:35%;font-size:3.2rem;--d:2.7s;--r:22deg">♫</span>
-
-      <span class="mn" style="left:2%;top:70%;font-size:3.8rem;--d:1.5s;--r:-9deg">♩</span>
-      <span class="mn" style="left:15%;top:82%;font-size:4rem;--d:3.8s;--r:12deg">𝄞</span>
-      <span class="mn" style="left:30%;top:75%;font-size:3.2rem;--d:0.3s;--r:-16deg">♪</span>
-      <span class="mn" style="left:45%;top:88%;font-size:5rem;--d:2.6s;--r:7deg">𝄢</span>
-      <span class="mn" style="left:60%;top:78%;font-size:2.8rem;--d:1.1s;--r:-22deg">♬</span>
-      <span class="mn" style="left:75%;top:90%;font-size:3.5rem;--d:3.3s;--r:15deg">♫</span>
-      <span class="mn" style="left:90%;top:72%;font-size:3rem;--d:0.7s;--r:-5deg">♩</span>
-    </div>
 
     <!-- NAV -->
     <nav id="mainNav">
+      <div class="nav-inner">
       <a href="#" class="nav-brand">
         <img
           src=""
@@ -55,7 +30,7 @@
           "
           style="display: none"
         />
-        <span class="nav-brand-fb" style="display: none">Lina's Music</span>
+        <span class="nav-brand-fb" style="display: none">Lina's Studio</span>
       </a>
       <div class="nav-center">
         <ul class="nav-links">
@@ -85,12 +60,13 @@
           >Пробный урок →</a
         >
       </div>
+      </div>
     </nav>
 
     <!-- MOBILE MENU -->
     <div class="mobile-menu" id="mobileMenu">
       <div class="mobile-menu-topbar">
-        <span class="mobile-menu-logo">Lina's Music</span>
+        <span class="mobile-menu-logo">Lina's Studio</span>
         <button class="mobile-menu-x" onclick="toggleMenu()">✕</button>
       </div>
       <a href="#founder" onclick="toggleMenu()" data-i18n="nav.about"
@@ -105,17 +81,36 @@
       <a href="#contact" onclick="toggleMenu()" data-i18n="nav.contact"
         >Контакты</a
       >
-      <a
-        href="#contact"
-        class="mobile-menu-cta"
-        onclick="toggleMenu()"
-        data-i18n="nav.menuCta"
-        >Записаться на пробный урок →</a
-      >
     </div>
 
     <!-- HERO -->
     <section class="hero">
+    <!-- Music note decorations -->
+    <div class="music-deco" aria-hidden="true">
+      <span class="mn" style="left:4%;top:8%;font-size:4.5rem;--d:0s;--r:-15deg">𝄞</span>
+      <span class="mn" style="left:18%;top:22%;font-size:3rem;--d:1.2s;--r:10deg">♩</span>
+      <span class="mn" style="left:32%;top:5%;font-size:3.5rem;--d:2.4s;--r:-8deg">♪</span>
+      <span class="mn" style="left:48%;top:14%;font-size:2.5rem;--d:0.6s;--r:20deg">♫</span>
+      <span class="mn" style="left:62%;top:3%;font-size:5rem;--d:3.1s;--r:-12deg">𝄢</span>
+      <span class="mn" style="left:76%;top:18%;font-size:3.2rem;--d:1.8s;--r:5deg">♩</span>
+      <span class="mn" style="left:88%;top:7%;font-size:2.8rem;--d:2.9s;--r:-20deg">♬</span>
+
+      <span class="mn" style="left:8%;top:38%;font-size:3.6rem;--d:0.9s;--r:14deg">♫</span>
+      <span class="mn" style="left:23%;top:52%;font-size:5.5rem;--d:2.2s;--r:-6deg">𝄞</span>
+      <span class="mn" style="left:40%;top:44%;font-size:2.6rem;--d:3.5s;--r:18deg">♪</span>
+      <span class="mn" style="left:55%;top:60%;font-size:4rem;--d:1s;--r:-10deg">♩</span>
+      <span class="mn" style="left:70%;top:40%;font-size:3rem;--d:4s;--r:8deg">♬</span>
+      <span class="mn" style="left:85%;top:55%;font-size:4.8rem;--d:0.4s;--r:-18deg">𝄢</span>
+      <span class="mn" style="left:93%;top:35%;font-size:3.2rem;--d:2.7s;--r:22deg">♫</span>
+
+      <span class="mn" style="left:2%;top:70%;font-size:3.8rem;--d:1.5s;--r:-9deg">♩</span>
+      <span class="mn" style="left:15%;top:82%;font-size:4rem;--d:3.8s;--r:12deg">𝄞</span>
+      <span class="mn" style="left:30%;top:75%;font-size:3.2rem;--d:0.3s;--r:-16deg">♪</span>
+      <span class="mn" style="left:45%;top:88%;font-size:5rem;--d:2.6s;--r:7deg">𝄢</span>
+      <span class="mn" style="left:60%;top:78%;font-size:2.8rem;--d:1.1s;--r:-22deg">♬</span>
+      <span class="mn" style="left:75%;top:90%;font-size:3.5rem;--d:3.3s;--r:15deg">♫</span>
+      <span class="mn" style="left:90%;top:72%;font-size:3rem;--d:0.7s;--r:-5deg">♩</span>
+    </div>
       <div class="hero-bg"><img src="hero-concert.jpg" alt="Concert" /></div>
       <div id="dotGrid"></div>
       <div class="hero-inner">
@@ -148,20 +143,32 @@
 
     <!-- TRUSTED -->
     <div class="trusted">
-      <div class="trusted-in">
-        <span class="trusted-label">Жанры</span>
-        <div class="trusted-logos">
-          <span class="tlogo">Pop</span><span class="tlogo">Jazz</span
-          ><span class="tlogo">Soul</span> <span class="tlogo">Folk</span
-          ><span class="tlogo">Rock</span><span class="tlogo">Opera</span>
-          <span class="tlogo">R&amp;B</span><span class="tlogo">Musical</span
-          ><span class="tlogo">Extreme</span>
+      <div class="trusted-marquee-wrap">
+        <div class="trusted-marquee-track">
+          <span class="tlogo">Pop</span><span class="tlogo-sep">·</span>
+          <span class="tlogo">Jazz</span><span class="tlogo-sep">·</span>
+          <span class="tlogo">Soul</span><span class="tlogo-sep">·</span>
+          <span class="tlogo">Folk</span><span class="tlogo-sep">·</span>
+          <span class="tlogo">Rock</span><span class="tlogo-sep">·</span>
+          <span class="tlogo">Opera</span><span class="tlogo-sep">·</span>
+          <span class="tlogo">R&amp;B</span><span class="tlogo-sep">·</span>
+          <span class="tlogo">Musical</span><span class="tlogo-sep">·</span>
+          <span class="tlogo">Extreme</span><span class="tlogo-sep">·</span>
+          <span class="tlogo">Pop</span><span class="tlogo-sep">·</span>
+          <span class="tlogo">Jazz</span><span class="tlogo-sep">·</span>
+          <span class="tlogo">Soul</span><span class="tlogo-sep">·</span>
+          <span class="tlogo">Folk</span><span class="tlogo-sep">·</span>
+          <span class="tlogo">Rock</span><span class="tlogo-sep">·</span>
+          <span class="tlogo">Opera</span><span class="tlogo-sep">·</span>
+          <span class="tlogo">R&amp;B</span><span class="tlogo-sep">·</span>
+          <span class="tlogo">Musical</span><span class="tlogo-sep">·</span>
+          <span class="tlogo">Extreme</span><span class="tlogo-sep">·</span>
         </div>
       </div>
     </div>
 
     <!-- FOUNDER -->
-    <div class="bg-dark" id="founder" style="position:relative;overflow:hidden">
+    <div class="bg-dark anim-section" id="founder" style="position:relative;overflow:hidden">
       <div class="mn-section" aria-hidden="true">
         <span class="mn" style="left:3%;top:12%;font-size:5rem;--d:0.3s;--r:-12deg">𝄞</span>
         <span class="mn" style="left:91%;top:8%;font-size:3.5rem;--d:1.7s;--r:14deg">♬</span>
@@ -1039,7 +1046,7 @@
     <div class="divider"></div>
 
     <!-- INSTRUMENT TEACHERS -->
-    <div class="bg-dark2" id="instruments" style="position:relative;overflow:hidden">
+    <div class="bg-dark2 anim-section" id="instruments" style="position:relative;overflow:hidden">
       <div class="mn-section" aria-hidden="true">
         <span class="mn" style="left:6%;top:20%;font-size:4.5rem;--d:1s;--r:10deg">♪</span>
         <span class="mn" style="left:88%;top:15%;font-size:5rem;--d:0s;--r:-8deg">𝄞</span>
@@ -1611,23 +1618,18 @@
     <div class="divider"></div>
 
     <!-- EVENTS -->
-    <div class="bg-dark2" id="events" style="position:relative;overflow:hidden">
+    <div class="bg-dark2 anim-section" id="events" style="position:relative;overflow:hidden">
       <div class="mn-section" aria-hidden="true">
-        <span class="mn" style="left:2%;top:30%;font-size:5.5rem;--d:0.5s;--r:-10deg">𝄢</span>
-        <span class="mn" style="left:90%;top:20%;font-size:3.8rem;--d:2s;--r:12deg">♫</span>
-        <span class="mn" style="left:55%;top:70%;font-size:4.2rem;--d:1.3s;--r:-15deg">♩</span>
-        <span class="mn" style="left:25%;top:60%;font-size:3rem;--d:3s;--r:18deg">𝄞</span>
-        <span class="mn" style="left:75%;top:80%;font-size:3.5rem;--d:0.8s;--r:-5deg">♪</span>
-        <span class="mn mn-m" style="left:40%;top:8%;font-size:4rem;--d:1.6s;--r:14deg">♬</span>
-        <span class="mn mn-m" style="left:65%;top:22%;font-size:3.2rem;--d:0.3s;--r:-19deg">♫</span>
-        <span class="mn mn-m" style="left:10%;top:48%;font-size:3.8rem;--d:2.9s;--r:8deg">♩</span>
-        <span class="mn mn-m" style="left:82%;top:50%;font-size:4.5rem;--d:1.1s;--r:-6deg">𝄞</span>
-        <span class="mn mn-m" style="left:35%;top:38%;font-size:3rem;--d:3.7s;--r:21deg">♪</span>
-        <span class="mn mn-m" style="left:58%;top:52%;font-size:3.5rem;--d:0.6s;--r:-13deg">𝄢</span>
-        <span class="mn mn-m" style="left:15%;top:78%;font-size:4rem;--d:2.4s;--r:10deg">♬</span>
-        <span class="mn mn-m" style="left:48%;top:88%;font-size:3.2rem;--d:3.2s;--r:-8deg">♫</span>
-        <span class="mn mn-m" style="left:88%;top:88%;font-size:3.8rem;--d:0.9s;--r:17deg">♩</span>
-        <span class="mn mn-m" style="left:70%;top:40%;font-size:2.8rem;--d:4.3s;--r:-3deg">𝄞</span>
+        <span class="mn" style="left:2%;top:15%;font-size:5.5rem;--d:0.5s;--r:-10deg">𝄢</span>
+        <span class="mn" style="left:1%;top:70%;font-size:3.8rem;--d:2s;--r:12deg">♫</span>
+        <span class="mn" style="left:3%;top:88%;font-size:3.5rem;--d:0.8s;--r:-5deg">♪</span>
+        <span class="mn" style="left:96%;top:10%;font-size:4rem;--d:1.6s;--r:14deg">♬</span>
+        <span class="mn" style="left:95%;top:45%;font-size:4.5rem;--d:1.1s;--r:-6deg">𝄞</span>
+        <span class="mn" style="left:97%;top:80%;font-size:3.8rem;--d:0.9s;--r:17deg">♩</span>
+        <span class="mn mn-m" style="left:1%;top:42%;font-size:3.8rem;--d:2.9s;--r:8deg">♩</span>
+        <span class="mn mn-m" style="left:94%;top:65%;font-size:3.2rem;--d:0.3s;--r:-19deg">♫</span>
+        <span class="mn mn-m" style="left:2%;top:58%;font-size:3rem;--d:3s;--r:18deg">𝄞</span>
+        <span class="mn mn-m" style="left:96%;top:30%;font-size:2.8rem;--d:4.3s;--r:-3deg">𝄢</span>
       </div>
       <div class="wrap">
         <div class="section">
@@ -1971,7 +1973,7 @@
     </div>
 
     <!-- GALLERY -->
-    <div class="bg-dark" id="gallery" style="position:relative;overflow:hidden">
+    <div class="bg-dark anim-section" id="gallery" style="position:relative;overflow:hidden">
       <div class="mn-section" aria-hidden="true">
         <span class="mn" style="left:5%;top:10%;font-size:4rem;--d:1.4s;--r:8deg">♬</span>
         <span class="mn" style="left:92%;top:25%;font-size:5rem;--d:0.2s;--r:-14deg">𝄞</span>
@@ -2291,7 +2293,7 @@
       <!-- Logo -->
       <div class="footer-logo">
         <img src="" alt="Logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" style="display:none" />
-        <span class="footer-bt">Lina's Music</span>
+        <span class="footer-bt">Lina's Studio</span>
       </div>
 
       <!-- Nav links - 2 columns -->

@@ -49,6 +49,17 @@ const obs = new IntersectionObserver((entries) => {
 }, { threshold: 0.07 });
 revs.forEach((el) => obs.observe(el));
 
+// Pause infinite animations when section is out of viewport
+const animTargets = [
+  document.querySelector(".hero"),
+  ...document.querySelectorAll(".anim-section"),
+  ...document.querySelectorAll(".marquee-outer"),
+].filter(Boolean);
+const animObs = new IntersectionObserver((entries) => {
+  entries.forEach((e) => e.target.classList.toggle("in-view", e.isIntersecting));
+}, { threshold: 0 });
+animTargets.forEach((el) => { el.classList.add("in-view"); animObs.observe(el); });
+
 function filterTeachers(cat, btn) {
   document.querySelectorAll(".ftab").forEach((b) => b.classList.remove("active"));
   btn.classList.add("active");
