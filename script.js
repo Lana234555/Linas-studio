@@ -63,25 +63,65 @@ animTargets.forEach((el) => { el.classList.add("in-view"); animObs.observe(el); 
 function filterTeachers(cat, btn) {
   document.querySelectorAll(".ftab").forEach((b) => b.classList.remove("active"));
   btn.classList.add("active");
-  document.querySelectorAll(".teacher-card").forEach((card) => {
-    if (cat === "all" || card.dataset.cat === cat) {
-      card.classList.remove("hidden");
-      setTimeout(() => card.classList.add("in"), 80);
-    } else {
-      card.classList.add("hidden");
-    }
-  });
+  const cards = document.querySelectorAll(".teacher-card");
+  cards.forEach(card => { card.style.opacity = "0"; });
+  setTimeout(() => {
+    cards.forEach(card => {
+      if (cat === "all" || card.dataset.cat === cat) {
+        card.classList.remove("hidden");
+        card.style.opacity = "1";
+      } else {
+        card.classList.add("hidden");
+        card.style.opacity = "";
+      }
+    });
+  }, 250);
 }
 
-function showPricing(id, btn) {
-  document.querySelectorAll(".ptab").forEach((b) => b.classList.remove("active"));
-  document.querySelectorAll(".pricing-panel").forEach((p) => p.classList.remove("active"));
+function showPricingTab(id, btn, panelSelector) {
+  btn.closest(".ptabs").querySelectorAll(".ptab").forEach((b) => b.classList.remove("active"));
+  document.querySelectorAll(panelSelector).forEach((p) => p.classList.remove("active"));
   btn.classList.add("active");
-  document.getElementById(id).classList.add("active");
-  document.querySelectorAll("#" + id + " .reveal").forEach((el) => {
+  const panel = document.getElementById(id);
+  panel.classList.add("active");
+  panel.querySelectorAll(".reveal").forEach((el) => {
     el.classList.remove("in");
     setTimeout(() => el.classList.add("in"), 80);
   });
+}
+
+function showPricing(id, btn) { showPricingTab(id, btn, ".pricing-panel"); }
+function showInstrPricing(id, btn) { showPricingTab(id, btn, ".instr-pricing-panel"); }
+
+const vocalData = {
+  vb: { titleSuffix: " / Фортепиано", sub: "Преподаватели Basic · начинающий и средний уровень, дети и взрослые", trialVal: "120 zł", singleVal: "170 zł", sub4note: "160 zł / урок", sub4val: "640 zł", sub4disc: "−6% от разового", sub8note: "150 zł / урок", sub8val: "1200 zł", sub8disc: "−12% от разового" },
+  vp: { titleSuffix: " / Фортепиано\u00A0PRO", sub: "Катерина Корниюк · расширенный репертуар техник, PRO-уровень", trialVal: "120 zł", singleVal: "200 zł", sub4note: "190 zł / урок", sub4val: "760 zł", sub4disc: "−5% от разового", sub8note: "180 zł / урок", sub8val: "1440 zł", sub8disc: "−10% от разового" },
+  vt: { titleSuffix: "\u00A0TOP", sub: "Лина Поверга · продолжающий и профессиональный уровень, подростки и взрослые", trialVal: "200 zł", singleVal: "250 zł", sub4note: "240 zł / урок", sub4val: "960 zł", sub4disc: "−4% от разового", sub8note: "230 zł / урок", sub8val: "1840 zł", sub8disc: "−8% от разового" }
+};
+const instrData = {
+  ib2: { titleSuffix: "", sub: "Сергей Панасенко, Евгений Велько · начинающий и продолжающий уровень", trialVal: "120 zł", singleVal: "170 zł", sub4note: "160 zł / урок", sub4val: "640 zł", sub4disc: "−6% от разового", sub8note: "150 zł / урок", sub8val: "1200 zł", sub8disc: "−12% от разового" },
+  ip2: { titleSuffix: "\u00A0PRO", sub: "Катерина Корниюк · продолжающий и профессиональный уровень", trialVal: "120 zł", singleVal: "200 zł", sub4note: "190 zł / урок", sub4val: "760 zł", sub4disc: "−5% от разового", sub8note: "180 zł / урок", sub8val: "1440 zł", sub8disc: "−10% от разового" }
+};
+
+function updateTabVals(panelId, data) {
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+  const vals = panel.querySelectorAll(".tab-val");
+  vals.forEach(el => { el.style.opacity = "0"; el.style.transform = "translateY(-5px)"; });
+  setTimeout(() => {
+    vals.forEach(el => { el.textContent = data[el.dataset.tv]; el.style.opacity = "1"; el.style.transform = "translateY(0)"; });
+  }, 180);
+}
+
+function showVocalTab(id, btn) {
+  btn.closest(".ptabs").querySelectorAll(".ptab").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  updateTabVals("vocal-panel", vocalData[id]);
+}
+function showInstrTab(id, btn) {
+  btn.closest(".ptabs").querySelectorAll(".ptab").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  updateTabVals("instr-panel", instrData[id]);
 }
 
 // Gallery lightbox
@@ -210,6 +250,24 @@ document.getElementById("submitBtn").addEventListener("click", function () {
     emailField.focus();
     return;
   }
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbxLNCAy8jMUZ5P0Gh3DsbBQW3OLFwMiKH6qX7S01opibT9MTQjaornAQ9U7tiFykRk-5Q/exec";
+
+  const payload = {
+    name: nameField.value.trim(),
+    phone: phoneField.value.trim(),
+    email: emailField.value.trim(),
+    instrument: (document.getElementById("instrumentField") || {}).value || "",
+    teacher: (document.getElementById("teacherField") || {}).value || "",
+    comment: (document.getElementById("commentField") || {}).value || ""
+  };
+
+  fetch(SHEET_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  }).catch(() => {});
+
   showSuccessMessage();
 });
 

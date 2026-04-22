@@ -13,7 +13,7 @@
       },
       hero: {
         chip: "Музыкальная студия · Варшава",
-        h1: "Развивай<br />свой <em>голос</em><br />с нами.",
+        h1: "Развивай<br />свой <em>голос</em><br />с нами",
         sub: "Вокал, инструменты, живые концерты и творческое сообщество. Растим и вдохновляем музыкантов любого уровня уже 5 лет.",
         cta1: "Пробный урок",
         cta2: "Наши преподаватели",
@@ -66,7 +66,7 @@
         blues: { name: "Зал «Блюз»", badge: "Звукозапись · Вокал" },
         jazz: { name: "Зал «Джаз»", badge: "Вокал · Фортепиано · Малый бенд" },
         rock: { name: "Зал «Рок»", badge: "Самый большой · до 15 человек" },
-        count: { name: "Зал «Count»", badge: "Вокал · Фортепиано · Группы" },
+        count: { name: "Зал «Country»", badge: "Вокал · Фортепиано · Группы" },
       },
       events: {
         chip: "Жизнь студии",
@@ -106,7 +106,7 @@
       },
       hero: {
         chip: "Музична студія · Варшава · з 2020 року",
-        h1: "Розвивай<br />свій <em>голос</em><br />з нами.",
+        h1: "Розвивай<br />свій <em>голос</em><br />з нами",
         sub: "Вокал, інструменти, живі концерти та творча спільнота. Ростимо та надихаємо музикантів будь-якого рівня вже 5 років.",
         cta1: "Пробний урок",
         cta2: "Наші викладачі",
@@ -159,7 +159,7 @@
         blues: { name: "Зал «Блюз»", badge: "Звукозапис · Вокал" },
         jazz: { name: "Зал «Джаз»", badge: "Вокал · Фортепіано · Малий бенд" },
         rock: { name: "Зал «Рок»", badge: "Найбільший · до 15 осіб" },
-        count: { name: "Зал «Count»", badge: "Вокал · Фортепіано · Групи" },
+        count: { name: "Зал «Country»", badge: "Вокал · Фортепіано · Групи" },
       },
       events: {
         chip: "Життя студії",
@@ -199,7 +199,7 @@
       },
       hero: {
         chip: "Studio muzyczne · Warszawa · od 2020",
-        h1: "Rozwijaj<br />swój <em>głos</em><br />z nami.",
+        h1: "Rozwijaj<br />swój <em>głos</em><br />z nami",
         sub: "Wokal, instrumenty, koncerty na żywo i kreatywna społeczność. Rozwijamy i inspirujemy muzyków na każdym poziomie od 5 lat.",
         cta1: "Lekcja próbna",
         cta2: "Nasi nauczyciele",
@@ -252,7 +252,7 @@
         blues: { name: "Sala «Blues»", badge: "Nagrania · Wokal" },
         jazz: { name: "Sala «Jazz»", badge: "Wokal · Fortepian · Mały band" },
         rock: { name: "Sala «Rock»", badge: "Największa · do 15 osób" },
-        count: { name: "Sala «Count»", badge: "Wokal · Fortepian · Grupy" },
+        count: { name: "Sala «Country»", badge: "Wokal · Fortepian · Grupy" },
       },
       events: {
         chip: "Życie studia",
