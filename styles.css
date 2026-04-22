@@ -853,6 +853,7 @@ footer {
   .footer-nav { grid-template-columns: 1fr 1fr 1fr; }
   .support-btn { width: 48px; height: 48px; }
 }
+.pricing-cards-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 @media (max-width: 768px) {
   .mn-m { display: none; }
   .nav-links { display: none; }
