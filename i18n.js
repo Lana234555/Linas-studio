@@ -78,7 +78,7 @@
       cert: { from: "от", btn: "Получить сертификат →" },
       contact: {
         chip: "Контакты",
-        cityVal: "Варшава, Польша",
+        cityVal: '<a href="https://maps.app.goo.gl/wKpDDY1Lx38wNLuT8" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;">Aleja Prymasa Tysiąclecia 66, Warszawa</a>',
         directionLabel: "Направление",
       },
       validation: {
@@ -171,7 +171,7 @@
       cert: { from: "від", btn: "Отримати сертифікат →" },
       contact: {
         chip: "Контакти",
-        cityVal: "Варшава, Польща",
+        cityVal: '<a href="https://maps.app.goo.gl/wKpDDY1Lx38wNLuT8" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;">Aleja Prymasa Tysiąclecia 66, Warszawa</a>',
         directionLabel: "Напрямок",
       },
       validation: {
@@ -264,7 +264,7 @@
       cert: { from: "od", btn: "Otrzymaj certyfikat →" },
       contact: {
         chip: "Kontakt",
-        cityVal: "Warszawa, Polska",
+        cityVal: '<a href="https://maps.app.goo.gl/wKpDDY1Lx38wNLuT8" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;">Aleja Prymasa Tysiąclecia 66, Warszawa</a>',
         directionLabel: "Kierunek",
       },
       validation: {
