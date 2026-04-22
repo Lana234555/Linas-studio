@@ -813,6 +813,7 @@ footer {
 @media (max-width: 768px) {
   .mn-m { display: none; }
   .nav-links { display: none; }
+  .nav-right .btn-pill { display: none; }
   .halls-grid, .pricing-panel.active, .events-grid, .instr-teachers-grid { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
   .teachers-grid { grid-template-columns: 1fr; }
