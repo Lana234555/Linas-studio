@@ -256,9 +256,8 @@ document.getElementById("submitBtn").addEventListener("click", function () {
     name: nameField.value.trim(),
     phone: phoneField.value.trim(),
     email: emailField.value.trim(),
-    instrument: (document.getElementById("instrumentField") || {}).value || "",
-    teacher: (document.getElementById("teacherField") || {}).value || "",
-    comment: (document.getElementById("commentField") || {}).value || ""
+    instrument: (document.getElementById("directionSelect") || {}).value || "",
+    comment: (document.getElementById("messageField") || {}).value || ""
   };
 
   fetch(SHEET_URL, {
