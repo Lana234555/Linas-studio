@@ -250,7 +250,7 @@ document.getElementById("submitBtn").addEventListener("click", function () {
     emailField.focus();
     return;
   }
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbwCVjllhU8i4syX0DP0fULfl1rRwBTRs7HRfGT2aS1Vo32oHMC-kaivijhNRI224aSkHQ/exec";
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbznZCypbVozPk_Uj0r2pqAUpvj-Af765bJeIBy2tlavhDmOZKL8hCNVvuUpgAOQYOTX-g/exec";
 
   const payload = {
     name: nameField.value.trim(),
