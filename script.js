@@ -224,7 +224,25 @@ adjustInstrGrid();
 window.addEventListener("resize", adjustInstrGrid);
 
 // Form submission
+const RATE_LIMIT_KEY = "lms_submit_times";
+const RATE_LIMIT_MAX = 3;       // max submissions
+const RATE_LIMIT_WINDOW = 10 * 60 * 1000; // per 10 minutes
+
+function checkRateLimit() {
+  const now = Date.now();
+  let times = JSON.parse(localStorage.getItem(RATE_LIMIT_KEY) || "[]");
+  times = times.filter(t => now - t < RATE_LIMIT_WINDOW);
+  if (times.length >= RATE_LIMIT_MAX) return false;
+  times.push(now);
+  localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(times));
+  return true;
+}
+
 document.getElementById("submitBtn").addEventListener("click", function () {
+  // Honeypot check — bots fill hidden field, humans leave it empty
+  const honeypot = document.getElementById("websiteField");
+  if (honeypot && honeypot.value.trim() !== "") return;
+
   const nameField = document.getElementById("nameField");
   const phoneField = document.getElementById("phoneField");
   const emailField = document.getElementById("emailField");
@@ -250,9 +268,19 @@ document.getElementById("submitBtn").addEventListener("click", function () {
     emailField.focus();
     return;
   }
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbzoxAs96YKJ5eOqNmOIZNI9ncUevBpjww9GAe9PUiLNMDQd0PLCGzlyHmaSfIIrr8o-6A/exec";
+
+  // Rate limit check
+  if (!checkRateLimit()) {
+    alert("Ви надіслали забагато заявок. Спробуйте через 10 хвилин.");
+    return;
+  }
+
+  const cfg = window.APP_CONFIG || {};
+  const SHEET_URL = cfg.sheetUrl;
+  if (!SHEET_URL) { console.error("APP_CONFIG.sheetUrl not set"); return; }
 
   const payload = {
+    token: cfg.formToken || "",
     name: nameField.value.trim(),
     phone: phoneField.value.trim(),
     email: emailField.value.trim(),

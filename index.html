@@ -1640,6 +1640,11 @@
                     placeholder="Расскажи о себе — опыт, цели, вопросы..."
                   ></textarea>
                 </div>
+                <!-- honeypot: invisible to humans, bots fill it -->
+                <div style="position:absolute;left:-9999px;top:-9999px;height:0;overflow:hidden" aria-hidden="true">
+                  <label>Leave this empty</label>
+                  <input type="text" id="websiteField" name="website" tabindex="-1" autocomplete="off" />
+                </div>
                 <button
                   type="button"
                   class="btn-pill btn-teal"
@@ -2027,6 +2032,7 @@
     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
   </svg>
 </a>
+<script src="config.js"></script>
 <script src="i18n.js"></script>
 <script src="script.js"></script>
 </body>
