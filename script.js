@@ -276,7 +276,7 @@ document.getElementById("submitBtn").addEventListener("click", function () {
   }
 
   const SHEET_URL = (window.APP_CONFIG && window.APP_CONFIG.sheetUrl)
-    || "https://linas-form-proxy.darienkosvetlana338.workers.dev";
+    || "https://linas-music-prox.darienkosvetlana338.workers.dev";
   const formToken = (window.APP_CONFIG && window.APP_CONFIG.formToken)
     || "LMS-2025-SECRET";
 
