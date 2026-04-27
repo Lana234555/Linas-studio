@@ -275,12 +275,13 @@ document.getElementById("submitBtn").addEventListener("click", function () {
     return;
   }
 
-  const cfg = window.APP_CONFIG || {};
-  const SHEET_URL = cfg.sheetUrl;
-  if (!SHEET_URL) { console.error("APP_CONFIG.sheetUrl not set"); return; }
+  const SHEET_URL = (window.APP_CONFIG && window.APP_CONFIG.sheetUrl)
+    || "https://linas-form-proxy.darienkosvetlana338.workers.dev";
+  const formToken = (window.APP_CONFIG && window.APP_CONFIG.formToken)
+    || "LMS-2025-SECRET";
 
   const payload = {
-    token: cfg.formToken || "",
+    token: formToken,
     name: nameField.value.trim(),
     phone: phoneField.value.trim(),
     email: emailField.value.trim(),
