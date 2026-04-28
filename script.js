@@ -114,13 +114,13 @@ function showPricing(id, btn) { showPricingTab(id, btn, ".pricing-panel"); }
 function showInstrPricing(id, btn) { showPricingTab(id, btn, ".instr-pricing-panel"); }
 
 const vocalData = {
-  vb: { titleSuffix: " / Фортепиано", sub: "pricing.vocal_basic_sub", trialVal: "120 zł", singleVal: "170 zł", sub4note: "160 zł / урок", sub4val: "640 zł", sub4disc: "−6% от разового", sub8note: "150 zł / урок", sub8val: "1200 zł", sub8disc: "−12% от разового" },
-  vp: { titleSuffix: " / Фортепиано\u00A0PRO", sub: "pricing.vocal_pro_sub", trialVal: "120 zł", singleVal: "200 zł", sub4note: "190 zł / урок", sub4val: "760 zł", sub4disc: "−5% от разового", sub8note: "180 zł / урок", sub8val: "1440 zł", sub8disc: "−10% от разового" },
-  vt: { titleSuffix: "\u00A0TOP", sub: "pricing.vocal_top_sub", trialVal: "200 zł", singleVal: "250 zł", sub4note: "240 zł / урок", sub4val: "960 zł", sub4disc: "−4% от разового", sub8note: "230 zł / урок", sub8val: "1840 zł", sub8disc: "−8% от разового" }
+  vb: { titleSuffix: "pricing.vocal_basic_suffix", sub: "pricing.vocal_basic_sub", trialVal: "120 zł", singleVal: "170 zł", sub4note: "160 zł|pricing.perLesson", sub4val: "640 zł", sub4disc: "pricing.disc6", sub8note: "150 zł|pricing.perLesson", sub8val: "1200 zł", sub8disc: "pricing.disc12" },
+  vp: { titleSuffix: "pricing.vocal_pro_suffix", sub: "pricing.vocal_pro_sub", trialVal: "120 zł", singleVal: "200 zł", sub4note: "190 zł|pricing.perLesson", sub4val: "760 zł", sub4disc: "pricing.disc5", sub8note: "180 zł|pricing.perLesson", sub8val: "1440 zł", sub8disc: "pricing.disc10" },
+  vt: { titleSuffix: "\u00A0TOP", sub: "pricing.vocal_top_sub", trialVal: "200 zł", singleVal: "250 zł", sub4note: "240 zł|pricing.perLesson", sub4val: "960 zł", sub4disc: "pricing.disc4", sub8note: "230 zł|pricing.perLesson", sub8val: "1840 zł", sub8disc: "pricing.disc8" }
 };
 const instrData = {
-  ib2: { titleSuffix: "", sub: "pricing.instr_basic_sub", trialVal: "120 zł", singleVal: "170 zł", sub4note: "160 zł / урок", sub4val: "640 zł", sub4disc: "−6% от разового", sub8note: "150 zł / урок", sub8val: "1200 zł", sub8disc: "−12% от разового" },
-  ip2: { titleSuffix: "\u00A0PRO", sub: "pricing.instr_pro_sub", trialVal: "120 zł", singleVal: "200 zł", sub4note: "190 zł / урок", sub4val: "760 zł", sub4disc: "−5% от разового", sub8note: "180 zł / урок", sub8val: "1440 zł", sub8disc: "−10% от разового" }
+  ib2: { titleSuffix: "", sub: "pricing.instr_basic_sub", trialVal: "120 zł", singleVal: "170 zł", sub4note: "160 zł|pricing.perLesson", sub4val: "640 zł", sub4disc: "pricing.disc6", sub8note: "150 zł|pricing.perLesson", sub8val: "1200 zł", sub8disc: "pricing.disc12" },
+  ip2: { titleSuffix: "\u00A0PRO", sub: "pricing.instr_pro_sub", trialVal: "120 zł", singleVal: "200 zł", sub4note: "190 zł|pricing.perLesson", sub4val: "760 zł", sub4disc: "pricing.disc5", sub8note: "180 zł|pricing.perLesson", sub8val: "1440 zł", sub8disc: "pricing.disc10" }
 };
 
 function updateTabVals(panelId, data) {
@@ -131,8 +131,12 @@ function updateTabVals(panelId, data) {
   setTimeout(() => {
     vals.forEach(el => {
       let val = data[el.dataset.tv];
-      if (typeof val === "string" && val.startsWith("pricing.") && window.i18n) {
-        val = window.i18n.t(val);
+      if (typeof val === "string") {
+        if (val.includes("|")) {
+          val = val.split("|").map(p => (p.startsWith("pricing.") && window.i18n) ? window.i18n.t(p) : p).join("");
+        } else if (val.startsWith("pricing.") && window.i18n) {
+          val = window.i18n.t(val);
+        }
       }
       el.textContent = val;
       el.style.opacity = "1";
@@ -276,7 +280,8 @@ function checkRateLimit() {
   return true;
 }
 
-document.getElementById("submitBtn").addEventListener("click", function () {
+const _submitBtn = document.getElementById("submitBtn");
+if (_submitBtn) _submitBtn.addEventListener("click", function () {
   // Honeypot check — bots fill hidden field, humans leave it empty
   const honeypot = document.getElementById("websiteField");
   if (honeypot && honeypot.value.trim() !== "") return;

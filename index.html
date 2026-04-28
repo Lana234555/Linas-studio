@@ -3,7 +3,41 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lina's Music Studio — Варшава</title>
+    <title>Lina's Music Studio Варшава — Уроки вокала, гитары и фортепиано</title>
+    <meta name="description" content="Музыкальная студия в Варшаве: уроки вокала, гитары, укулеле и фортепиано. Профессиональные педагоги, дети и взрослые. Пробный урок от 70 zł. Аренда репетиционных залов." />
+    <meta name="keywords" content="уроки вокала Варшава, музыкальная студия Варшава, уроки гитары Варшава, уроки фортепиано Варшава, вокальная студия, nauka śpiewu Warszawa, szkoła muzyczna Warszawa" />
+    <link rel="canonical" href="https://linasmusicgroup.org/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://linasmusicgroup.org/" />
+    <meta property="og:title" content="Lina's Music Studio — Вокал и инструменты в Варшаве" />
+    <meta property="og:description" content="Профессиональные уроки вокала, гитары и фортепиано в Варшаве. Опытные педагоги, аренда залов. Пробный урок от 70 zł." />
+    <meta property="og:image" content="https://linasmusicgroup.org/hero-concert.jpg" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:site_name" content="Lina's Music Studio" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Lina's Music Studio — Вокал и инструменты в Варшаве" />
+    <meta name="twitter:description" content="Уроки вокала, гитары и фортепиано в Варшаве. Запишись на пробный урок." />
+    <meta name="twitter:image" content="https://linasmusicgroup.org/hero-concert.jpg" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "MusicSchool",
+      "name": "Lina's Music Studio",
+      "url": "https://linasmusicgroup.org",
+      "description": "Профессиональная музыкальная студия в Варшаве: уроки вокала, гитары, укулеле и фортепиано.",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Aleja Prymasa Tysiąclecia 66",
+        "addressLocality": "Warszawa",
+        "addressCountry": "PL"
+      },
+      "email": "linasvokalstudio@gmail.com",
+      "priceRange": "70–300 zł",
+      "image": "https://linasmusicgroup.org/hero-concert.jpg",
+      "founder": { "@type": "Person", "name": "Lina Poverga" },
+      "sameAs": ["https://www.instagram.com/linas_music_studio"]
+    }
+    </script>
     <link rel="icon" type="image/png" href="logo lina's.png" />
     <link
       href="https://fonts.googleapis.com/css2?family=Alice&family=Geologica:wght@300;400;500;600&display=swap"
@@ -49,8 +83,8 @@
           </button>
           <ul class="lang-dropdown" id="langDropdown">
             <li onclick="selectLang('ru', 'RU')">Русский</li>
-            <li onclick="selectLang('en', 'EN')">English</li>
             <li onclick="selectLang('pl', 'PL')">Polski</li>
+            <li onclick="selectLang('be', 'BE')">Беларуская</li>
           </ul>
         </div>
         <button
@@ -186,8 +220,8 @@
               />
               <div class="founder-photo-overlay"></div>
               <div class="founder-badge">
-                <div class="founder-badge-title">Основатель студии</div>
-                <div class="founder-badge-val">
+                <div class="founder-badge-title" data-i18n="about.founderTitle">Основатель студии</div>
+                <div class="founder-badge-val" data-i18n="about.founderVal">
                   Lina's Music Studio · Варшава · 2020
                 </div>
               </div>
@@ -328,7 +362,7 @@
                 <div class="tc-role" data-i18n="teachers.lina.role">
                   Вокал TOP · Основатель
                 </div>
-                <div class="tc-name">Лина Поверга</div>
+                <div class="tc-name" data-i18n="teachers.lina.name">Лина Поверга</div>
                 <p class="tc-bio" data-i18n="teachers.lina.bio">
                   Современные техники: субтон, твенг, бэлтинг, фальцет, микст,
                   академический звук. Экстрим: штробас, фрай, скрим, гроул,
@@ -396,7 +430,7 @@
                 <div class="tc-role" data-i18n="teachers.kateryna.role">
                   Вокал / Фортепиано PRO
                 </div>
-                <div class="tc-name">Катерина Корниюк</div>
+                <div class="tc-name" data-i18n="teachers.kateryna.name">Катерина Корниюк</div>
                 <p class="tc-bio" data-i18n="teachers.kateryna.bio">
                   R&amp;B, поп, мюзикл, рок, соул, рэп. Постановка голоса,
                   дыхание, сценический образ, ритм, импровизация. Техники: микс,
@@ -456,7 +490,7 @@
                 <div class="tc-role" data-i18n="teachers.yevheniy.role">
                   Вокал Basic · Фортепиано · Гитара
                 </div>
-                <div class="tc-name">Евгений Велько</div>
+                <div class="tc-name" data-i18n="teachers.yevheniy.name">Евгений Велько</div>
                 <p class="tc-bio" data-i18n="teachers.yevheniy.bio">
                   Научу играть на фортепиано и гитаре и знаю как совместить это
                   с пением. Пишу песни и саундтреки — помогу тебе в твоём
@@ -523,7 +557,7 @@
                 <div class="tc-role" data-i18n="teachers.ilona.role">
                   Вокал Basic
                 </div>
-                <div class="tc-name">Илона Бондар</div>
+                <div class="tc-name" data-i18n="teachers.ilona.name">Илона Бондар</div>
                 <p class="tc-bio" data-i18n="teachers.ilona.bio">
                   Постановка голоса: дыхание, интонирование, темп, ритм,
                   динамика. Техники: субтон, эстрадный звук, тванг, бэлтинг,
@@ -593,8 +627,8 @@
                 <button class="ptab" onclick="showVocalTab('vt', this)">Top</button>
               </div>
               <div id="vocal-panel">
-                <div class="pc-title">Вокал<span class="tab-val" data-tv="titleSuffix"> / Фортепиано</span></div>
-                <div class="pc-sub tab-val" data-tv="sub">Преподаватели Basic · начинающий и средний уровень, дети и взрослые</div>
+                <div class="pc-title"><span data-i18n="nav.vocal">Вокал</span><span class="tab-val" data-tv="titleSuffix"> / Фортепиано</span></div>
+                <div class="pc-sub tab-val" data-tv="sub" data-i18n="pricing.vocal_basic_sub">Преподаватели Basic · начинающий и средний уровень, дети и взрослые</div>
                 <div class="price-row">
                   <div class="pr-left">
                     <div class="pr-label" data-i18n="pricing.trial">Пробное занятие</div>
@@ -643,7 +677,7 @@
               <div class="pc-title" data-i18n="pricing.vocal_kids_title">
                 KIDS — Дети
               </div>
-              <div class="pc-sub">
+              <div class="pc-sub" data-i18n="pricing.vocal_kids_sub">
                 Индивидуальные занятия по вокалу, игре на инструментах и общее музыкальное развитие для детей от 4 до 10 лет
               </div>
               <div class="price-row">
@@ -679,7 +713,7 @@
                   <div class="pr-label" data-i18n="pricing.sub4">
                     Абонемент 4 занятия
                   </div>
-                  <div class="pr-note">115 zł / урок</div>
+                  <div class="pr-note">115 zł <span data-i18n="pricing.perLesson">/ урок</span></div>
                 </div>
                 <div class="pr-right">
                   <div class="pr-val">460 zł</div>
@@ -696,7 +730,7 @@
                   <div class="pr-label" data-i18n="pricing.sub8">
                     Абонемент 8 занятий
                   </div>
-                  <div class="pr-note">110 zł / урок</div>
+                  <div class="pr-note">110 zł <span data-i18n="pricing.perLesson">/ урок</span></div>
                 </div>
                 <div class="pr-right">
                   <div class="pr-val">880 zł</div>
@@ -767,7 +801,7 @@
                 <div class="tc-role" data-i18n="teachers.sergey.role">
                   Гитара · Укулеле · Преподаватель инструментов
                 </div>
-                <div class="tc-name">Сергей Панасенко</div>
+                <div class="tc-name" data-i18n="teachers.sergey.name">Сергей Панасенко</div>
                 <p class="tc-bio" data-i18n="teachers.sergey.bio">
                   Аппликатура и постановка рук, работа с темпом и ритмом, игра
                   по табулатуре и аккордами, динамика, аккомпанирование.
@@ -815,7 +849,7 @@
                 <div class="tc-role" data-i18n="teachers.kateryna_piano.role">
                   Фортепиано PRO · Преподаватель инструментов
                 </div>
-                <div class="tc-name">Катерина Корниюк</div>
+                <div class="tc-name" data-i18n="teachers.kateryna_piano.name">Катерина Корниюк</div>
                 <p class="tc-bio" data-i18n="teachers.kateryna_piano.bio">
                   Классическая и современная игра на фортепиано: постановка рук,
                   техника, работа с нотами, гармония, аккомпанирование. R&amp;B,
@@ -873,7 +907,7 @@
                 <div class="tc-role" data-i18n="teachers.yevheniy_piano.role">
                   Фортепиано · Гитара · Преподаватель инструментов
                 </div>
-                <div class="tc-name">Евгений Велько</div>
+                <div class="tc-name" data-i18n="teachers.yevheniy_piano.name">Евгений Велько</div>
                 <p class="tc-bio" data-i18n="teachers.yevheniy_piano.bio">
                   Научу играть на фортепиано и гитаре и знаю как совместить это
                   с пением. Постановка рук, работа с ритмом, игра по нотам и
@@ -920,6 +954,7 @@
                 margin-top: 10px;
                 margin-bottom: 28px;
               "
+              data-i18n-html="instruments.pricingTitle_html"
             >
               Прайс-лист <em>инструменты</em>
             </h3>
@@ -930,8 +965,8 @@
                   <button class="ptab" onclick="showInstrTab('ip2', this)">Pro</button>
                 </div>
                 <div id="instr-panel">
-                  <div class="pc-title">Гитара / Укулеле / Фортепиано<span class="tab-val" data-tv="titleSuffix"></span></div>
-                  <div class="pc-sub tab-val" data-tv="sub">Сергей Панасенко, Евгений Велько · начинающий и продолжающий уровень</div>
+                  <div class="pc-title"><span data-i18n="pricing.instr_basic_title">Гитара / Укулеле / Фортепиано</span><span class="tab-val" data-tv="titleSuffix"></span></div>
+                  <div class="pc-sub tab-val" data-tv="sub" data-i18n="pricing.instr_basic_sub">Сергей Панасенко, Евгений Велько · начинающий и продолжающий уровень</div>
                   <div class="price-row">
                     <div class="pr-left">
                       <div class="pr-label" data-i18n="pricing.trial">Пробное занятие</div>
@@ -980,7 +1015,7 @@
             <div class="pc-title" data-i18n="pricing.vocal_kids_title">
               KIDS — Дети
             </div>
-            <div class="pc-sub">
+            <div class="pc-sub" data-i18n="pricing.vocal_kids_sub">
               Индивидуальные занятия по вокалу, игре на инструментах и общее музыкальное развитие для детей от 4 до 10 лет
             </div>
             <div class="price-row">
@@ -1020,7 +1055,7 @@
                 <div class="pr-label" data-i18n="pricing.sub4">
                   Абонемент 4 занятия
                 </div>
-                <div class="pr-note">115 zł / урок</div>
+                <div class="pr-note">115 zł <span data-i18n="pricing.perLesson">/ урок</span></div>
               </div>
               <div class="pr-right">
                 <div class="pr-val">460 zł</div>
@@ -1037,7 +1072,7 @@
                 <div class="pr-label" data-i18n="pricing.sub8">
                   Абонемент 8 занятий
                 </div>
-                <div class="pr-note">110 zł / урок</div>
+                <div class="pr-note">110 zł <span data-i18n="pricing.perLesson">/ урок</span></div>
               </div>
               <div class="pr-right">
                 <div class="pr-val">880 zł</div>
@@ -2016,6 +2051,9 @@
         <a href="#instruments" data-i18n="nav.instruments">Инструменты</a>
         <a href="#halls" data-i18n="nav.halls">Залы</a>
         <a href="#contact" data-i18n="nav.contact">Контакты</a>
+        <a href="teachers.html" style="color:var(--teal)">Викладачі →</a>
+        <a href="prices.html" style="color:var(--teal)">Ціни →</a>
+        <a href="contacts.html" style="color:var(--teal)">Контакти →</a>
       </nav>
 
       <!-- Right - contacts + support block -->
