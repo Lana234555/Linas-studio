@@ -832,7 +832,20 @@
   window._currentLang = "ru";
 
   document.addEventListener("DOMContentLoaded", function () {
-    const saved = localStorage.getItem("lang") || "ru";
-    applyLang(["ru", "en", "pl", "be"].includes(saved) ? saved : "ru");
+    const supported = ["ru", "en", "pl", "be"];
+    const saved = localStorage.getItem("lang");
+    if (saved && supported.includes(saved)) {
+      applyLang(saved);
+      return;
+    }
+    // Auto-detect from browser language
+    const browserLangs = navigator.languages || [navigator.language || "ru"];
+    let detected = "ru";
+    for (const bl of browserLangs) {
+      const code = bl.toLowerCase().split("-")[0];
+      if (code === "uk") { detected = "ru"; break; } // Ukrainian → Russian fallback
+      if (supported.includes(code)) { detected = code; break; }
+    }
+    applyLang(detected);
   });
 })();
