@@ -1,3 +1,23 @@
+function toggleLangMenu() {
+  document.getElementById("langDropdown").classList.toggle("open");
+  document.getElementById("langSwitcher").classList.toggle("open");
+}
+
+function selectLang(code, label) {
+  document.getElementById("langSelectLabel").textContent = label;
+  document.getElementById("langDropdown").classList.remove("open");
+  document.getElementById("langSwitcher").classList.remove("open");
+  i18n.setLang(code);
+}
+
+document.addEventListener("click", function (e) {
+  const sw = document.getElementById("langSwitcher");
+  if (sw && !sw.contains(e.target)) {
+    document.getElementById("langDropdown").classList.remove("open");
+    sw.classList.remove("open");
+  }
+});
+
 function toggleMenu() {
   const m = document.getElementById("mobileMenu");
   const h = document.getElementById("navHamburger");
@@ -94,13 +114,13 @@ function showPricing(id, btn) { showPricingTab(id, btn, ".pricing-panel"); }
 function showInstrPricing(id, btn) { showPricingTab(id, btn, ".instr-pricing-panel"); }
 
 const vocalData = {
-  vb: { titleSuffix: " / Фортепиано", sub: "Преподаватели Basic · начинающий и средний уровень, дети и взрослые", trialVal: "120 zł", singleVal: "170 zł", sub4note: "160 zł / урок", sub4val: "640 zł", sub4disc: "−6% от разового", sub8note: "150 zł / урок", sub8val: "1200 zł", sub8disc: "−12% от разового" },
-  vp: { titleSuffix: " / Фортепиано\u00A0PRO", sub: "Катерина Корниюк · расширенный репертуар техник, PRO-уровень", trialVal: "120 zł", singleVal: "200 zł", sub4note: "190 zł / урок", sub4val: "760 zł", sub4disc: "−5% от разового", sub8note: "180 zł / урок", sub8val: "1440 zł", sub8disc: "−10% от разового" },
-  vt: { titleSuffix: "\u00A0TOP", sub: "Лина Поверга · продолжающий и профессиональный уровень, подростки и взрослые", trialVal: "200 zł", singleVal: "250 zł", sub4note: "240 zł / урок", sub4val: "960 zł", sub4disc: "−4% от разового", sub8note: "230 zł / урок", sub8val: "1840 zł", sub8disc: "−8% от разового" }
+  vb: { titleSuffix: " / Фортепиано", sub: "pricing.vocal_basic_sub", trialVal: "120 zł", singleVal: "170 zł", sub4note: "160 zł / урок", sub4val: "640 zł", sub4disc: "−6% от разового", sub8note: "150 zł / урок", sub8val: "1200 zł", sub8disc: "−12% от разового" },
+  vp: { titleSuffix: " / Фортепиано\u00A0PRO", sub: "pricing.vocal_pro_sub", trialVal: "120 zł", singleVal: "200 zł", sub4note: "190 zł / урок", sub4val: "760 zł", sub4disc: "−5% от разового", sub8note: "180 zł / урок", sub8val: "1440 zł", sub8disc: "−10% от разового" },
+  vt: { titleSuffix: "\u00A0TOP", sub: "pricing.vocal_top_sub", trialVal: "200 zł", singleVal: "250 zł", sub4note: "240 zł / урок", sub4val: "960 zł", sub4disc: "−4% от разового", sub8note: "230 zł / урок", sub8val: "1840 zł", sub8disc: "−8% от разового" }
 };
 const instrData = {
-  ib2: { titleSuffix: "", sub: "Сергей Панасенко, Евгений Велько · начинающий и продолжающий уровень", trialVal: "120 zł", singleVal: "170 zł", sub4note: "160 zł / урок", sub4val: "640 zł", sub4disc: "−6% от разового", sub8note: "150 zł / урок", sub8val: "1200 zł", sub8disc: "−12% от разового" },
-  ip2: { titleSuffix: "\u00A0PRO", sub: "Катерина Корниюк · продолжающий и профессиональный уровень", trialVal: "120 zł", singleVal: "200 zł", sub4note: "190 zł / урок", sub4val: "760 zł", sub4disc: "−5% от разового", sub8note: "180 zł / урок", sub8val: "1440 zł", sub8disc: "−10% от разового" }
+  ib2: { titleSuffix: "", sub: "pricing.instr_basic_sub", trialVal: "120 zł", singleVal: "170 zł", sub4note: "160 zł / урок", sub4val: "640 zł", sub4disc: "−6% от разового", sub8note: "150 zł / урок", sub8val: "1200 zł", sub8disc: "−12% от разового" },
+  ip2: { titleSuffix: "\u00A0PRO", sub: "pricing.instr_pro_sub", trialVal: "120 zł", singleVal: "200 zł", sub4note: "190 zł / урок", sub4val: "760 zł", sub4disc: "−5% от разового", sub8note: "180 zł / урок", sub8val: "1440 zł", sub8disc: "−10% от разового" }
 };
 
 function updateTabVals(panelId, data) {
@@ -109,20 +129,38 @@ function updateTabVals(panelId, data) {
   const vals = panel.querySelectorAll(".tab-val");
   vals.forEach(el => { el.style.opacity = "0"; el.style.transform = "translateY(-5px)"; });
   setTimeout(() => {
-    vals.forEach(el => { el.textContent = data[el.dataset.tv]; el.style.opacity = "1"; el.style.transform = "translateY(0)"; });
+    vals.forEach(el => {
+      let val = data[el.dataset.tv];
+      if (typeof val === "string" && val.startsWith("pricing.") && window.i18n) {
+        val = window.i18n.t(val);
+      }
+      el.textContent = val;
+      el.style.opacity = "1";
+      el.style.transform = "translateY(0)";
+    });
   }, 180);
 }
 
+let _currentVocalTab = "vb";
+let _currentInstrTab = "ib2";
+
 function showVocalTab(id, btn) {
+  _currentVocalTab = id;
   btn.closest(".ptabs").querySelectorAll(".ptab").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
   updateTabVals("vocal-panel", vocalData[id]);
 }
 function showInstrTab(id, btn) {
+  _currentInstrTab = id;
   btn.closest(".ptabs").querySelectorAll(".ptab").forEach(b => b.classList.remove("active"));
   btn.classList.add("active");
   updateTabVals("instr-panel", instrData[id]);
 }
+
+window.refreshPricingPanels = function () {
+  updateTabVals("vocal-panel", vocalData[_currentVocalTab]);
+  updateTabVals("instr-panel", instrData[_currentInstrTab]);
+};
 
 // Gallery lightbox
 (function () {

@@ -42,10 +42,16 @@
         </ul>
       </div>
       <div class="nav-right">
-        <div class="lang-switcher">
-          <button class="lang-btn active" data-lang="ru" onclick="i18n.setLang('ru')">RU</button>
-          <button class="lang-btn" data-lang="en" onclick="i18n.setLang('en')">EN</button>
-          <button class="lang-btn" data-lang="pl" onclick="i18n.setLang('pl')">PL</button>
+        <div class="lang-switcher" id="langSwitcher">
+          <button class="lang-select-btn" id="langSelectBtn" onclick="toggleLangMenu()">
+            <span id="langSelectLabel">RU</span>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <ul class="lang-dropdown" id="langDropdown">
+            <li onclick="selectLang('ru', 'RU')">Русский</li>
+            <li onclick="selectLang('en', 'EN')">English</li>
+            <li onclick="selectLang('pl', 'PL')">Polski</li>
+          </ul>
         </div>
         <button
           class="nav-hamburger"
@@ -59,6 +65,7 @@
           href="#contact"
           class="btn-pill btn-teal"
           style="font-size: 0.78rem; padding: 8px 18px"
+          data-i18n="nav.cta"
           >Пробный урок →</a
         >
       </div>
@@ -187,18 +194,18 @@
             </div>
             <div class="founder-text reveal">
               <div class="chip" data-i18n="about.chip">О студии</div>
-              <h2>Лина Поверга —<br /><em>создатель студии</em></h2>
-              <p>
+              <h2 data-i18n-html="about.h2_html">Лина Поверга —<br /><em>создатель студии</em></h2>
+              <p data-i18n="about.p1">
                 Профессиональная вокалистка, автор песен и преподаватель
                 современного вокала. Наставник преподавателей вокала и автор
                 вокальных курсов.
               </p>
-              <p>
+              <p data-i18n="about.p2">
                 Музыкальное образование: артист, инструменталист, дирижёр
                 оркестра, преподаватель вокала. Сценический опыт более 20 лет.
                 Поёт и преподаёт: поп, джаз, соул, фолк, рок, экстрим, опера.
               </p>
-              <p>
+              <p data-i18n="about.p3">
                 Жюри музыкальных конкурсов. Ивент-менеджер с 5-летним опытом
                 работы с артистами.
               </p>
@@ -233,13 +240,13 @@
                   href="https://youtu.be/Vx3nzS7va9E"
                   target="_blank"
                   class="vlink"
-                  >▶︎ Видео студии</a
+                   data-i18n="about.vidStudio">▶︎ Видео студии</a
                 >
                 <a
                   href="https://youtu.be/SR2O4he66WY"
                   target="_blank"
                   class="vlink"
-                  >▶︎ Концерт</a
+                   data-i18n="about.vidConcert">▶︎ Концерт</a
                 >
                 <a
                   href="https://youtube.com/shorts/W1bWvSmNWPk"
@@ -273,7 +280,7 @@
       <div class="wrap">
         <div class="section">
           <div class="chip" data-i18n="vocal.chip">Вокал</div>
-          <h2 class="section-title">Преподаватели <em>вокала</em></h2>
+          <h2 class="section-title" data-i18n-html="vocal.title_html">Преподаватели <em>вокала</em></h2>
           <p
             style="
               color: var(--muted);
@@ -281,12 +288,13 @@
               margin-bottom: 36px;
               max-width: 500px;
             "
+            data-i18n="vocal.sub"
           >
             Три уровня преподавателей для любого этапа вашего музыкального пути
           </p>
 
           <div class="filter-tabs">
-            <button class="ftab active" onclick="filterTeachers('all', this)">
+            <button class="ftab active" onclick="filterTeachers('all', this)" data-i18n="vocal.filterAll">
               Все
             </button>
             <button class="ftab" onclick="filterTeachers('basic', this)">
@@ -321,7 +329,7 @@
                   Вокал TOP · Основатель
                 </div>
                 <div class="tc-name">Лина Поверга</div>
-                <p class="tc-bio">
+                <p class="tc-bio" data-i18n="teachers.lina.bio">
                   Современные техники: субтон, твенг, бэлтинг, фальцет, микст,
                   академический звук. Экстрим: штробас, фрай, скрим, гроул,
                   харш. Украшения: вибрато, мелизмы, йодль. Продолжающий и
@@ -340,11 +348,12 @@
                     color: var(--muted);
                     margin-bottom: 12px;
                   "
+                  data-i18n="teachers.lina.level"
                 >
                   Уровень: продолжающий — профессиональный · Подростки и
                   взрослые
                 </p>
-                <div class="tc-links">
+                <div class="tc-links" data-lina-links>
                   <a
                     href="https://youtube.com/shorts/W1bWvSmNWPk"
                     target="_blank"
@@ -368,7 +377,7 @@
                   class="tc-enroll-btn"
                   onclick="enrollTeacher('Вокал TOP — Лина Поверга')"
                 >
-                  <span>Записаться к этому педагогу</span
+                  <span data-i18n="teachers.enrollBtn">Записаться к этому педагогу</span
                   ><span class="tc-enroll-btn-arrow">→</span>
                 </button>
               </div>
@@ -388,7 +397,7 @@
                   Вокал / Фортепиано PRO
                 </div>
                 <div class="tc-name">Катерина Корниюк</div>
-                <p class="tc-bio">
+                <p class="tc-bio" data-i18n="teachers.kateryna.bio">
                   R&amp;B, поп, мюзикл, рок, соул, рэп. Постановка голоса,
                   дыхание, сценический образ, ритм, импровизация. Техники: микс,
                   твенг, бэлтинг, фальцет, йодль, вибрато, край, штробас, фрай,
@@ -402,8 +411,7 @@
                   ><span class="tc-tag">Фортепиано</span>
                 </div>
                 <div class="tc-langs">
-                  <strong>Языки:</strong> Укр, Рус, Польский, Итальянский,
-                  Английский
+                  <strong data-i18n="teachers.langs">Языки:</strong> <span data-i18n="teachers.kateryna.langs">Укр, Рус, Польский, Итальянский, Английский</span>
                 </div>
                 <div class="tc-links">
                   <a
@@ -429,7 +437,7 @@
                   class="tc-enroll-btn"
                   onclick="enrollTeacher('Вокал PRO — Катерина Корниюк')"
                 >
-                  <span>Записаться к этому педагогу</span
+                  <span data-i18n="teachers.enrollBtn">Записаться к этому педагогу</span
                   ><span class="tc-enroll-btn-arrow">→</span>
                 </button>
               </div>
@@ -449,7 +457,7 @@
                   Вокал Basic · Фортепиано · Гитара
                 </div>
                 <div class="tc-name">Евгений Велько</div>
-                <p class="tc-bio">
+                <p class="tc-bio" data-i18n="teachers.yevheniy.bio">
                   Научу играть на фортепиано и гитаре и знаю как совместить это
                   с пением. Пишу песни и саундтреки — помогу тебе в твоём
                   творчестве. Обожаю мюзиклы и умею работать с музыкальным
@@ -463,9 +471,9 @@
                     margin-top: -8px;
                   "
                 >
-                  "Ты мой студент, если любишь рок, ищешь безопасное
+                  "<span data-i18n="teachers.yevheniy.bio2">Ты мой студент, если любишь рок, ищешь безопасное
                   пространство и комфортного преподавателя. Вся твоя жизнь
-                  театр, и ты хочешь петь главную роль."
+                  театр, и ты хочешь петь главную роль.</span>"
                 </p>
                 <div class="tc-tags">
                   <span class="tc-tag">Рок</span><span class="tc-tag">Поп</span
@@ -482,10 +490,10 @@
                     margin-bottom: 10px;
                   "
                 >
-                  Начинающий и продолжающий уровень
+                  <span data-i18n="teachers.yevheniy.level">Начинающий и продолжающий уровень</span>
                 </p>
                 <div class="tc-langs">
-                  <strong>Языки:</strong> Русский, Белорусский, Английский
+                  <strong data-i18n="teachers.langs">Языки:</strong> <span data-i18n="teachers.yevheniy.langs">Русский, Белорусский, Английский</span>
                 </div>
                 <div class="tc-links">
                   <a href="#contact" target="_blank" class="vlink">▶︎ Мюзикл</a>
@@ -496,7 +504,7 @@
                   class="tc-enroll-btn"
                   onclick="enrollTeacher('Вокал Basic — Евгений Велько')"
                 >
-                  <span>Записаться к этому педагогу</span
+                  <span data-i18n="teachers.enrollBtn">Записаться к этому педагогу</span
                   ><span class="tc-enroll-btn-arrow">→</span>
                 </button>
               </div>
@@ -516,7 +524,7 @@
                   Вокал Basic
                 </div>
                 <div class="tc-name">Илона Бондар</div>
-                <p class="tc-bio">
+                <p class="tc-bio" data-i18n="teachers.ilona.bio">
                   Постановка голоса: дыхание, интонирование, темп, ритм,
                   динамика. Техники: субтон, эстрадный звук, тванг, бэлтинг,
                   фальцет, микст. Украшения: вибрато, мелизмы, йодль. Сцена и
@@ -528,7 +536,7 @@
                   ><span class="tc-tag">Дети</span>
                 </div>
                 <div class="tc-langs">
-                  <strong>Языки:</strong> Укр, Рус, Польский, Английский
+                  <strong data-i18n="teachers.langs">Языки:</strong> <span data-i18n="teachers.ilona.langs">Укр, Рус, Польский, Английский</span>
                 </div>
                 <div class="tc-links">
                   <a
@@ -554,7 +562,7 @@
                   class="tc-enroll-btn"
                   onclick="enrollTeacher('Вокал Basic — Илона Бондар')"
                 >
-                  <span>Записаться к этому педагогу</span
+                  <span data-i18n="teachers.enrollBtn">Записаться к этому педагогу</span
                   ><span class="tc-enroll-btn-arrow">→</span>
                 </button>
               </div>
@@ -573,7 +581,7 @@
               <div class="chip" data-i18n="vocal.pricingChip">
                 Цены на вокал
               </div>
-              <h2 class="section-title">Прайс-лист <em>вокал</em></h2>
+              <h2 class="section-title" data-i18n-html="vocal.pricingTitle_html">Прайс-лист <em>вокал</em></h2>
             </div>
           </div>
 
@@ -730,7 +738,7 @@
       <div class="wrap">
         <div class="section">
           <div class="chip" data-i18n="instruments.chip">Инструменты</div>
-          <h2 class="section-title">Преподаватели <em>инструментов</em></h2>
+          <h2 class="section-title" data-i18n-html="instruments.title_html">Преподаватели <em>инструментов</em></h2>
           <p
             style="
               color: var(--muted);
@@ -738,6 +746,7 @@
               margin-bottom: 44px;
               max-width: 600px;
             "
+            data-i18n="instruments.sub"
           >
             Гитара, укулеле и фортепиано — занятия для начинающих и
             продолжающих, дети и взрослые
@@ -755,11 +764,11 @@
                 <div class="instr-single-badge">Basic</div>
               </div>
               <div class="instr-single-body">
-                <div class="tc-role">
+                <div class="tc-role" data-i18n="teachers.sergey.role">
                   Гитара · Укулеле · Преподаватель инструментов
                 </div>
                 <div class="tc-name">Сергей Панасенко</div>
-                <p class="tc-bio">
+                <p class="tc-bio" data-i18n="teachers.sergey.bio">
                   Аппликатура и постановка рук, работа с темпом и ритмом, игра
                   по табулатуре и аккордами, динамика, аккомпанирование.
                   Знакомство с теорией музыки. Помощь в подборе инструмента.
@@ -772,7 +781,7 @@
                   <span class="tc-tag">Взрослые</span>
                 </div>
                 <div class="tc-langs" style="margin-bottom: 20px">
-                  <strong>Языки:</strong> Украинский, Русский, Польский
+                  <strong data-i18n="teachers.langs">Языки:</strong> <span data-i18n="teachers.sergey.langs">Украинский, Русский, Польский</span>
                 </div>
                 <div class="tc-links" style="margin-bottom: 16px">
                   <a href="#contact" class="vlink">▶︎ Видео</a>
@@ -782,7 +791,7 @@
                   style="max-width: 280px"
                   onclick="enrollTeacher('Гитара — Сергей Панасенко')"
                 >
-                  <span>Записаться к этому педагогу</span
+                  <span data-i18n="teachers.enrollBtn">Записаться к этому педагогу</span
                   ><span class="tc-enroll-btn-arrow">→</span>
                 </button>
               </div>
@@ -803,11 +812,11 @@
                 </div>
               </div>
               <div class="instr-single-body">
-                <div class="tc-role">
+                <div class="tc-role" data-i18n="teachers.kateryna_piano.role">
                   Фортепиано PRO · Преподаватель инструментов
                 </div>
                 <div class="tc-name">Катерина Корниюк</div>
-                <p class="tc-bio">
+                <p class="tc-bio" data-i18n="teachers.kateryna_piano.bio">
                   Классическая и современная игра на фортепиано: постановка рук,
                   техника, работа с нотами, гармония, аккомпанирование. R&amp;B,
                   поп, мюзикл, джаз. Также совмещение игры с пением — вокал и
@@ -823,8 +832,7 @@
                   <span class="tc-tag">Взрослые</span>
                 </div>
                 <div class="tc-langs" style="margin-bottom: 20px">
-                  <strong>Языки:</strong> Укр, Рус, Польский, Итальянский,
-                  Английский
+                  <strong data-i18n="teachers.langs">Языки:</strong> <span data-i18n="teachers.kateryna.langs">Укр, Рус, Польский, Итальянский, Английский</span>
                 </div>
                 <div class="tc-links" style="margin-bottom: 16px">
                   <a
@@ -845,7 +853,7 @@
                   style="max-width: 280px"
                   onclick="enrollTeacher('Фортепиано PRO — Катерина Корниюк')"
                 >
-                  <span>Записаться к этому педагогу</span
+                  <span data-i18n="teachers.enrollBtn">Записаться к этому педагогу</span
                   ><span class="tc-enroll-btn-arrow">→</span>
                 </button>
               </div>
@@ -862,11 +870,11 @@
                 <div class="instr-single-badge">Basic</div>
               </div>
               <div class="instr-single-body">
-                <div class="tc-role">
+                <div class="tc-role" data-i18n="teachers.yevheniy_piano.role">
                   Фортепиано · Гитара · Преподаватель инструментов
                 </div>
                 <div class="tc-name">Евгений Велько</div>
-                <p class="tc-bio">
+                <p class="tc-bio" data-i18n="teachers.yevheniy_piano.bio">
                   Научу играть на фортепиано и гитаре и знаю как совместить это
                   с пением. Постановка рук, работа с ритмом, игра по нотам и
                   аккордами, аккомпанирование. Помогу выстроить свой музыкальный
@@ -880,7 +888,7 @@
                   <span class="tc-tag">Взрослые</span>
                 </div>
                 <div class="tc-langs" style="margin-bottom: 20px">
-                  <strong>Языки:</strong> Русский, Белорусский, Английский
+                  <strong data-i18n="teachers.langs">Языки:</strong> <span data-i18n="teachers.yevheniy.langs">Русский, Белорусский, Английский</span>
                 </div>
                 <div class="tc-links" style="margin-bottom: 16px">
                   <a href="#contact" class="vlink">▶︎ Мюзикл</a>
@@ -892,7 +900,7 @@
                   style="max-width: 280px"
                   onclick="enrollTeacher('Фортепиано — Евгений Велько')"
                 >
-                  <span>Записаться к этому педагогу</span
+                  <span data-i18n="teachers.enrollBtn">Записаться к этому педагогу</span
                   ><span class="tc-enroll-btn-arrow">→</span>
                 </button>
               </div>
@@ -1055,7 +1063,7 @@
       <div class="wrap">
         <div class="section">
           <div class="chip" data-i18n="halls.chip">Аренда залов</div>
-          <h2 class="section-title">4 зала для <em>репетиций</em></h2>
+          <h2 class="section-title" data-i18n-html="halls.title_html">4 зала для <em>репетиций</em></h2>
           <p
             style="
               color: var(--muted);
@@ -1063,6 +1071,7 @@
               margin-bottom: 44px;
               max-width: 520px;
             "
+            data-i18n="halls.sub"
           >
             Аренда пространства для самостоятельных занятий, репетиций и
             мероприятий. Фото залов скоро появятся.
@@ -1091,7 +1100,7 @@
                 <div class="hall-badge" data-i18n="halls.jazz.badge">
                   Вокал · Фортепиано · Малый бенд
                 </div>
-                <p class="hall-desc">
+                <p class="hall-desc" data-i18n="halls.jazz.desc">
                   Оснащённый зал для занятий вокалом, фортепиано или небольшого
                   бенда. Колонка, микрофон, планшет с доступом к минусам,
                   интернет и фортепиано Roland.
@@ -1136,7 +1145,7 @@
                 <div class="hall-badge" data-i18n="halls.blues.badge">
                   Звукозапись · Вокал
                 </div>
-                <p class="hall-desc">
+                <p class="hall-desc" data-i18n="halls.blues.desc">
                   Небольшой акустически обработанный зал — идеален для
                   качественной записи голоса. Если есть своя аппаратура и нужно
                   тихое удобное помещение — зал Блюз.
@@ -1180,7 +1189,7 @@
                 <div class="hall-badge" data-i18n="halls.count.badge">
                   Вокал · Фортепиано · Группы
                 </div>
-                <p class="hall-desc">
+                <p class="hall-desc" data-i18n="halls.count.desc">
                   Просторный зал для занятий вокалом или игры на фортепиано.
                   Подходит для небольших групповых занятий — собирайтесь вместе
                   в комфортном пространстве.
@@ -1224,7 +1233,7 @@
                 <div class="hall-badge" data-i18n="halls.rock.badge">
                   Самый большой · до 15 человек
                 </div>
-                <p class="hall-desc">
+                <p class="hall-desc" data-i18n="halls.rock.desc">
                   Самый большой зал студии — для репетиций со своим бендом,
                   уроков вокала, фортепиано и мероприятий до 15 человек.
                   Барабаны, профессиональный свет, кольцевые лампы.
@@ -1251,31 +1260,31 @@
 
           <!-- HALL PRICING -->
           <div class="hall-pricing reveal" style="margin-top: 56px">
-            <div class="chip" style="margin-bottom: 20px">Аренда · Цены</div>
+            <div class="chip" style="margin-bottom: 20px" data-i18n="halls.pricingChip">Аренда · Цены</div>
             <div class="hall-price-grid">
 
               <div class="hp-card">
-                <div class="hp-type">Разово</div>
+                <div class="hp-type" data-i18n="halls.hp_single">Разово</div>
                 <div class="hp-price">60 <span class="hp-cur">zł</span></div>
-                <div class="hp-unit">/ 60 минут</div>
+                <div class="hp-unit" data-i18n="halls.hp_unit60">/ 60 минут</div>
               </div>
 
               <div class="hp-card hp-card--featured">
-                <div class="hp-type">Абонемент · 4 ч</div>
+                <div class="hp-type" data-i18n="halls.hp_sub4h">Абонемент · 4 ч</div>
                 <div class="hp-price">220 <span class="hp-cur">zł</span></div>
-                <div class="hp-unit">/ месяц</div>
+                <div class="hp-unit" data-i18n="halls.hp_perMonth">/ месяц</div>
               </div>
 
               <div class="hp-card hp-card--featured">
-                <div class="hp-type">Абонемент · 8 ч</div>
+                <div class="hp-type" data-i18n="halls.hp_sub8h">Абонемент · 8 ч</div>
                 <div class="hp-price">400 <span class="hp-cur">zł</span></div>
-                <div class="hp-unit">/ месяц</div>
+                <div class="hp-unit" data-i18n="halls.hp_perMonth">/ месяц</div>
               </div>
 
               <div class="hp-card">
-                <div class="hp-type">Абонемент · 12 ч</div>
+                <div class="hp-type" data-i18n="halls.hp_sub12h">Абонемент · 12 ч</div>
                 <div class="hp-price">540 <span class="hp-cur">zł</span></div>
-                <div class="hp-unit">/ месяц</div>
+                <div class="hp-unit" data-i18n="halls.hp_perMonth">/ месяц</div>
               </div>
 
             </div>
@@ -1283,19 +1292,19 @@
             <div class="hp-conditions">
               <div class="hp-cond-item">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-                Во время аренды доступна вся необходимая техника и помощь администратора
+                <span data-i18n="halls.hp_cond1">Во время аренды доступна вся необходимая техника и помощь администратора</span>
               </div>
               <div class="hp-cond-item">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                Доступны 4 зала — Rock, Jazz, Country, Blues
+                <span data-i18n="halls.hp_cond2">Доступны 4 зала — Rock, Jazz, Country, Blues</span>
               </div>
               <div class="hp-cond-item">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 8v4l3 3"/></svg>
-                Бронь актуальна только после внесения предоплаты
+                <span data-i18n="halls.hp_cond3">Бронь актуальна только после внесения предоплаты</span>
               </div>
               <div class="hp-cond-item">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                Мероприятия в нескольких залах и аренда техники — стоимость индивидуально
+                <span data-i18n="halls.hp_cond4">Мероприятия в нескольких залах и аренда техники — стоимость индивидуально</span>
               </div>
             </div>
           </div>
@@ -1332,7 +1341,7 @@
       <div class="wrap">
         <div class="section">
           <div class="chip" data-i18n="events.chip">Жизнь студии</div>
-          <h2 class="section-title">События &amp; <em>сообщество</em></h2>
+          <h2 class="section-title" data-i18n-html="events.title_html">События &amp; <em>сообщество</em></h2>
           <div class="marquee-outer">
             <div class="marquee-track"><span>Концерты</span><span>Квартирники</span><span>Интенсивы</span><span>Вечера кино</span><span>Мастер-классы</span><span>Ивенты</span><span>Концерты</span><span>Квартирники</span><span>Интенсивы</span><span>Вечера кино</span><span>Мастер-классы</span><span>Ивенты</span></div>
           </div>
@@ -1342,11 +1351,11 @@
               <div class="ev-title" data-i18n="events.card1.title">
                 Концерты учеников
               </div>
-              <p class="ev-desc">
+              <p class="ev-desc" data-i18n="events.card1.desc">
                 Живые выступления на сцене — лучший способ проверить себя и
                 получить настоящий сценический опыт.
               </p>
-              <a href="#contact" class="ev-cta">Узнать расписание →</a>
+              <a href="#contact" class="ev-cta" data-i18n="events.card1.cta">Узнать расписание →</a>
             </div>
             <div class="event-card reveal">
               <div class="ev-type" data-i18n="events.card2.type">
@@ -1355,22 +1364,22 @@
               <div class="ev-title" data-i18n="events.card2.title">
                 Квартирники
               </div>
-              <p class="ev-desc">
+              <p class="ev-desc" data-i18n="events.card2.desc">
                 Уютные музыкальные вечера в небольшом кругу. Живая музыка,
                 тёплая атмосфера и настоящие эмоции.
               </p>
-              <a href="#contact" class="ev-cta">Стать участником →</a>
+              <a href="#contact" class="ev-cta" data-i18n="events.card2.cta">Стать участником →</a>
             </div>
             <div class="event-card reveal">
               <div class="ev-type" data-i18n="events.card3.type">Интенсив</div>
               <div class="ev-title" data-i18n="events.card3.title">
                 Мастер-классы
               </div>
-              <p class="ev-desc">
+              <p class="ev-desc" data-i18n="events.card3.desc">
                 Концентрированные занятия для быстрого роста. Техника, сцена,
                 артистизм — всё сразу от профессионалов.
               </p>
-              <a href="#contact" class="ev-cta">Записаться →</a>
+              <a href="#contact" class="ev-cta" data-i18n="events.card3.cta">Записаться →</a>
             </div>
           </div>
         </div>
@@ -1384,19 +1393,19 @@
           <div class="cert-grid">
             <div class="cert-visual reveal">
               <div class="cert-card">
-                <div class="cert-top">Lina's Music Studio · Варшава · 2020</div>
+                <div class="cert-top" data-i18n="cert.cardTop">Lina's Music Studio · Варшава · 2020</div>
                 <div>
                   <img src="" style="display: none" />
-                  <div class="cert-title">Подарочный<br />сертификат</div>
+                  <div class="cert-title" data-i18n-html="cert.cardTitle">Подарочный<br />сертификат</div>
                 </div>
-                <div class="cert-footer">
+                <div class="cert-footer" data-i18n="cert.cardFooter">
                   Музыка — лучший подарок · linasmusicgroup.org
                 </div>
               </div>
             </div>
             <div class="reveal">
-              <div class="chip">Подарок</div>
-              <h2 class="section-title">Подари<br /><em>музыку</em></h2>
+              <div class="chip" data-i18n="cert.chip">Подарок</div>
+              <h2 class="section-title" data-i18n-html="cert.title_html">Подари<br /><em>музыку</em></h2>
               <p
                 style="
                   color: var(--muted);
@@ -1406,8 +1415,8 @@
                   margin-bottom: 10px;
                 "
               >
-                Сертификат на занятия — идеальный подарок для тех, кто мечтает
-                петь, играть или открыть для себя мир музыки.
+                <span data-i18n="cert.p1">Сертификат на занятия — идеальный подарок для тех, кто мечтает
+                петь, играть или открыть для себя мир музыки.</span>
               </p>
               <p
                 style="
@@ -1417,8 +1426,8 @@
                   margin-bottom: 20px;
                 "
               >
-                Действует для любого направления: вокал, инструменты,
-                мастер-классы.
+                <span data-i18n="cert.p2">Действует для любого направления: вокал, инструменты,
+                мастер-классы.</span>
               </p>
               <div class="cert-price">
                 <span class="cert-from" data-i18n="cert.from">от</span>
@@ -1445,7 +1454,7 @@
           <div class="contact-grid">
             <div>
               <div class="chip" data-i18n="contact.chip">Контакты</div>
-              <h2 class="section-title">
+              <h2 class="section-title" data-i18n-html="contact.title_html">
                 Начни своё<br /><em>путешествие</em>
               </h2>
               <p
@@ -1457,14 +1466,14 @@
                   max-width: 340px;
                 "
               >
-                Запишись на пробный урок или задай любой вопрос — мы с радостью
-                ответим и поможем выбрать направление.
+                <span data-i18n="contact.sub">Запишись на пробный урок или задай любой вопрос — мы с радостью
+                ответим и поможем выбрать направление.</span>
               </p>
               <div class="contact-details">
                 <div class="contact-item">
                   <div class="ci-icon">📍</div>
                   <div>
-                    <div class="ci-label">Адрес</div>
+                    <div class="ci-label" data-i18n="contact.addressLabel">Адрес</div>
                     <div class="ci-val" data-i18n-html="contact.cityVal">
                       <a href="https://maps.app.goo.gl/wKpDDY1Lx38wNLuT8" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;">Aleja Prymasa Tysiąclecia 66, Warszawa</a>
                     </div>
@@ -1573,6 +1582,7 @@
                   margin-bottom: 22px;
                   line-height: 1.3;
                 "
+                data-i18n-html="contact.formTitle_html"
               >
                 Запишись на<br /><em
                   style="font-style: italic; color: var(--teal)"
@@ -1582,16 +1592,17 @@
               <div class="form">
                 <div class="form-row">
                   <div class="field">
-                    <label>Имя *</label
+                    <label data-i18n="contact.formNameLabel">Имя *</label
                     ><input
                       type="text"
                       id="nameField"
                       required
                       placeholder="Твоё имя"
+                      data-i18n-placeholder="contact.formNamePlaceholder"
                     />
                   </div>
                   <div class="field">
-                    <label>Телефон *</label
+                    <label data-i18n="contact.formPhoneLabel">Телефон *</label
                     ><input
                       type="tel"
                       id="phoneField"
@@ -1601,7 +1612,7 @@
                   </div>
                 </div>
                 <div class="field">
-                  <label>Email *</label
+                  <label data-i18n="contact.formEmailLabel">Email *</label
                   ><input
                     type="email"
                     id="emailField"
@@ -1612,7 +1623,7 @@
                 <div class="field">
                   <label data-i18n="contact.directionLabel">Направление</label>
                   <select id="directionSelect">
-                    <option value="">Выбери направление</option>
+                    <option value="" data-i18n="contact.formSelectDefault">Выбери направление</option>
                     <optgroup label="Вокал Basic">
                       <option>Вокал Basic — Евгений Велько</option>
                       <option>Вокал Basic — Илона Бондар</option>
@@ -1639,11 +1650,12 @@
                   </select>
                 </div>
                 <div class="field">
-                  <label>Сообщение (необязательно)</label
+                  <label data-i18n="contact.formMessageLabel">Сообщение (необязательно)</label
                   ><textarea
                     rows="4"
                     id="messageField"
                     placeholder="Расскажи о себе — опыт, цели, вопросы..."
+                    data-i18n-placeholder="contact.formMessagePlaceholder"
                   ></textarea>
                 </div>
                 <!-- honeypot: invisible to humans, bots fill it -->
@@ -1663,7 +1675,7 @@
                     border-radius: 100px;
                   "
                 >
-                  Отправить заявку →
+                  <span data-i18n="contact.formSubmit">Отправить заявку →</span>
                 </button>
               </div>
             </div>
@@ -1694,7 +1706,7 @@
       <div class="wrap">
         <div class="section">
           <div class="chip" data-i18n="gallery.chip">Галерея</div>
-          <h2 class="section-title">Жизнь <em>студии в фото</em></h2>
+          <h2 class="section-title" data-i18n-html="gallery.title_html">Жизнь <em>студии в фото</em></h2>
           <div class="gallery-masonry">
             <div class="gallery-item">
               <img
@@ -2020,14 +2032,14 @@
             Aleja Prymasa Tysiąclecia 66, Warszawa
           </a>
         </div>
-        <a href="https://t.me/linas_music_studio" target="_blank" rel="noopener" class="footer-support-block">Поддержка</a>
+        <a href="https://t.me/linas_music_studio" target="_blank" rel="noopener" class="footer-support-block" data-i18n="footer.support">Поддержка</a>
       </div>
     </div>
 
     <!-- Footer bottom - centered copyright -->
     <div class="footer-bottom">
       <p class="footer-copy">© 2026 Lina's Music Group</p>
-      <a href="https://drive.google.com/file/d/1ODDDwAyZwdaShwk2uDD9bV_Wu2lE3vna/view?usp=drivesdk" target="_blank" rel="noopener" class="footer-collab-link">Условия сотрудничества</a>
+      <a href="https://drive.google.com/file/d/1ODDDwAyZwdaShwk2uDD9bV_Wu2lE3vna/view?usp=drivesdk" target="_blank" rel="noopener" class="footer-collab-link" data-i18n="footer.collab">Условия сотрудничества</a>
     </div>
   </div>
 </footer>
