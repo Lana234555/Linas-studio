@@ -49,11 +49,9 @@
       teachers: {
         lina: { name: "Лина Поверга", role: "Вокал TOP · Основатель", bio: "Современные техники: субтон, твенг, бэлтинг, фальцет, микст, академический звук. Экстрим: штробас, фрай, скрим, гроул, харш. Украшения: вибрато, мелизмы, йодль. Продолжающий и профессиональный уровень.", level: "Уровень: продолжающий — профессиональный · Подростки и взрослые" },
         kateryna: { name: "Катерина Корниюк", role: "Вокал / Фортепиано PRO", bio: "R&B, поп, мюзикл, рок, соул, рэп. Постановка голоса, дыхание, сценический образ, ритм, импровизация. Техники: микс, твенг, бэлтинг, фальцет, йодль, вибрато, край, штробас, фрай, дисторшн, рэттл.", langs: "Укр, Рус, Польский, Итальянский, Английский" },
-        yevheniy: { name: "Евгений Велько", role: "Вокал Basic · Фортепиано · Гитара", bio: "Научу играть на фортепиано и гитаре и знаю как совместить это с пением. Пишу песни и саундтреки — помогу тебе в твоём творчестве. Обожаю мюзиклы и умею работать с музыкальным театром.", bio2: "\"Ты мой студент, если любишь рок, ищешь безопасное пространство и комфортного преподавателя. Вся твоя жизнь театр, и ты хочешь петь главную роль.\"", level: "Начинающий и продолжающий уровень", langs: "Русский, Белорусский, Польский, Английский" },
         ilona: { name: "Илона Бондар", role: "Вокал Basic", bio: "Постановка голоса: дыхание, интонирование, темп, ритм, динамика. Техники: субтон, эстрадный звук, тванг, бэлтинг, фальцет, микст. Украшения: вибрато, мелизмы, йодль. Сцена и работа с микрофоном.", langs: "Укр, Рус, Польский, Английский" },
         sergey: { name: "Сергей Панасенко", role: "Гитара · Укулеле · Преподаватель инструментов", bio: "Аппликатура и постановка рук, работа с темпом и ритмом, игра по табулатуре и аккордами, динамика, аккомпанирование. Знакомство с теорией музыки. Помощь в подборе инструмента.", langs: "Украинский, Русский, Польский" },
         kateryna_piano: { name: "Катерина Корниюк", role: "Фортепиано PRO · Преподаватель инструментов", bio: "Классическая и современная игра на фортепиано: постановка рук, техника, работа с нотами, гармония, аккомпанирование. R&B, поп, мюзикл, джаз. Также совмещение игры с пением — вокал и инструмент одновременно." },
-        yevheniy_piano: { name: "Евгений Велько", role: "Фортепиано · Гитара · Преподаватель инструментов", bio: "Научу играть на фортепиано и гитаре и знаю как совместить это с пением. Постановка рук, работа с ритмом, игра по нотам и аккордами, аккомпанирование. Помогу выстроить свой музыкальный язык." },
         enrollBtn: "Записаться к этому педагогу",
         langs: "Языки:",
       },
@@ -92,7 +90,7 @@
         vocal_basic_sub: "Преподаватели Basic · начинающий и средний уровень, дети и взрослые",
         vocal_pro_sub: "Катерина Корниюк · расширенный репертуар техник, PRO-уровень",
         vocal_top_sub: "Лина Поверга · продолжающий и профессиональный уровень, подростки и взрослые",
-        instr_basic_sub: "Сергей Панасенко, Евгений Велько · начинающий и продолжающий уровень",
+        instr_basic_sub: "Сергей Панасенко · начинающий и продолжающий уровень",
         instr_pro_sub: "Катерина Корниюк · продолжающий и профессиональный уровень",
       },
       halls: {
@@ -238,11 +236,9 @@
       teachers: {
         lina: { name: "Lina Poverga", role: "Vocal TOP · Founder", bio: "Modern techniques: subtone, twang, belting, falsetto, mixed voice, classical sound. Extreme: fry, scream, growl, grunt, harsh. Ornaments: vibrato, melismas, yodel. Intermediate and professional level.", level: "Level: intermediate — professional · Teens and adults" },
         kateryna: { name: "Kateryna Korniyuk", role: "Vocal / Piano PRO", bio: "R&B, pop, musical, rock, soul, rap. Voice placement, breathing, stage presence, rhythm, improvisation. Techniques: mix, twang, belting, falsetto, yodel, vibrato, edge, fry, distortion, rattle.", langs: "Ukr, Rus, Polish, Italian, English" },
-        yevheniy: { name: "Yevheniy Velko", role: "Vocal Basic · Piano · Guitar", bio: "I'll teach you piano and guitar and show how to combine it with singing. I write songs and soundtracks — I'll help you with your creativity. I love musicals and know how to work with musical theatre.", bio2: "\"You are my student if you love rock, are looking for a safe space and a comfortable teacher. All the world's a stage, and you want to sing the lead role.\"", level: "Beginner and intermediate level", langs: "Russian, Belarusian, Polish, English" },
         ilona: { name: "Ilona Bondar", role: "Vocal Basic", bio: "Voice placement: breathing, intonation, tempo, rhythm, dynamics. Techniques: subtone, pop sound, twang, belting, falsetto, mixed voice. Ornaments: vibrato, melismas, yodel. Stage and microphone work.", langs: "Ukr, Rus, Polish, English" },
         sergey: { name: "Serhiy Panasenko", role: "Guitar · Ukulele · Instrument teacher", bio: "Fingering and hand position, tempo and rhythm work, tablature and chord playing, dynamics, accompaniment. Introduction to music theory. Help choosing an instrument.", langs: "Ukrainian, Russian, Polish" },
         kateryna_piano: { name: "Kateryna Korniyuk", role: "Piano PRO · Instrument teacher", bio: "Classical and modern piano: hand position, technique, sheet music, harmony, accompaniment. R&B, pop, musical, jazz. Also combining playing with singing — vocals and instrument simultaneously." },
-        yevheniy_piano: { name: "Yevheniy Velko", role: "Piano · Guitar · Instrument teacher", bio: "I'll teach you piano and guitar and show how to combine it with singing. Hand position, rhythm work, sheet music and chord playing, accompaniment. I'll help you build your musical language." },
         enrollBtn: "Sign up with this teacher",
         langs: "Languages:",
       },
@@ -281,7 +277,7 @@
         vocal_basic_sub: "Basic teachers · beginner and intermediate level, children and adults",
         vocal_pro_sub: "Kateryna Korniyuk · extended technique repertoire, PRO level",
         vocal_top_sub: "Lina Poverga · intermediate and professional level, teens and adults",
-        instr_basic_sub: "Serhiy Panasenko, Yevheniy Velko · beginner and intermediate level",
+        instr_basic_sub: "Serhiy Panasenko · beginner and intermediate level",
         instr_pro_sub: "Kateryna Korniyuk · intermediate and professional level",
       },
       halls: {
@@ -427,11 +423,9 @@
       teachers: {
         lina: { name: "Ліна Поверга", role: "Вакал TOP · Заснавальніца", bio: "Сучасныя тэхнікі: субтон, твэнг, бэлтынг, фальцэт, мікст, акадэмічны гук. Экстрым: фрай, скрым, гроўл, харш. Упрыгожанні: вібрата, мелізмы, ёдаль. Узровень: ад сярэдняга да прафесійнага.", level: "Узровень: сярэдні — прафесійны · Падлеткі і дарослыя" },
         kateryna: { name: "Кацярына Корніюк", role: "Вакал / Фартэпіяна PRO", bio: "R&B, поп, мюзікл, рок, соул, рэп. Пастаноўка голасу, дыханне, сцэнічны вобраз, рытм, імправізацыя. Тэхнікі: мікст, твэнг, бэлтынг, фальцэт, ёдаль, вібрата, край, фрай, дысторшн, рэтл.", langs: "Укр, Рус, Польскі, Італьянскі, Англійскі" },
-        yevheniy: { name: "Яўгеній Велько", role: "Вакал Basic · Фартэпіяна · Гітара", bio: "Навучу граць на фартэпіяна і гітары і пакажу, як спалучыць гэта са спевам. Пішу песні і саўндтрэкі — дапамагу ў тваёй творчасці. Абагаўляю мюзіклы і ўмею працаваць з музычным тэатрам.", bio2: "\"Ты мой студэнт, калі любіш рок, шукаеш бяспечную прастору і камфортнага выкладчыка. Усё тваё жыццё тэатр, і ты хочаш спяваць галоўную ролю.\"", level: "Пачатковы і сярэдні ўзровень", langs: "Рускі, Беларускі, Польскі, Англійскі" },
         ilona: { name: "Ілона Бондар", role: "Вакал Basic", bio: "Пастаноўка голасу: дыханне, інтанаванне, тэмп, рытм, дынаміка. Тэхнікі: субтон, эстрадны гук, твэнг, бэлтынг, фальцэт, мікст. Упрыгожанні: вібрата, мелізмы, ёдаль. Сцэна і праца з мікрафонам.", langs: "Укр, Рус, Польскі, Англійскі" },
         sergey: { name: "Сяргей Панасенка", role: "Гітара · Укулеле · Выкладчык інструментаў", bio: "Апліката і пастаноўка рук, праца з тэмпам і рытмам, гульня па табулатуры і акордамі, дынаміка, акампанемент. Знаёмства з тэорыяй музыкі. Дапамога ў выбары інструмента.", langs: "Украінскі, Рускі, Польскі" },
         kateryna_piano: { name: "Кацярына Корніюк", role: "Фартэпіяна PRO · Выкладчык інструментаў", bio: "Класічная і сучасная гульня на фартэпіяна: пастаноўка рук, тэхніка, праца з нотамі, гармонія, акампанемент. R&B, поп, мюзікл, джаз. Таксама спалучэнне гульні са спевам — вакал і інструмент адначасова." },
-        yevheniy_piano: { name: "Яўгеній Велько", role: "Фартэпіяна · Гітара · Выкладчык інструментаў", bio: "Навучу граць на фартэпіяна і гітары і пакажу, як спалучыць гэта са спевам. Пастаноўка рук, праца з рытмам, гульня па нотах і акордамі, акампанемент. Дапамагу выбудаваць сваю музычную мову." },
         enrollBtn: "Запісацца да гэтага педагога",
         langs: "Мовы:",
       },
@@ -470,7 +464,7 @@
         vocal_basic_sub: "Выкладчыкі Basic · пачатковы і сярэдні ўзровень, дзеці і дарослыя",
         vocal_pro_sub: "Кацярына Корніюк · пашыраны рэпертуар тэхнік, PRO-ўзровень",
         vocal_top_sub: "Ліна Поверга · сярэдні і прафесійны ўзровень, падлеткі і дарослыя",
-        instr_basic_sub: "Сяргей Панасенка, Яўгеній Велько · пачатковы і сярэдні ўзровень",
+        instr_basic_sub: "Сяргей Панасенка · пачатковы і сярэдні ўзровень",
         instr_pro_sub: "Кацярына Корніюк · сярэдні і прафесійны ўзровень",
       },
       halls: {
@@ -616,11 +610,9 @@
       teachers: {
         lina: { name: "Lina Poverga", role: "Wokal TOP · Założycielka", bio: "Nowoczesne techniki: subton, twang, belting, falsetto, mixt, dźwięk akademicki. Ekstrem: fry, scream, growl, grunt, harsh. Ozdobniki: vibrato, melizmaty, jodłowanie. Poziom zaawansowany i profesjonalny.", level: "Poziom: zaawansowany — profesjonalny · Młodzież i dorośli" },
         kateryna: { name: "Kateryna Korniyuk", role: "Wokal / Fortepian PRO", bio: "R&B, pop, musical, rock, soul, rap. Emisja głosu, oddech, wizerunek sceniczny, rytm, improwizacja. Techniki: mixt, twang, belting, falsetto, jodłowanie, vibrato, edge, fry, distortion, rattle.", langs: "Ukr, Ros, Polski, Włoski, Angielski" },
-        yevheniy: { name: "Yevheniy Velko", role: "Wokal Basic · Fortepian · Gitara", bio: "Nauczę gry na fortepianie i gitarze i pokażę jak połączyć to ze śpiewem. Piszę piosenki i soundtracki — pomogę Ci w Twojej twórczości. Uwielbiam musicale i potrafię pracować z teatrem muzycznym.", bio2: "\"Jesteś moim studentem, jeśli kochasz rock, szukasz bezpiecznej przestrzeni i komfortowego nauczyciela. Całe Twoje życie to teatr i chcesz śpiewać główną rolę.\"", level: "Poziom początkujący i zaawansowany", langs: "Rosyjski, Białoruski, Polski, Angielski" },
         ilona: { name: "Ilona Bondar", role: "Wokal Basic", bio: "Emisja głosu: oddech, intonacja, tempo, rytm, dynamika. Techniki: subton, dźwięk estradowy, twang, belting, falsetto, mixt. Ozdobniki: vibrato, melizmaty, jodłowanie. Scena i praca z mikrofonem.", langs: "Ukr, Ros, Polski, Angielski" },
         sergey: { name: "Serhiy Panasenko", role: "Gitara · Ukulele · Nauczyciel instrumentów", bio: "Palcowanie i ustawienie rąk, praca z tempem i rytmem, gra z tabulatury i akordami, dynamika, akompaniament. Wprowadzenie do teorii muzyki. Pomoc w wyborze instrumentu.", langs: "Ukraiński, Rosyjski, Polski" },
         kateryna_piano: { name: "Kateryna Korniyuk", role: "Fortepian PRO · Nauczyciel instrumentów", bio: "Klasyczna i nowoczesna gra na fortepianie: ustawienie rąk, technika, praca z nutami, harmonia, akompaniament. R&B, pop, musical, jazz. Również łączenie gry ze śpiewem — wokal i instrument jednocześnie." },
-        yevheniy_piano: { name: "Yevheniy Velko", role: "Fortepian · Gitara · Nauczyciel instrumentów", bio: "Nauczę gry na fortepianie i gitarze i pokażę jak połączyć to ze śpiewem. Ustawienie rąk, praca z rytmem, gra z nut i akordami, akompaniament. Pomogę Ci zbudować swój muzyczny język." },
         enrollBtn: "Zapisz się do tego nauczyciela",
         langs: "Języki:",
       },
@@ -659,7 +651,7 @@
         vocal_basic_sub: "Nauczyciele Basic · poziom początkujący i średniozaawansowany, dzieci i dorośli",
         vocal_pro_sub: "Kateryna Korniyuk · rozszerzony repertuar technik, poziom PRO",
         vocal_top_sub: "Lina Poverga · poziom zaawansowany i profesjonalny, młodzież i dorośli",
-        instr_basic_sub: "Serhiy Panasenko, Yevheniy Velko · poziom początkujący i zaawansowany",
+        instr_basic_sub: "Serhiy Panasenko · poziom początkujący i zaawansowany",
         instr_pro_sub: "Kateryna Korniyuk · poziom zaawansowany i profesjonalny",
       },
       halls: {
