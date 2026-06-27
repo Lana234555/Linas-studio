@@ -586,6 +586,23 @@ body {
 .ev-cta:hover { gap: 14px; }
 
 /* ── GALLERY ── */
+.gallery-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+.gallery-tag {
+  background: transparent; border: 1px solid rgba(0,196,179,0.35); color: #e8e8e8;
+  padding: 8px 18px; border-radius: 999px; font-size: 0.72rem; letter-spacing: 0.06em;
+  text-transform: uppercase; cursor: pointer; transition: background 0.25s, color 0.25s, border-color 0.25s;
+}
+.gallery-tag:hover { border-color: var(--teal); }
+.gallery-tag.active { background: var(--teal); color: #040d0c; border-color: var(--teal); }
+.gallery-item.is-hidden { display: none; }
+.gallery-more-wrap { display: flex; justify-content: center; margin-top: 32px; }
+.gallery-more {
+  background: transparent; border: 1px solid rgba(0,196,179,0.35); color: var(--teal);
+  padding: 12px 32px; border-radius: 999px; font-size: 0.78rem; letter-spacing: 0.08em;
+  text-transform: uppercase; cursor: pointer; transition: background 0.25s, color 0.25s, border-color 0.25s;
+}
+.gallery-more:hover { background: var(--teal); color: #040d0c; border-color: var(--teal); }
+.gallery-more-wrap.is-hidden { display: none; }
 .gallery-masonry { columns: 4; gap: 12px; margin-top: 36px; }
 .gallery-item {
   break-inside: avoid; margin-bottom: 12px; overflow: hidden;

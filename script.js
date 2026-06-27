@@ -183,7 +183,7 @@ window.refreshPricingPanels = function () {
     function onSettle() {
       pending--;
       if (pending > 0) return;
-      items = allItems.filter((el) => el.style.display !== "none");
+      items = allItems.filter((el) => getComputedStyle(el).display !== "none");
       items.forEach((item, idx) => {
         if (!item.querySelector(".gallery-zoom-icon")) {
           const icon = document.createElement("span");
@@ -256,6 +256,54 @@ window.refreshPricingPanels = function () {
   } else {
     init();
   }
+})();
+
+// Gallery tag filter + "show more" pagination
+(function () {
+  const buttons = document.querySelectorAll(".gallery-tag");
+  const items = Array.from(document.querySelectorAll(".gallery-item"));
+  const moreBtn = document.getElementById("galleryMoreBtn");
+  const moreWrap = moreBtn ? moreBtn.closest(".gallery-more-wrap") : null;
+  if (!buttons.length) return;
+  const PAGE_SIZE = 10;
+  let currentTag = "all";
+  let visibleCount = PAGE_SIZE;
+
+  function matches(item, tag) {
+    return tag === "all" || item.dataset.tag === tag;
+  }
+
+  function render() {
+    const matched = items.filter((item) => matches(item, currentTag));
+    matched.forEach((item, idx) => {
+      item.classList.toggle("is-hidden", idx >= visibleCount);
+    });
+    items.filter((item) => !matches(item, currentTag)).forEach((item) => {
+      item.classList.add("is-hidden");
+    });
+    if (moreWrap) {
+      moreWrap.classList.toggle("is-hidden", visibleCount >= matched.length);
+    }
+  }
+
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      buttons.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentTag = btn.dataset.tag;
+      visibleCount = PAGE_SIZE;
+      render();
+    });
+  });
+
+  if (moreBtn) {
+    moreBtn.addEventListener("click", () => {
+      visibleCount += PAGE_SIZE;
+      render();
+    });
+  }
+
+  render();
 })();
 
 function adjustInstrGrid() {
