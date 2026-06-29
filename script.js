@@ -196,6 +196,10 @@ window.refreshPricingPanels = function () {
     }
     allItems.forEach((item) => {
       const img = item.querySelector("img");
+      if (img.dataset.src) {
+        onSettle();
+        return;
+      }
       if (img.complete) {
         if (!img.naturalWidth) item.style.display = "none";
         onSettle();
@@ -265,12 +269,20 @@ window.refreshPricingPanels = function () {
   const moreBtn = document.getElementById("galleryMoreBtn");
   const moreWrap = moreBtn ? moreBtn.closest(".gallery-more-wrap") : null;
   if (!buttons.length) return;
-  const PAGE_SIZE = 10;
+  const PAGE_SIZE = window.matchMedia("(max-width: 768px)").matches ? 5 : 10;
   let currentTag = "all";
   let visibleCount = PAGE_SIZE;
+  let sectionInView = false;
 
   function matches(item, tag) {
     return tag === "all" || item.dataset.tag === tag;
+  }
+
+  function loadImage(item) {
+    const img = item.querySelector("img[data-src]");
+    if (!img) return;
+    img.src = img.dataset.src;
+    img.removeAttribute("data-src");
   }
 
   function render(animateFrom) {
@@ -280,6 +292,7 @@ window.refreshPricingPanels = function () {
       const wasHidden = item.classList.contains("is-hidden");
       const show = idx < visibleCount;
       item.classList.toggle("is-hidden", !show);
+      if (show && sectionInView) loadImage(item);
       if (show && wasHidden && animateFrom !== undefined && idx >= animateFrom) {
         item.classList.remove("is-popping");
         item.style.animationDelay = (popIdx * 60) + "ms";
@@ -315,6 +328,23 @@ window.refreshPricingPanels = function () {
   }
 
   render();
+
+  const gallerySection = document.getElementById("gallery");
+  if (gallerySection && "IntersectionObserver" in window) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          sectionInView = true;
+          render();
+          observer.disconnect();
+        }
+      });
+    }, { rootMargin: "200px" });
+    observer.observe(gallerySection);
+  } else {
+    sectionInView = true;
+    render();
+  }
 })();
 
 function adjustInstrGrid() {
