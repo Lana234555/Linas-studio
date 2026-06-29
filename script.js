@@ -273,10 +273,20 @@ window.refreshPricingPanels = function () {
     return tag === "all" || item.dataset.tag === tag;
   }
 
-  function render() {
+  function render(animateFrom) {
     const matched = items.filter((item) => matches(item, currentTag));
+    let popIdx = 0;
     matched.forEach((item, idx) => {
-      item.classList.toggle("is-hidden", idx >= visibleCount);
+      const wasHidden = item.classList.contains("is-hidden");
+      const show = idx < visibleCount;
+      item.classList.toggle("is-hidden", !show);
+      if (show && wasHidden && animateFrom !== undefined && idx >= animateFrom) {
+        item.classList.remove("is-popping");
+        item.style.animationDelay = (popIdx * 60) + "ms";
+        void item.offsetWidth;
+        item.classList.add("is-popping");
+        popIdx++;
+      }
     });
     items.filter((item) => !matches(item, currentTag)).forEach((item) => {
       item.classList.add("is-hidden");
@@ -292,14 +302,15 @@ window.refreshPricingPanels = function () {
       btn.classList.add("active");
       currentTag = btn.dataset.tag;
       visibleCount = PAGE_SIZE;
-      render();
+      render(0);
     });
   });
 
   if (moreBtn) {
     moreBtn.addEventListener("click", () => {
+      const prevCount = visibleCount;
       visibleCount += PAGE_SIZE;
-      render();
+      render(prevCount);
     });
   }
 
