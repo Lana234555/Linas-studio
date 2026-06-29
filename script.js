@@ -265,7 +265,18 @@ window.refreshPricingPanels = function () {
 // Gallery tag filter + "show more" pagination
 (function () {
   const buttons = document.querySelectorAll(".gallery-tag");
-  const items = Array.from(document.querySelectorAll(".gallery-item"));
+  let items = Array.from(document.querySelectorAll(".gallery-item"));
+
+  // Shuffle photo order so "Все" mixes all categories together
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [items[i], items[j]] = [items[j], items[i]];
+  }
+  if (items.length) {
+    const parent = items[0].parentNode;
+    items.forEach((item) => parent.appendChild(item));
+  }
+
   const moreBtn = document.getElementById("galleryMoreBtn");
   const moreWrap = moreBtn ? moreBtn.closest(".gallery-more-wrap") : null;
   if (!buttons.length) return;
