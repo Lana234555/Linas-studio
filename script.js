@@ -280,7 +280,7 @@ window.refreshPricingPanels = function () {
   const moreBtn = document.getElementById("galleryMoreBtn");
   const moreWrap = moreBtn ? moreBtn.closest(".gallery-more-wrap") : null;
   if (!buttons.length) return;
-  const PAGE_SIZE = window.matchMedia("(max-width: 768px)").matches ? 5 : 10;
+  const PAGE_SIZE = window.matchMedia("(max-width: 768px)").matches ? 5 : 8;
   let currentTag = "all";
   let visibleCount = PAGE_SIZE;
   let sectionInView = false;
