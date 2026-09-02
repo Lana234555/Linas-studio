@@ -26,20 +26,6 @@ function toggleMenu() {
   document.body.style.overflow = m.classList.contains("open") ? "hidden" : "";
 }
 
-function enrollTeacher(val) {
-  const sel = document.getElementById("directionSelect");
-  if (sel) {
-    for (let i = 0; i < sel.options.length; i++) {
-      if (sel.options[i].value === val || sel.options[i].text === val) {
-        sel.selectedIndex = i;
-        break;
-      }
-    }
-  }
-  const contact = document.getElementById("contact");
-  if (contact) contact.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
 // Dot grid
 const dg = document.getElementById("dotGrid");
 if (dg) {
@@ -116,11 +102,11 @@ function showInstrPricing(id, btn) { showPricingTab(id, btn, ".instr-pricing-pan
 const vocalData = {
   vb: { titleSuffix: "pricing.vocal_basic_suffix", sub: "pricing.vocal_basic_sub", trialVal: "120 zł", singleVal: "170 zł", sub4note: "160 zł|pricing.perLesson", sub4val: "640 zł", sub4disc: "pricing.disc6", sub8note: "150 zł|pricing.perLesson", sub8val: "1200 zł", sub8disc: "pricing.disc12" },
   vp: { titleSuffix: "pricing.vocal_pro_suffix", sub: "pricing.vocal_pro_sub", trialVal: "120 zł", singleVal: "200 zł", sub4note: "190 zł|pricing.perLesson", sub4val: "760 zł", sub4disc: "pricing.disc5", sub8note: "180 zł|pricing.perLesson", sub8val: "1440 zł", sub8disc: "pricing.disc10" },
-  vt: { titleSuffix: "\u00A0TOP", sub: "pricing.vocal_top_sub", trialVal: "200 zł", singleVal: "250 zł", sub4note: "240 zł|pricing.perLesson", sub4val: "960 zł", sub4disc: "pricing.disc4", sub8note: "230 zł|pricing.perLesson", sub8val: "1840 zł", sub8disc: "pricing.disc8" }
+  vt: { titleSuffix: "\u00A0TOP", sub: "pricing.vocal_top_sub", trialVal: "300 zł", singleVal: "400 zł", sub4note: "380 zł|pricing.perLesson", sub4val: "1520 zł", sub4disc: "pricing.disc4", sub8note: "285 zł|pricing.perLesson", sub8val: "2280 zł", sub8disc: "pricing.disc8" }
 };
 const instrData = {
-  ib2: { titleSuffix: "", sub: "pricing.instr_basic_sub", trialVal: "120 zł", singleVal: "170 zł", sub4note: "160 zł|pricing.perLesson", sub4val: "640 zł", sub4disc: "pricing.disc6", sub8note: "150 zł|pricing.perLesson", sub8val: "1200 zł", sub8disc: "pricing.disc12" },
-  ip2: { titleSuffix: "\u00A0PRO", sub: "pricing.instr_pro_sub", trialVal: "120 zł", singleVal: "200 zł", sub4note: "190 zł|pricing.perLesson", sub4val: "760 zł", sub4disc: "pricing.disc5", sub8note: "180 zł|pricing.perLesson", sub8val: "1440 zł", sub8disc: "pricing.disc10" }
+  ib2: { titleBase: "pricing.instr_basic_title", sub: "pricing.instr_basic_sub", trialVal: "120 zł", singleVal: "170 zł", sub4note: "160 zł|pricing.perLesson", sub4val: "640 zł", sub4disc: "pricing.disc6", sub8note: "150 zł|pricing.perLesson", sub8val: "1200 zł", sub8disc: "pricing.disc12" },
+  ip2: { titleBase: "pricing.instr_pro_title", sub: "pricing.instr_pro_sub", trialVal: "120 zł", singleVal: "200 zł", sub4note: "190 zł|pricing.perLesson", sub4val: "760 zł", sub4disc: "pricing.disc5", sub8note: "180 zł|pricing.perLesson", sub8val: "1440 zł", sub8disc: "pricing.disc10" }
 };
 
 function updateTabVals(panelId, data) {
@@ -365,100 +351,3 @@ function adjustInstrGrid() {
 adjustInstrGrid();
 window.addEventListener("resize", adjustInstrGrid);
 
-// Form submission
-const RATE_LIMIT_KEY = "lms_submit_times";
-const RATE_LIMIT_MAX = 3;       // max submissions
-const RATE_LIMIT_WINDOW = 10 * 60 * 1000; // per 10 minutes
-
-function checkRateLimit() {
-  const now = Date.now();
-  let times = JSON.parse(localStorage.getItem(RATE_LIMIT_KEY) || "[]");
-  times = times.filter(t => now - t < RATE_LIMIT_WINDOW);
-  if (times.length >= RATE_LIMIT_MAX) return false;
-  times.push(now);
-  localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(times));
-  return true;
-}
-
-const _submitBtn = document.getElementById("submitBtn");
-if (_submitBtn) _submitBtn.addEventListener("click", function () {
-  // Honeypot check — bots fill hidden field, humans leave it empty
-  const honeypot = document.getElementById("websiteField");
-  if (honeypot && honeypot.value.trim() !== "") return;
-
-  const nameField = document.getElementById("nameField");
-  const phoneField = document.getElementById("phoneField");
-  const emailField = document.getElementById("emailField");
-
-  if (!nameField.value.trim()) {
-    alert(window.i18n ? window.i18n.t("validation.nameRequired") : "Пожалуйста, введите имя");
-    nameField.focus();
-    return;
-  }
-  if (!phoneField.value.trim()) {
-    alert(window.i18n ? window.i18n.t("validation.phoneRequired") : "Пожалуйста, введите телефон");
-    phoneField.focus();
-    return;
-  }
-  if (!emailField.value.trim()) {
-    alert(window.i18n ? window.i18n.t("validation.emailRequired") : "Пожалуйста, введите email");
-    emailField.focus();
-    return;
-  }
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(emailField.value.trim())) {
-    alert(window.i18n ? window.i18n.t("validation.emailInvalid") : "Пожалуйста, введите корректный email");
-    emailField.focus();
-    return;
-  }
-
-  // Rate limit check
-  if (!checkRateLimit()) {
-    alert("Ви надіслали забагато заявок. Спробуйте через 10 хвилин.");
-    return;
-  }
-
-  const SHEET_URL = (window.APP_CONFIG && window.APP_CONFIG.sheetUrl)
-    || "https://linas-music-prox.darienkosvetlana338.workers.dev";
-  const formToken = (window.APP_CONFIG && window.APP_CONFIG.formToken)
-    || "LMS-2025-SECRET";
-
-  const payload = {
-    token: formToken,
-    name: nameField.value.trim(),
-    phone: phoneField.value.trim(),
-    email: emailField.value.trim(),
-    instrument: (document.getElementById("directionSelect") || {}).value || "",
-    comment: (document.getElementById("messageField") || {}).value || ""
-  };
-
-  fetch(SHEET_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  }).catch(() => {});
-
-  showSuccessMessage();
-});
-
-function showSuccessMessage() {
-  const t = (k, fb) => window.i18n ? window.i18n.t(k) : fb;
-  const modal = document.createElement("div");
-  modal.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:10000;backdrop-filter:blur(8px);";
-  const modalContent = document.createElement("div");
-  modalContent.style.cssText = "background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:40px 32px;max-width:500px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5);";
-  modalContent.innerHTML = `
-    <div style="font-size:3rem;margin-bottom:20px">🎉</div>
-    <h3 style="font-family:'Alice',serif;font-size:1.8rem;color:var(--white);margin-bottom:16px;line-height:1.3">${t("modal.title", "Спасибо за заявку!")}</h3>
-    <p style="color:var(--text);line-height:1.6;margin-bottom:24px;font-size:1rem">${t("modal.body", "Мы обязательно ответим Вам в рабочее время.")}</p>
-    <a href="https://www.instagram.com/linas_music_studio?igsh=MWpycjZiZ3Awdnp3Mw==" target="_blank" class="btn-pill btn-teal" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none">
-      <span>📸</span><span>${t("modal.igBtn", "Перейти в Instagram")}</span>
-    </a>
-  `;
-  modal.appendChild(modalContent);
-  document.body.appendChild(modal);
-  modal.addEventListener("click", (e) => { if (e.target === modal) modal.remove(); });
-  document.addEventListener("keydown", function closeOnEscape(e) {
-    if (e.key === "Escape") { modal.remove(); document.removeEventListener("keydown", closeOnEscape); }
-  });
-}
