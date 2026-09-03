@@ -102,7 +102,7 @@ function showInstrPricing(id, btn) { showPricingTab(id, btn, ".instr-pricing-pan
 const vocalData = {
   vb: { titleSuffix: "pricing.vocal_basic_suffix", sub: "pricing.vocal_basic_sub", trialVal: "120 zł", singleVal: "170 zł", sub4note: "160 zł|pricing.perLesson", sub4val: "640 zł", sub4disc: "pricing.disc6", sub8note: "150 zł|pricing.perLesson", sub8val: "1200 zł", sub8disc: "pricing.disc12" },
   vp: { titleSuffix: "pricing.vocal_pro_suffix", sub: "pricing.vocal_pro_sub", trialVal: "120 zł", singleVal: "200 zł", sub4note: "190 zł|pricing.perLesson", sub4val: "760 zł", sub4disc: "pricing.disc5", sub8note: "180 zł|pricing.perLesson", sub8val: "1440 zł", sub8disc: "pricing.disc10" },
-  vt: { titleSuffix: "\u00A0TOP", sub: "pricing.vocal_top_sub", trialVal: "300 zł", singleVal: "400 zł", sub4note: "380 zł|pricing.perLesson", sub4val: "1520 zł", sub4disc: "pricing.disc4", sub8note: "285 zł|pricing.perLesson", sub8val: "2280 zł", sub8disc: "pricing.disc8" }
+  vt: { titleSuffix: "\u00A0TOP", sub: "pricing.vocal_top_sub", trialVal: "300 zł", singleVal: "400 zł", sub4note: "380 zł|pricing.perLesson", sub4val: "1520 zł", sub4disc: "pricing.disc4", sub8note: "360 zł|pricing.perLesson", sub8val: "2880 zł", sub8disc: "pricing.disc8" }
 };
 const instrData = {
   ib2: { titleBase: "pricing.instr_basic_title", sub: "pricing.instr_basic_sub", trialVal: "120 zł", singleVal: "170 zł", sub4note: "160 zł|pricing.perLesson", sub4val: "640 zł", sub4disc: "pricing.disc6", sub8note: "150 zł|pricing.perLesson", sub8val: "1200 zł", sub8disc: "pricing.disc12" },
