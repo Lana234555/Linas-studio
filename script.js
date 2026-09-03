@@ -160,46 +160,40 @@ window.refreshPricingPanels = function () {
   const lbPrev = document.getElementById("lbPrev");
   const lbNext = document.getElementById("lbNext");
   const lbCnt = document.getElementById("lbCounter");
+  const gallery = document.querySelector(".gallery-masonry");
   let items = [];
   let current = 0;
 
-  function init() {
-    const allItems = Array.from(document.querySelectorAll(".gallery-item"));
-    let pending = allItems.length;
-    function onSettle() {
-      pending--;
-      if (pending > 0) return;
-      items = allItems.filter((el) => getComputedStyle(el).display !== "none");
-      items.forEach((item, idx) => {
-        if (!item.querySelector(".gallery-zoom-icon")) {
-          const icon = document.createElement("span");
-          icon.className = "gallery-zoom-icon";
-          icon.innerHTML = "⤢";
-          item.appendChild(icon);
-        }
-        item.addEventListener("click", () => openLightbox(idx));
-      });
-    }
-    allItems.forEach((item) => {
-      const img = item.querySelector("img");
-      if (img.dataset.src) {
-        onSettle();
-        return;
-      }
-      if (img.complete) {
-        if (!img.naturalWidth) item.style.display = "none";
-        onSettle();
-      } else {
-        img.addEventListener("load", () => onSettle());
-        img.addEventListener("error", () => { item.style.display = "none"; onSettle(); });
-      }
-    });
+  // Recompute the visible-item list on demand, since the tag filter
+  // and "show more" pagination change which items are shown after load.
+  function visibleItems() {
+    return Array.from(document.querySelectorAll(".gallery-item")).filter(
+      (el) => !el.classList.contains("is-hidden") && getComputedStyle(el).display !== "none"
+    );
   }
 
-  function getImgSrc(item) { return item.querySelector("img").src; }
+  function ensureZoomIcon(item) {
+    if (!item.querySelector(".gallery-zoom-icon")) {
+      const icon = document.createElement("span");
+      icon.className = "gallery-zoom-icon";
+      icon.innerHTML = "⤢";
+      item.appendChild(icon);
+    }
+  }
 
-  function openLightbox(idx) {
-    current = idx;
+  function init() {
+    document.querySelectorAll(".gallery-item").forEach(ensureZoomIcon);
+  }
+
+  function getImgSrc(item) {
+    const img = item.querySelector("img");
+    return img.dataset.src || img.src || "";
+  }
+
+  function openLightbox(item) {
+    items = visibleItems();
+    current = items.indexOf(item);
+    if (current === -1) return;
     lbImg.src = getImgSrc(items[current]);
     lbImg.classList.remove("lb-fade");
     lbCnt.textContent = current + 1 + " / " + items.length;
@@ -220,6 +214,13 @@ window.refreshPricingPanels = function () {
       lbCnt.textContent = current + 1 + " / " + items.length;
       lbImg.classList.remove("lb-fade");
     }, 200);
+  }
+
+  if (gallery) {
+    gallery.addEventListener("click", (e) => {
+      const item = e.target.closest(".gallery-item");
+      if (item) openLightbox(item);
+    });
   }
 
   if (lb) {
