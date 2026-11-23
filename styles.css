@@ -1027,22 +1027,7 @@ footer {
 
 /* ── AFISHA: events board + opening banner (content.js → events-render.js) ── */
 [data-afisha-link][hidden], .afisha[hidden] { display: none !important; }
-/* «Афиша» in the menu: bright shimmering pill */
-@keyframes afisha-shimmer { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
-.nav-links a.nav-afisha, .nav-links a.nav-afisha:hover, .nav-links a.nav-afisha.active {
-  color: #111; font-weight: 600;
-  background: linear-gradient(90deg, #00c4b3, #6aa8ff, #e8b420, #ff7ab6, #00c4b3, #6aa8ff, #e8b420, #ff7ab6, #00c4b3);
-  background-size: 300% 100%;
-  animation: afisha-shimmer 6s linear infinite;
-  box-shadow: 0 0 16px rgba(0,196,179,0.45);
-}
-.nav-links a.nav-afisha:hover { box-shadow: 0 0 22px rgba(232,180,32,0.6); }
-.mobile-menu a.nav-afisha {
-  background: linear-gradient(90deg, #00c4b3, #6aa8ff, #e8b420, #ff7ab6, #00c4b3, #6aa8ff, #e8b420, #ff7ab6, #00c4b3);
-  background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
-  animation: afisha-shimmer 6s linear infinite; font-weight: 600;
-}
-@media (prefers-reduced-motion: reduce) { .nav-links a.nav-afisha, .mobile-menu a.nav-afisha { animation: none; } }
+.nav-links a.nav-afisha { color: var(--teal); }
 .afisha .section { padding-bottom: 60px; }
 .afisha-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; position: relative; isolation: isolate; }
 .afisha-grid::before {
@@ -1096,15 +1081,27 @@ footer {
 /* top ribbon */
 .evr {
   position: fixed; top: 0; left: 0; right: 0; z-index: 210; height: 42px; display: flex; align-items: center;
-  background: linear-gradient(90deg, #00a99a, var(--teal) 40%, #19d3c3); color: #041311; box-shadow: 0 2px 14px rgba(0,0,0,0.35);
+  color: #111; box-shadow: 0 2px 18px rgba(0,196,179,0.35); overflow: hidden;
+  background: linear-gradient(90deg, #00c4b3, #6aa8ff, #e8b420, #ff7ab6, #00c4b3, #6aa8ff, #e8b420, #ff7ab6, #00c4b3);
+  background-size: 300% 100%;
+  animation: evr-flow 9s linear infinite;
 }
+/* moving colours + a light shine sweeping across */
+@keyframes evr-flow { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
+@keyframes evr-shine { 0% { transform: translateX(-100%); } 60%, 100% { transform: translateX(100vw); } }
+.evr::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 180px; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.55), transparent);
+  animation: evr-shine 4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) { .evr, .evr::after { animation: none; } }
 .evr-open { flex: 1; min-width: 0; height: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 0 12px;
   background: none; border: 0; color: inherit; font: inherit; font-size: 0.88rem; cursor: pointer; white-space: nowrap; overflow: hidden; }
 .evr-open b { font-weight: 700; overflow: hidden; text-overflow: ellipsis; }
 .evr-star { font-size: 1rem; }
 .evr-date { opacity: 0.8; }
 .evr-arrow { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #041311; color: var(--teal); font-size: 0.8rem; flex-shrink: 0; }
-.evr-x { width: 42px; height: 42px; background: none; border: 0; color: #041311; font-size: 0.95rem; cursor: pointer; opacity: 0.7; flex-shrink: 0; }
+.evr-x { width: 42px; height: 42px; background: none; border: 0; color: #111; position: relative; z-index: 1; font-size: 0.95rem; cursor: pointer; opacity: 0.7; flex-shrink: 0; }
 .evr-x:hover { opacity: 1; }
 body.has-evr #mainNav { top: 42px; }
 body.has-evr .mobile-menu { top: 42px; }
