@@ -536,6 +536,13 @@ body {
 }
 .plan-kids .pc-title { color: var(--plan); }
 .plan-kids .plan-badge::before { content: "★ "; }
+.plan-book {
+  margin-top: 16px; display: block; text-align: center; padding: 11px 16px; border-radius: 100px;
+  font-size: 0.82rem; font-weight: 600; text-decoration: none; color: #0a0a0a; background: var(--plan);
+  transition: filter 0.2s, transform 0.2s;
+}
+.plan-book:hover { filter: brightness(1.12); transform: translateY(-1px); }
+.plan-book:focus-visible { outline: 2px solid var(--white); outline-offset: 3px; }
 @media (max-width: 1100px) {
   .pricing-cards-row.plans-4 { grid-template-columns: repeat(2, 1fr); }
 }
@@ -545,7 +552,8 @@ body {
   .plan-card .pc-sub { margin-bottom: 10px; }
   /* 2×2 price tiles on phones to keep each card short */
   .plan-card { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8px; row-gap: 8px; }
-  .plan-card > .plan-badge, .plan-card > .pc-title, .plan-card > .pc-sub { grid-column: 1 / -1; margin-bottom: 0; }
+  .plan-card > .plan-badge, .plan-card > .pc-title, .plan-card > .pc-sub, .plan-card > .plan-book { grid-column: 1 / -1; margin-bottom: 0; }
+  .plan-card > .plan-book { margin-top: 6px; }
   .plan-card > .plan-badge { justify-self: start; }
   .plan-card .price-row, .plan-card .price-row:last-child {
     flex-direction: column; justify-content: flex-start; gap: 4px; padding: 10px 12px;
