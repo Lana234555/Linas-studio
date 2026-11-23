@@ -639,6 +639,7 @@ window.SITE_CONTENT = {
       }
     ]
   },
+  "events": [],
   "gallery": {
     "tags": [
       {

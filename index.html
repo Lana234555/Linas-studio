@@ -65,6 +65,7 @@
       </a>
       <div class="nav-center">
         <ul class="nav-links">
+          <li data-afisha-link hidden><a href="#afisha" class="nav-afisha" data-i18n="content.ev.ui.nav">Афиша</a></li>
           <li><a href="#founder" data-i18n="nav.about">О студии</a></li>
           <li><a href="#vocal" data-i18n="nav.vocal">Вокал</a></li>
           <li><a href="#pricing" data-i18n="nav.pricing">Цены</a></li>
@@ -114,6 +115,7 @@
         <span class="mobile-menu-logo">Lina's Studio</span>
         <button class="mobile-menu-x" onclick="toggleMenu()">✕</button>
       </div>
+      <a href="#afisha" onclick="toggleMenu()" data-afisha-link hidden data-i18n="content.ev.ui.nav">Афиша</a>
       <a href="#founder" onclick="toggleMenu()" data-i18n="nav.about"
         >О студии</a
       >
@@ -190,6 +192,17 @@
     <div class="trusted">
       <div class="trusted-marquee-wrap">
         <div class="trusted-marquee-track"><span class="tlogo">Pop</span><span class="tlogo-sep">·</span><span class="tlogo">Jazz</span><span class="tlogo-sep">·</span><span class="tlogo">Soul</span><span class="tlogo-sep">·</span><span class="tlogo">Folk</span><span class="tlogo-sep">·</span><span class="tlogo">Rock</span><span class="tlogo-sep">·</span><span class="tlogo">Opera</span><span class="tlogo-sep">·</span><span class="tlogo">R&amp;B</span><span class="tlogo-sep">·</span><span class="tlogo">Musical</span><span class="tlogo-sep">·</span><span class="tlogo">Extreme</span><span class="tlogo-sep">·</span><span class="tlogo">Pop</span><span class="tlogo-sep">·</span><span class="tlogo">Jazz</span><span class="tlogo-sep">·</span><span class="tlogo">Soul</span><span class="tlogo-sep">·</span><span class="tlogo">Folk</span><span class="tlogo-sep">·</span><span class="tlogo">Rock</span><span class="tlogo-sep">·</span><span class="tlogo">Opera</span><span class="tlogo-sep">·</span><span class="tlogo">R&amp;B</span><span class="tlogo-sep">·</span><span class="tlogo">Musical</span><span class="tlogo-sep">·</span><span class="tlogo">Extreme</span><span class="tlogo-sep">·</span></div>
+      </div>
+    </div>
+
+    <!-- AFISHA: upcoming events from content.js (edited in /admin/, tab «Події») -->
+    <div class="bg-dark anim-section afisha" id="afisha" hidden>
+      <div class="wrap">
+        <div class="section">
+          <div class="chip" data-afisha="chip">Афиша</div>
+          <h2 class="section-title" data-afisha="title">Ближайшие <em>события</em></h2>
+          <div class="afisha-grid" data-content="events"></div>
+        </div>
       </div>
     </div>
 
@@ -1091,6 +1104,7 @@
 
       <!-- Nav links - 2 columns -->
       <nav class="footer-nav">
+        <a href="#afisha" data-afisha-link hidden data-i18n="content.ev.ui.nav">Афиша</a>
         <a href="#founder" data-i18n="nav.about">О студии</a>
         <a href="#vocal" data-i18n="nav.vocal">Вокал</a>
         <a href="#pricing" data-i18n="nav.pricing">Цены</a>
@@ -1135,6 +1149,7 @@
 <script src="i18n.js"></script>
 <script src="content.js"></script>
 <script src="content-render.js"></script>
+<script src="events-render.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

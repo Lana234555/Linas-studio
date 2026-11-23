@@ -29,7 +29,7 @@
   ];
   const ENROLL_DEFAULT = "https://app.band-space.com/user/search/warszawa/linas_music_studio/tutors";
   // Only files inside these folders are ever deleted by the admin
-  const DELETABLE = /^photo\/(gallery|koncert|kvartirnyky|kemp|teachers)\//;
+  const DELETABLE = /^photo\/(gallery|koncert|kvartirnyky|kemp|teachers|events)\//;
 
   const state = {
     token: null,
@@ -37,7 +37,7 @@
     content: null, // working copy
     contentSha: null, // blob sha of content.js at load time
     pending: {}, // path -> { dataUrl, base64 } for newly added photos
-    tab: "teachers",
+    tab: "events",
     galleryFilter: "all",
     uploadTags: [],
   };
@@ -165,6 +165,7 @@
     const set = new Set();
     (c.teachers || []).forEach((t) => t.photo && set.add(t.photo));
     ((c.gallery && c.gallery.photos) || []).forEach((p) => p.src && set.add(p.src));
+    (c.events || []).forEach((e) => e.image && set.add(e.image));
     return set;
   }
 
@@ -766,11 +767,300 @@
     );
   }
 
+  // ── EVENTS (афіша і банер) ──
+  // Dates are strings "YYYY-MM-DDTHH:mm" in Warsaw time, the same way the site reads them.
+  const TZ = "Europe/Warsaw";
+  function warsawTime(str) {
+    if (!str) return NaN;
+    const m = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?/.exec(str);
+    if (!m) return NaN;
+    const asUtc = Date.UTC(+m[1], +m[2] - 1, +m[3], +(m[4] || 0), +(m[5] || 0));
+    const p = {};
+    new Intl.DateTimeFormat("en-US", { timeZone: TZ, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
+      .formatToParts(new Date(asUtc))
+      .forEach((x) => (p[x.type] = x.value));
+    const shown = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute);
+    return asUtc - (shown - asUtc);
+  }
+  function toWarsawStr(ts) {
+    const p = {};
+    new Intl.DateTimeFormat("en-US", { timeZone: TZ, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
+      .formatToParts(new Date(ts))
+      .forEach((x) => (p[x.type] = x.value));
+    return `${p.year}-${p.month}-${p.day}T${String(+p.hour % 24).padStart(2, "0")}:${p.minute}`;
+  }
+  function eventEnd(e) {
+    if (e.endDate) return warsawTime(e.endDate);
+    return e.date ? warsawTime(e.date.slice(0, 10) + "T23:59") + 59000 : NaN;
+  }
+  function showFrom(e) {
+    return e.publishFrom ? warsawTime(e.publishFrom) : -Infinity;
+  }
+  function showUntil(e) {
+    return e.publishUntil ? warsawTime(e.publishUntil) : eventEnd(e);
+  }
+  // draft | scheduled | live | ended
+  function eventStatus(e, now) {
+    now = now || Date.now();
+    if (e.hidden || !e.date) return "draft";
+    if (now < showFrom(e)) return "scheduled";
+    if (now >= showUntil(e)) return "ended";
+    return "live";
+  }
+  const STATUS = {
+    live: ["На сайті зараз", "live"],
+    scheduled: ["Заплановано", "scheduled"],
+    draft: ["Чернетка", "draft"],
+    ended: ["Завершено", "ended"],
+  };
+  function nice(ts, withYear) {
+    if (!isFinite(ts)) return "";
+    return new Intl.DateTimeFormat("uk-UA", { timeZone: TZ, day: "numeric", month: "long", year: withYear ? "numeric" : undefined, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date(ts));
+  }
+  function niceDate(str) {
+    if (!str) return "дата не вказана";
+    const ts = warsawTime(str);
+    return new Intl.DateTimeFormat("uk-UA", { timeZone: TZ, weekday: "short", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date(ts));
+  }
+  function scheduleText(e) {
+    if (e.hidden) return "Чернетка: на сайті не показується, поки ви не вимкнете цю позначку.";
+    if (!e.date) return "Вкажіть дату події.";
+    const from = e.publishFrom ? "з " + nice(warsawTime(e.publishFrom), true) : "одразу після публікації";
+    const until = isFinite(showUntil(e)) ? "до " + nice(showUntil(e), true) : "";
+    const late = e.publishUntil && showUntil(e) > eventEnd(e) + 3600000 ? " Увага: подія вже пройде, а картка ще буде на сайті." : "";
+    return `На сайті ${from} ${until}${e.publishUntil ? "" : " (коли подія закінчиться)"}.` + (e.banner ? " Весь цей час банер вискакує при відкритті сайту." : "") + late;
+  }
+
+  function emptyEvent() {
+    const text = {};
+    LANGS.forEach(([l]) => (text[l] = { title: "", place: "", desc: "", button: "" }));
+    text.ru.place = "Lina's Music Studio, Warszawa";
+    return { id: "e" + Date.now().toString(36), date: "", endDate: "", image: "", text, buttonUrl: ENROLL_DEFAULT, banner: false, publishFrom: "", publishUntil: "", hidden: false };
+  }
+
+  function renderEvents() {
+    const view = $("eventsView");
+    view.innerHTML = "";
+    const events = (state.content.events = state.content.events || []);
+    const now = Date.now();
+    view.appendChild(
+      h(
+        "div",
+        { class: "view-head" },
+        h("div", null, h("div", { class: "chip" }, "Афіша"), h("h2", null, "Події")),
+        h("button", { class: "btn btn-teal", onclick: () => editEvent(-1) }, "+ Додати подію")
+      )
+    );
+    view.appendChild(
+      h(
+        "p",
+        { class: "muted ev-help" },
+        "Події показуються на сайті в розділі «Афіша». Позначте ★ «Банер», щоб подія вискакувала великим вікном, коли людина відкриває сайт. Сайт сам вмикає і вимикає подію в указаний час. Після змін натисніть «Опублікувати на сайті» внизу."
+      )
+    );
+    const order = ["live", "scheduled", "draft", "ended"];
+    const titles = { live: "Зараз на сайті", scheduled: "Заплановані (з'являться самі)", draft: "Чернетки", ended: "Завершені (вже не показуються)" };
+    const items = events.map((e, i) => ({ e, i, s: eventStatus(e, now) }));
+    if (!items.length) {
+      view.appendChild(
+        h("div", { class: "ev-empty" }, h("div", { class: "ev-empty-icon" }, "🎤"), h("p", null, "Поки немає жодної події."), h("button", { class: "btn btn-teal", onclick: () => editEvent(-1) }, "+ Додати першу подію"))
+      );
+      return;
+    }
+    order.forEach((s) => {
+      const list = items.filter((x) => x.s === s).sort((a, b) => (s === "ended" ? -1 : 1) * (warsawTime(a.e.date) - warsawTime(b.e.date)));
+      if (!list.length) return;
+      const rows = h("div", { class: "row-list" });
+      list.forEach(({ e, i }) => {
+        const ru = (e.text && e.text.ru) || {};
+        rows.appendChild(
+          h(
+            "div",
+            { class: "trow evrow st-" + s },
+            e.image ? imgWithFallback(e.image) : h("div", { class: "ph" }, "🎤"),
+            h(
+              "div",
+              null,
+              h(
+                "div",
+                { class: "trow-name" },
+                ru.title || "(без назви)",
+                h("span", { class: "badge st " + STATUS[s][1] }, STATUS[s][0]),
+                e.banner ? h("span", { class: "badge star" }, "★ Банер") : null
+              ),
+              h("div", { class: "trow-role" }, "🗓 " + niceDate(e.date)),
+              h("div", { class: "ev-sched" }, scheduleText(e))
+            ),
+            h(
+              "div",
+              { class: "trow-actions" },
+              h("button", { class: "btn btn-ghost btn-small", onclick: () => editEvent(i) }, "Редагувати"),
+              h("button", { class: "btn btn-ghost btn-small", title: "Створити копію (наприклад, для наступного такого ж івенту)", onclick: () => { const c = clone(e); c.id = "e" + Date.now().toString(36); c.hidden = true; events.push(c); changed(); toast("Копію створено як чернетку."); } }, "Копія"),
+              h("button", { class: "icon-btn danger", title: "Видалити", onclick: () => { if (confirm(`Видалити подію «${ru.title || "без назви"}»?`)) { events.splice(i, 1); changed(); } } }, "✕")
+            )
+          )
+        );
+      });
+      view.appendChild(h("div", { class: "group" }, h("div", { class: "group-head" }, h("h3", null, titles[s], h("span", { class: "count-pill" }, String(list.length)))), rows));
+    });
+  }
+
+  function editEvent(index) {
+    const isNew = index < 0;
+    const e = isNew ? emptyEvent() : clone(state.content.events[index]);
+    e.text = e.text || {};
+    LANGS.forEach(([l]) => (e.text[l] = Object.assign({ title: "", place: "", desc: "", button: "" }, e.text[l] || {})));
+    let lang = "ru";
+
+    const photoBox = h("div", { class: "photo-pick wide" });
+    function drawPhoto() {
+      photoBox.innerHTML = "";
+      photoBox.appendChild(e.image ? imgWithFallback(e.image) : h("div", { class: "ph" }, "🎤"));
+      const input = h("input", { type: "file", accept: "image/*" });
+      input.addEventListener("change", async () => {
+        const file = input.files[0];
+        if (!file) return;
+        try {
+          e.image = await addPendingImage(file, "events", slugify(e.text.ru.title) || "event", 1600);
+          drawPhoto();
+        } catch (err) {
+          toast(err.message, true);
+        }
+      });
+      photoBox.appendChild(
+        h(
+          "div",
+          null,
+          h("span", { class: "btn btn-ghost btn-small file-btn" }, e.image ? "Змінити фото / афішу" : "Завантажити фото / афішу", input),
+          e.image ? h("button", { class: "link", type: "button", style: "margin-left:10px", onclick: () => { e.image = ""; drawPhoto(); } }, "прибрати") : null,
+          h("p", { class: "muted", style: "margin-top:8px" }, "Краще горизонтальне фото. Без фото буде красивий фон з мікрофоном.")
+        )
+      );
+    }
+    drawPhoto();
+
+    const textBox = h("div");
+    function drawText() {
+      const d = e.text[lang];
+      textBox.innerHTML = "";
+      textBox.appendChild(
+        h(
+          "div",
+          null,
+          field("Назва події", textInput(d.title, (v) => (d.title = v), { placeholder: "Новорічний концерт учнів" })),
+          field("Місце", textInput(d.place, (v) => (d.place = v), { placeholder: "Lina's Music Studio, Warszawa" })),
+          field("Опис", h("textarea", { oninput: (ev) => (d.desc = ev.target.value), placeholder: "Коротко: що буде, для кого, скільки коштує вхід" }, d.desc)),
+          field("Текст кнопки (необов'язково)", textInput(d.button, (v) => (d.button = v), { placeholder: lang === "ru" ? "Подробнее" : lang === "en" ? "Learn more" : "Szczegóły" }))
+        )
+      );
+    }
+    drawText();
+
+    const summary = h("div", { class: "ev-summary" });
+    function drawSummary() {
+      summary.textContent = scheduleText(e);
+      summary.className = "ev-summary st-" + eventStatus(e);
+    }
+
+    // banner toggle
+    const bannerBox = h("label", { class: "big-toggle" + (e.banner ? " on" : "") });
+    const bannerInput = h("input", { type: "checkbox", checked: e.banner, onchange: (ev) => { e.banner = ev.target.checked; bannerBox.classList.toggle("on", e.banner); drawSummary(); } });
+    bannerBox.append(bannerInput, h("span", { class: "big-toggle-ui" }), h("span", null, h("b", null, "★ Головна подія: банер при відкритті сайту"), h("small", null, "Велике вікно з цією подією вискакує, коли людина заходить на сайт, і зверху сайту з'являється яскрава стрічка.")));
+
+    // date fields
+    const dateInput = h("input", { type: "datetime-local", value: e.date, oninput: (ev) => { e.date = ev.target.value; drawSummary(); } });
+    const endInput = h("input", { type: "datetime-local", value: e.endDate, oninput: (ev) => { e.endDate = ev.target.value; drawSummary(); } });
+
+    // publish from
+    const fromBox = h("div", { class: "choice" });
+    function drawFrom() {
+      fromBox.innerHTML = "";
+      const now = !e.publishFrom;
+      fromBox.append(
+        h("button", { type: "button", class: "choice-btn" + (now ? " on" : ""), onclick: () => { e.publishFrom = ""; drawFrom(); drawSummary(); } }, "Одразу"),
+        h("button", { type: "button", class: "choice-btn" + (!now ? " on" : ""), onclick: () => { if (!e.publishFrom) e.publishFrom = toWarsawStr(Date.now() + 86400000).slice(0, 11) + "10:00"; drawFrom(); drawSummary(); } }, "З дати…"),
+        !now ? h("input", { type: "datetime-local", value: e.publishFrom, oninput: (ev) => { e.publishFrom = ev.target.value; drawSummary(); } }) : null
+      );
+    }
+    drawFrom();
+
+    // publish until
+    const untilBox = h("div", { class: "choice" });
+    function quick(days) {
+      const base = e.publishFrom ? warsawTime(e.publishFrom) : Date.now();
+      e.publishUntil = toWarsawStr(base + days * 86400000);
+      drawUntil();
+      drawSummary();
+    }
+    function drawUntil() {
+      untilBox.innerHTML = "";
+      const auto = !e.publishUntil;
+      untilBox.append(
+        h("button", { type: "button", class: "choice-btn" + (auto ? " on" : ""), onclick: () => { e.publishUntil = ""; drawUntil(); drawSummary(); } }, "До кінця події"),
+        h("button", { type: "button", class: "choice-btn", onclick: () => quick(7) }, "1 тиждень"),
+        h("button", { type: "button", class: "choice-btn", onclick: () => quick(14) }, "2 тижні"),
+        h("button", { type: "button", class: "choice-btn", onclick: () => quick(30) }, "1 місяць"),
+        h("button", { type: "button", class: "choice-btn" + (!auto ? " on" : ""), onclick: () => { if (!e.publishUntil) quick(7); } }, "До дати…"),
+        !auto ? h("input", { type: "datetime-local", value: e.publishUntil, oninput: (ev) => { e.publishUntil = ev.target.value; drawSummary(); } }) : null
+      );
+    }
+    drawUntil();
+
+    const draftBox = h("label", { class: "check" }, h("input", { type: "checkbox", checked: e.hidden, onchange: (ev) => { e.hidden = ev.target.checked; drawSummary(); } }), h("span", null, "Чернетка: поки не показувати на сайті"));
+    drawSummary();
+
+    const node = h(
+      "div",
+      null,
+      h("h3", null, isNew ? "Нова подія" : "Редагування події"),
+      bannerBox,
+      h("div", { class: "sub-head" }, "Коли подія"),
+      h("div", { class: "grid2" }, field("Початок (дата і час)", dateInput), field("Кінець (необов'язково)", endInput)),
+      h("div", { class: "sub-head" }, "Фото"),
+      photoBox,
+      h("div", { class: "sub-head" }, "Тексти"),
+      langTabs((l) => { lang = l; drawText(); }, lang),
+      textBox,
+      field("Посилання кнопки (запис, квитки, Instagram…)", textInput(e.buttonUrl, (v) => (e.buttonUrl = v.trim()), { placeholder: "https://…" })),
+      h("div", { class: "sub-head" }, "Публікація на сайті"),
+      h("div", { class: "field" }, h("span", null, "Коли показати на сайті"), fromBox),
+      h("div", { class: "field" }, h("span", null, "Скільки показувати"), untilBox),
+      draftBox,
+      summary,
+      h(
+        "div",
+        { class: "modal-actions" },
+        h("button", { class: "btn btn-ghost", type: "button", onclick: closeModal }, "Скасувати"),
+        h(
+          "button",
+          {
+            class: "btn btn-teal",
+            type: "button",
+            onclick: () => {
+              if (!e.text.ru.title.trim()) return toast("Вкажіть назву російською (RU), це основна мова сайту.", true);
+              if (!e.date) return toast("Вкажіть дату і час початку події.", true);
+              if (e.endDate && warsawTime(e.endDate) < warsawTime(e.date)) return toast("Кінець події раніше за початок.", true);
+              if (e.publishFrom && e.publishUntil && warsawTime(e.publishUntil) <= warsawTime(e.publishFrom)) return toast("«Показувати до» має бути пізніше, ніж «Показати з».", true);
+              if (isNew) state.content.events.push(e);
+              else state.content.events[index] = e;
+              closeModal();
+              changed();
+              if (eventStatus(e) === "ended") toast("Увага: за цими датами подія вже не показується на сайті.", true);
+            },
+          },
+          "Готово"
+        )
+      )
+    );
+    openModal(node);
+  }
+
   // ── render ──
   function render() {
-    ["teachers", "prices", "gallery"].forEach((t) => ($(t + "View").hidden = state.tab !== t));
+    ["events", "teachers", "prices", "gallery"].forEach((t) => ($(t + "View").hidden = state.tab !== t));
     document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("active", b.dataset.tab === state.tab));
     const y = window.scrollY;
+    if (state.tab === "events") renderEvents();
     if (state.tab === "teachers") renderTeachers();
     if (state.tab === "prices") renderPrices();
     if (state.tab === "gallery") renderGallery();
@@ -832,6 +1122,7 @@
     const swap = (p) => (state.pending[p] ? state.pending[p].dataUrl : p);
     c.teachers.forEach((t) => (t.photo = swap(t.photo)));
     c.gallery.photos.forEach((p) => (p.src = swap(p.src)));
+    (c.events || []).forEach((e) => (e.image = swap(e.image)));
     try {
       localStorage.setItem(PREVIEW_KEY, JSON.stringify(c));
     } catch (e) {
@@ -853,6 +1144,7 @@
       state.content = f.content;
       state.original = clone(f.content);
       state.content.teachers = state.content.teachers || [];
+      state.content.events = state.content.events || [];
       $("loadingView").hidden = true;
       $("tabs").hidden = false;
       $("topbarRight").hidden = false;
@@ -869,7 +1161,7 @@
     $("tabs").hidden = true;
     $("topbarRight").hidden = true;
     $("savebar").hidden = true;
-    ["teachers", "prices", "gallery"].forEach((t) => ($(t + "View").hidden = true));
+    ["events", "teachers", "prices", "gallery"].forEach((t) => ($(t + "View").hidden = true));
     $("loginError").hidden = !err;
     $("loginError").textContent = err || "";
   }

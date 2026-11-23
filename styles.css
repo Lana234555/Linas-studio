@@ -953,3 +953,124 @@ footer {
   .fstat-label { font-size: 0.58rem; }
   .vlink { font-size: 0.7rem; padding: 4px 10px; gap: 4px; }
 }
+
+/* ── AFISHA: events board + opening banner (content.js → events-render.js) ── */
+[data-afisha-link][hidden], .afisha[hidden] { display: none !important; }
+.nav-links a.nav-afisha { color: var(--teal); }
+.afisha .section { padding-bottom: 60px; }
+.afisha-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; position: relative; isolation: isolate; }
+.afisha-grid::before {
+  content: ""; position: absolute; inset: 0 2%; z-index: -1; pointer-events: none; filter: blur(48px); opacity: 0.3;
+  background:
+    radial-gradient(closest-side at 18% 30%, rgba(0,196,179,0.9), transparent),
+    radial-gradient(closest-side at 55% 75%, rgba(106,168,255,0.7), transparent),
+    radial-gradient(closest-side at 85% 35%, rgba(232,180,32,0.7), transparent);
+}
+.afisha-grid.afisha-one { grid-template-columns: 1fr; max-width: 980px; }
+.afisha-card {
+  display: flex; flex-direction: column; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius);
+  background: linear-gradient(160deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 45%, rgba(12,12,11,0.4) 100%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%); backdrop-filter: blur(20px) saturate(150%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 18px 36px -18px rgba(0,0,0,0.7);
+  transition: transform 0.25s, border-color 0.25s, background 0.25s;
+}
+.afisha-card:hover { transform: translateY(-4px); border-color: rgba(0,196,179,0.35); }
+.afisha-card.is-main { border-color: rgba(232,180,32,0.45); box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 0 0 1px rgba(232,180,32,0.15), 0 18px 40px -16px rgba(232,180,32,0.25); }
+.afisha-img { position: relative; aspect-ratio: 16 / 10; background: #111; overflow: hidden; }
+.afisha-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.afisha-img-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 3.4rem;
+  background: radial-gradient(circle at 30% 30%, rgba(0,196,179,0.35), transparent 60%), radial-gradient(circle at 75% 70%, rgba(232,180,32,0.3), transparent 60%), #121211; }
+.afisha-date {
+  position: absolute; left: 14px; top: 14px; min-width: 66px; padding: 8px 10px 7px; text-align: center;
+  background: rgba(8,8,8,0.82); border: 1px solid rgba(0,196,179,0.45); border-radius: 10px;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); line-height: 1;
+}
+.afisha-day { display: block; font-family: "Alice", serif; font-size: 2rem; color: var(--teal); }
+.afisha-mon { display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--white); margin-top: 4px; }
+.afisha-wd { display: block; font-size: 0.66rem; color: var(--muted); margin-top: 3px; }
+.afisha-flag { position: absolute; right: 12px; top: 14px; background: var(--gold2); color: #111; font-size: 0.7rem; font-weight: 600; padding: 5px 11px; border-radius: 100px; letter-spacing: 0.03em; }
+.afisha-body { padding: 20px 22px 22px; display: flex; flex-direction: column; flex: 1; }
+.afisha-title { font-family: "Alice", serif; font-weight: 400; font-size: 1.45rem; line-height: 1.2; color: var(--white); margin-bottom: 12px; }
+.afisha-meta { display: grid; gap: 6px; font-size: 0.86rem; color: var(--text); margin-bottom: 12px; }
+.afisha-desc { font-size: 0.84rem; color: var(--muted); line-height: 1.7; margin-bottom: 18px; flex: 1; white-space: pre-line;
+  display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+.afisha-btn, .evb-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; align-self: flex-start;
+  background: var(--teal); color: #041311; text-decoration: none; font-weight: 600; font-size: 0.92rem;
+  padding: 13px 24px; border-radius: 100px; transition: background 0.2s, box-shadow 0.2s, gap 0.2s;
+}
+.afisha-btn:hover, .evb-btn:hover { background: var(--teal3); box-shadow: 0 6px 24px rgba(0,196,179,0.35); gap: 14px; }
+.afisha-one .afisha-card { flex-direction: row; }
+.afisha-one .afisha-img { flex: 0 0 48%; aspect-ratio: auto; min-height: 320px; }
+.afisha-one .afisha-body { padding: 30px 32px; justify-content: center; }
+.afisha-one .afisha-title { font-size: 2rem; }
+.afisha-one .afisha-desc { -webkit-line-clamp: 8; flex: 0; }
+
+/* top ribbon */
+.evr {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 210; height: 42px; display: flex; align-items: center;
+  background: linear-gradient(90deg, #00a99a, var(--teal) 40%, #19d3c3); color: #041311; box-shadow: 0 2px 14px rgba(0,0,0,0.35);
+}
+.evr-open { flex: 1; min-width: 0; height: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 0 12px;
+  background: none; border: 0; color: inherit; font: inherit; font-size: 0.88rem; cursor: pointer; white-space: nowrap; overflow: hidden; }
+.evr-open b { font-weight: 700; overflow: hidden; text-overflow: ellipsis; }
+.evr-star { font-size: 1rem; }
+.evr-date { opacity: 0.8; }
+.evr-arrow { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: #041311; color: var(--teal); font-size: 0.8rem; flex-shrink: 0; }
+.evr-x { width: 42px; height: 42px; background: none; border: 0; color: #041311; font-size: 0.95rem; cursor: pointer; opacity: 0.7; flex-shrink: 0; }
+.evr-x:hover { opacity: 1; }
+body.has-evr #mainNav { top: 42px; }
+body.has-evr .mobile-menu { top: 42px; }
+body.has-evr .hero { padding-top: 142px; }
+
+/* opening banner */
+.evb { position: fixed; inset: 0; z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px;
+  background: rgba(0,0,0,0.72); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); opacity: 0; transition: opacity 0.25s; }
+.evb.show { opacity: 1; }
+.evb[hidden] { display: none; }
+.evb-box { position: relative; width: min(920px, 100%); max-height: calc(100vh - 40px); overflow: auto; border-radius: 18px;
+  background: linear-gradient(160deg, #1f2221 0%, #141514 55%, #0e0f0e 100%); border: 1px solid rgba(232,180,32,0.4);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset; transform: translateY(16px) scale(0.98); transition: transform 0.3s; }
+.evb.show .evb-box { transform: none; }
+.evb-slide { display: none; grid-template-columns: 1fr 1fr; }
+.evb-slide.active { display: grid; }
+.evb-img { min-height: 380px; background: #111; }
+.evb-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.evb-body { padding: 38px 36px 34px; display: flex; flex-direction: column; justify-content: center; }
+.evb-flag { align-self: flex-start; background: var(--gold2); color: #111; font-size: 0.74rem; font-weight: 600; padding: 6px 13px; border-radius: 100px; margin-bottom: 16px; }
+.evb-title { font-family: "Alice", serif; font-weight: 400; font-size: clamp(1.7rem, 3vw, 2.5rem); line-height: 1.12; color: var(--white); margin-bottom: 16px; }
+.evb-date { font-size: 1.02rem; color: var(--teal); font-weight: 500; margin-bottom: 6px; }
+.evb-place { font-size: 0.92rem; color: var(--text); margin-bottom: 14px; }
+.evb-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.7; margin-bottom: 22px; white-space: pre-line; }
+.evb-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.evb-btn { font-size: 1rem; padding: 15px 28px; }
+.evb-all { color: var(--white); font-size: 0.86rem; text-decoration: underline; text-underline-offset: 4px; opacity: 0.8; }
+.evb-all:hover { opacity: 1; color: var(--teal); }
+.evb-x { position: absolute; right: 12px; top: 12px; z-index: 2; width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(0,0,0,0.6); color: #fff; font-size: 1rem; cursor: pointer; }
+.evb-x:hover { background: #000; border-color: var(--teal); }
+.evb-nav { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 0 18px; }
+.evb-dot { width: 10px; height: 10px; border-radius: 50%; border: 0; background: rgba(255,255,255,0.25); cursor: pointer; padding: 0; }
+.evb-dot.active { background: var(--teal); width: 26px; border-radius: 10px; }
+.evb-arrow { background: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; line-height: 1; }
+.evb-arrow:hover { border-color: var(--teal); color: var(--teal); }
+
+@media (max-width: 1024px) {
+  .afisha-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 700px) {
+  .afisha-grid { grid-template-columns: 1fr; }
+  .afisha-one .afisha-card { flex-direction: column; }
+  .afisha-one .afisha-img { min-height: 0; aspect-ratio: 16 / 10; }
+  .afisha-one .afisha-body { padding: 20px 22px 22px; }
+  .afisha-one .afisha-title { font-size: 1.5rem; }
+  .evb { padding: 12px; align-items: flex-end; }
+  .evb-box { max-height: calc(100vh - 24px); }
+  .evb-slide.active { display: block; }
+  .evb-img { min-height: 0; aspect-ratio: 16 / 10; }
+  .evb-body { padding: 22px 20px 22px; }
+  .evb-btn { width: 100%; }
+  .evr-lead, .evr-date { display: none; }
+  .evr-open { justify-content: flex-start; font-size: 0.84rem; }
+}
