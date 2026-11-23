@@ -1020,3 +1020,7 @@ footer {
   background: linear-gradient(160deg, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.05) 45%, rgba(16,16,15,0.4) 100%);
   border-color: rgba(0,196,179,0.35);
 }
+
+/* Gift certificate image */
+.cert-visual { aspect-ratio: auto; padding: 0; }
+.cert-img { display: block; width: 100%; height: auto; border-radius: inherit; }
