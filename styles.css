@@ -499,6 +499,43 @@ body {
 .pr-unit { font-size: 0.66rem; color: var(--muted); margin-top: 1px; }
 .pr-discount { display: inline-block; background: rgba(0,196,179,0.1); border: 1px solid rgba(0,196,179,0.2); color: var(--teal); font-size: 0.63rem; font-weight: 600; padding: 2px 7px; border-radius: 100px; margin-top: 3px; }
 
+/* Plan cards: all plans visible side by side (no tabs) */
+.pricing-cards-row.plans-4 { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.pricing-cards-row.plans-3 { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.plan-card { padding: 26px 22px 22px; display: flex; flex-direction: column; }
+.plan-card .pc-title { font-size: 1.2rem; line-height: 1.25; }
+.plan-card .pc-sub { margin-bottom: 14px; flex-grow: 1; }
+.plan-card .price-row { padding: 9px 0; gap: 10px; }
+.plan-card .pr-label { font-size: 0.8rem; }
+.plan-card .pr-val { font-size: 1.4rem; line-height: 1.15; white-space: nowrap; }
+.plan-card .pr-discount { white-space: nowrap; }
+.plan-badge {
+  align-self: flex-start; margin-bottom: 12px; padding: 4px 12px; border-radius: 100px;
+  font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--teal); background: rgba(0,196,179,0.1); border: 1px solid rgba(0,196,179,0.25);
+}
+.plan-top { border-color: rgba(0,196,179,0.35); }
+.plan-top .plan-badge { background: var(--teal); color: #040d0c; border-color: var(--teal); }
+.plan-top::before { transform: scaleX(1); }
+@media (max-width: 1100px) {
+  .pricing-cards-row.plans-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .pricing-cards-row.plans-4, .pricing-cards-row.plans-3 { grid-template-columns: 1fr; gap: 12px; }
+  .plan-card { padding: 20px 18px 18px; }
+  .plan-card .pc-sub { margin-bottom: 10px; }
+  /* 2×2 price tiles on phones to keep each card short */
+  .plan-card { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8px; row-gap: 8px; }
+  .plan-card > .plan-badge, .plan-card > .pc-title, .plan-card > .pc-sub { grid-column: 1 / -1; margin-bottom: 0; }
+  .plan-card > .plan-badge { justify-self: start; }
+  .plan-card .price-row, .plan-card .price-row:last-child {
+    flex-direction: column; justify-content: flex-start; gap: 4px; padding: 10px 12px;
+    border: 1px solid var(--border); border-radius: 12px; background: rgba(255,255,255,0.02);
+  }
+  .plan-card .pr-right { text-align: left; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 6px; }
+  .plan-card .pr-discount { margin-top: 2px; }
+}
+
 /* ── INSTRUMENT TEACHERS ── */
 .instr-teachers-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(300px,1fr)); gap: 16px; }
 .it-card {
