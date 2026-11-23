@@ -1027,7 +1027,22 @@ footer {
 
 /* ── AFISHA: events board + opening banner (content.js → events-render.js) ── */
 [data-afisha-link][hidden], .afisha[hidden] { display: none !important; }
-.nav-links a.nav-afisha { color: var(--teal); }
+/* «Афиша» in the menu: bright shimmering pill */
+@keyframes afisha-shimmer { 0% { background-position: 0% 50%; } 100% { background-position: 300% 50%; } }
+.nav-links a.nav-afisha, .nav-links a.nav-afisha:hover, .nav-links a.nav-afisha.active {
+  color: #111; font-weight: 600;
+  background: linear-gradient(90deg, #00c4b3, #6aa8ff, #e8b420, #ff7ab6, #00c4b3, #6aa8ff, #e8b420, #ff7ab6, #00c4b3);
+  background-size: 300% 100%;
+  animation: afisha-shimmer 6s linear infinite;
+  box-shadow: 0 0 16px rgba(0,196,179,0.45);
+}
+.nav-links a.nav-afisha:hover { box-shadow: 0 0 22px rgba(232,180,32,0.6); }
+.mobile-menu a.nav-afisha {
+  background: linear-gradient(90deg, #00c4b3, #6aa8ff, #e8b420, #ff7ab6, #00c4b3, #6aa8ff, #e8b420, #ff7ab6, #00c4b3);
+  background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: afisha-shimmer 6s linear infinite; font-weight: 600;
+}
+@media (prefers-reduced-motion: reduce) { .nav-links a.nav-afisha, .mobile-menu a.nav-afisha { animation: none; } }
 .afisha .section { padding-bottom: 60px; }
 .afisha-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; position: relative; isolation: isolate; }
 .afisha-grid::before {
