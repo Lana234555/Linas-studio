@@ -998,3 +998,25 @@ footer {
   .fstat-label { font-size: 0.58rem; }
   .vlink { font-size: 0.7rem; padding: 4px 10px; gap: 4px; }
 }
+
+/* ── SITE-WIDE FROSTED GLASS (same feel as the pricing cards) ── */
+.teachers-grid, .instr-teachers-grid, .halls-grid, .events-grid, .hall-price-grid { position: relative; isolation: isolate; }
+.teachers-grid::before, .instr-teachers-grid::before, .halls-grid::before, .events-grid::before, .hall-price-grid::before {
+  content: ""; position: absolute; inset: 0 2%; z-index: -1; pointer-events: none; filter: blur(48px); opacity: 0.3;
+  background:
+    radial-gradient(closest-side at 18% 30%, rgba(0,196,179,0.9), transparent),
+    radial-gradient(closest-side at 55% 75%, rgba(106,168,255,0.7), transparent),
+    radial-gradient(closest-side at 85% 35%, rgba(232,180,32,0.7), transparent);
+}
+.teacher-card, .it-card, .hall-card, .event-card, .hp-card, .hp-conditions,
+.contact-item, .instr-single-card, .glass-card, .cert-visual {
+  background: linear-gradient(160deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 45%, rgba(12,12,11,0.4) 100%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%); backdrop-filter: blur(20px) saturate(150%);
+  border-color: rgba(255,255,255,0.12);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 18px 36px -18px rgba(0,0,0,0.7);
+}
+.teacher-card:hover, .it-card:hover, .hall-card:hover, .event-card:hover, .hp-card:hover,
+.contact-item:hover, .instr-single-card:hover, .glass-card:hover {
+  background: linear-gradient(160deg, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.05) 45%, rgba(16,16,15,0.4) 100%);
+  border-color: rgba(0,196,179,0.35);
+}
