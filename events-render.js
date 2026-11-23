@@ -122,7 +122,8 @@
   const now = Date.now();
   const live = (C.events || [])
     .filter((e) => isLive(e, now))
-    .sort((a, b) => warsawTime(a.date) - warsawTime(b.date));
+    // main (banner) events first, then the rest; each group by date
+    .sort((a, b) => (b.banner ? 1 : 0) - (a.banner ? 1 : 0) || warsawTime(a.date) - warsawTime(b.date));
 
   const board = document.getElementById("afisha");
   const navLinks = document.querySelectorAll('[data-afisha-link]');
