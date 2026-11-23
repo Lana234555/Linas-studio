@@ -1151,3 +1151,17 @@ body.has-evr .hero { padding-top: 142px; }
   .evr-lead, .evr-date { display: none; }
   .evr-open { justify-content: flex-start; font-size: 0.84rem; }
 }
+
+/* ── SOFT TRANSITIONS BETWEEN SECTIONS ──
+   Every section fades to the same deep black at its top and bottom edge,
+   so neighbouring backgrounds (paper texture, flat dark) blend instead of cutting. */
+.bg-dark, .bg-dark2 { position: relative; }
+.bg-dark::before, .bg-dark2::before, .bg-dark::after, .bg-dark2::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 140px; pointer-events: none; z-index: 0;
+}
+.bg-dark::before, .bg-dark2::before { top: 0; background: linear-gradient(to bottom, #0a0a0a, rgba(10,10,10,0)); }
+.bg-dark::after, .bg-dark2::after { bottom: 0; background: linear-gradient(to top, #0a0a0a, rgba(10,10,10,0)); }
+.bg-dark > .wrap, .bg-dark2 > .wrap { position: relative; z-index: 1; }
+@media (max-width: 700px) {
+  .bg-dark::before, .bg-dark2::before, .bg-dark::after, .bg-dark2::after { height: 80px; }
+}
