@@ -509,14 +509,33 @@ body {
 .plan-card .pr-label { font-size: 0.8rem; }
 .plan-card .pr-val { font-size: 1.4rem; line-height: 1.15; white-space: nowrap; }
 .plan-card .pr-discount { white-space: nowrap; }
-.plan-badge {
-  align-self: flex-start; margin-bottom: 12px; padding: 4px 12px; border-radius: 100px;
-  font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--teal); background: rgba(0,196,179,0.1); border: 1px solid rgba(0,196,179,0.25);
+/* Each plan has its own accent colour: --plan (solid) and --plan-rgb (for tints) */
+.plan-basic { --plan: #00c4b3; --plan-rgb: 0,196,179; }
+.plan-pro   { --plan: #6aa8ff; --plan-rgb: 106,168,255; }
+.plan-top   { --plan: #e8b420; --plan-rgb: 232,180,32; }
+.plan-kids  { --plan: #ff7eb3; --plan-rgb: 255,126,179; }
+.plan-card {
+  border-color: rgba(var(--plan-rgb), 0.35);
+  background: linear-gradient(180deg, rgba(var(--plan-rgb), 0.13) 0%, rgba(var(--plan-rgb), 0.03) 45%, var(--card) 100%);
 }
-.plan-top { border-color: rgba(0,196,179,0.35); }
-.plan-top .plan-badge { background: var(--teal); color: #040d0c; border-color: var(--teal); }
-.plan-top::before { transform: scaleX(1); }
+.plan-card:hover { border-color: rgba(var(--plan-rgb), 0.6); background: linear-gradient(180deg, rgba(var(--plan-rgb), 0.18) 0%, rgba(var(--plan-rgb), 0.05) 45%, var(--card2) 100%); }
+.plan-card::before { height: 4px; background: var(--plan); transform: scaleX(1); }
+.plan-card .pr-val { color: var(--plan); }
+.plan-card .pr-discount { color: var(--plan); background: rgba(var(--plan-rgb), 0.12); border-color: rgba(var(--plan-rgb), 0.3); }
+.plan-card .price-row { border-bottom-color: rgba(var(--plan-rgb), 0.14); }
+.plan-badge {
+  align-self: flex-start; margin-bottom: 12px; padding: 5px 14px; border-radius: 100px;
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: #0a0a0a; background: var(--plan); border: 1px solid var(--plan);
+}
+/* KIDS stands out the most: stronger tint, glow and a thicker frame */
+.plan-kids {
+  border-width: 2px; border-color: rgba(var(--plan-rgb), 0.7);
+  background: linear-gradient(180deg, rgba(var(--plan-rgb), 0.22) 0%, rgba(var(--plan-rgb), 0.08) 55%, var(--card) 100%);
+  box-shadow: 0 0 0 4px rgba(var(--plan-rgb), 0.08), 0 12px 40px -12px rgba(var(--plan-rgb), 0.45);
+}
+.plan-kids .pc-title { color: var(--plan); }
+.plan-kids .plan-badge::before { content: "★ "; }
 @media (max-width: 1100px) {
   .pricing-cards-row.plans-4 { grid-template-columns: repeat(2, 1fr); }
 }
@@ -530,7 +549,7 @@ body {
   .plan-card > .plan-badge { justify-self: start; }
   .plan-card .price-row, .plan-card .price-row:last-child {
     flex-direction: column; justify-content: flex-start; gap: 4px; padding: 10px 12px;
-    border: 1px solid var(--border); border-radius: 12px; background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(var(--plan-rgb), 0.22); border-radius: 12px; background: rgba(var(--plan-rgb), 0.05);
   }
   .plan-card .pr-right { text-align: left; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 6px; }
   .plan-card .pr-discount { margin-top: 2px; }
