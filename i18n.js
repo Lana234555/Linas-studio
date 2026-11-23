@@ -47,12 +47,6 @@
         pricingTitle_html: "Прайс-лист <em>вокал</em>",
       },
       teachers: {
-        lina: { name: "Лина Поверга", role: "Вокал TOP · Основатель", bio: "Основатель Wearevoice. Современные техники: субтон, твенг, бэлтинг, фальцет, микст, академический звук. Экстрим: штробас, фрай, скрим, гроул, харш. Украшения: вибрато, мелизмы, йодль. Продолжающий и профессиональный уровень.", level: "Уровень: продолжающий — профессиональный · Подростки и взрослые" },
-        kateryna: { name: "Катерина Корниюк", role: "Вокал / Фортепиано PRO", bio: "Основатель Wearevoice. R&B, поп, мюзикл, рок, соул, рэп. Постановка голоса, дыхание, сценический образ, ритм, импровизация. Техники: микс, твенг, бэлтинг, фальцет, йодль, вибрато, край, штробас, фрай, дисторшн, рэттл.", langs: "Укр, Рус, Польский, Итальянский, Английский" },
-        ilona: { name: "Елена Люшневская", role: "Вокал Basic", bio: "Поп, эстрада, рок, альтернативный рок, инди. Постановка голоса, дыхание, интонирование, ритм, ансамблевое звучание. Техники: бэлтинг, микст, двухголосие. Расщепление: rasp, distortion.", langs: "Польский, Рус, Английский" },
-        sergey: { name: "Сергей Панасенко", role: "Гитара · Укулеле · Преподаватель инструментов", bio: "Аппликатура и постановка рук, работа с темпом и ритмом, игра по табулатуре и аккордами, динамика, аккомпанирование. Знакомство с теорией музыки. Помощь в подборе инструмента.", langs: "Украинский, Русский, Польский" },
-        elena_drums: { name: "Елена Люшневская", role: "Барабаны Basic · Преподаватель инструментов", bio: "Классическая и современная игра на барабанах: постановка рук, техника, работа с нотной записью, чувство ритма и метра, работа в ансамбле. Поп, рок, джаз. Также совмещение перкуссионной базы с вокалом — понимание ритма помогает точнее держать темп и фразировку при пении.", langs: "Укр, Рус, Польский, Английский" },
-        kateryna_piano: { name: "Катерина Корниюк", role: "Фортепиано PRO · Преподаватель инструментов", bio: "Основатель Wearevoice. Классическая и современная игра на фортепиано: постановка рук, техника, работа с нотами, гармония, аккомпанирование. R&B, поп, мюзикл, джаз. Также совмещение игры с пением — вокал и инструмент одновременно." },
         enrollBtn: "Записаться к этому педагогу",
         langs: "Языки:",
       },
@@ -87,6 +81,7 @@
         disc8: "−8% от разового",
         disc10: "−10% от разового",
         disc12: "−12% от разового",
+        discTpl: "−{n}% от разового",
         vocal_basic_suffix: "",
         vocal_pro_suffix: " PRO",
         vocal_basic_sub: "Преподаватели Basic · начинающий и средний уровень, дети и взрослые",
@@ -244,12 +239,6 @@
         pricingTitle_html: "Price list <em>vocal</em>",
       },
       teachers: {
-        lina: { name: "Lina Poverga", role: "Vocal TOP · Founder", bio: "Founder of Wearevoice. Modern techniques: subtone, twang, belting, falsetto, mixed voice, classical sound. Extreme: fry, scream, growl, grunt, harsh. Ornaments: vibrato, melismas, yodel. Intermediate and professional level.", level: "Level: intermediate — professional · Teens and adults" },
-        kateryna: { name: "Kateryna Korniyuk", role: "Vocal / Piano PRO", bio: "Founder of Wearevoice. R&B, pop, musical, rock, soul, rap. Voice placement, breathing, stage presence, rhythm, improvisation. Techniques: mix, twang, belting, falsetto, yodel, vibrato, edge, fry, distortion, rattle.", langs: "Ukr, Rus, Polish, Italian, English" },
-        ilona: { name: "Olena Lushnevska", role: "Vocal Basic", bio: "Pop, pop-rock, rock, alt rock, indie. Voice placement, breathing, intonation, rhythm, ensemble sound. Techniques: belting, mixed voice, two-part harmony. Splits: rasp, distortion.", langs: "Polish, Rus, English" },
-        sergey: { name: "Serhiy Panasenko", role: "Guitar · Ukulele · Instrument teacher", bio: "Fingering and hand position, tempo and rhythm work, tablature and chord playing, dynamics, accompaniment. Introduction to music theory. Help choosing an instrument.", langs: "Ukrainian, Russian, Polish" },
-        elena_drums: { name: "Olena Lushnevska", role: "Drums Basic · Instrument teacher", bio: "Classical and modern drumming: hand technique, sheet music reading, sense of rhythm and meter, ensemble playing. Pop, rock, jazz. Also combining a percussion base with singing — understanding rhythm helps keep tempo and phrasing precise while singing.", langs: "Ukr, Rus, Polish, English" },
-        kateryna_piano: { name: "Kateryna Korniyuk", role: "Piano PRO · Instrument teacher", bio: "Founder of Wearevoice. Classical and modern piano: hand position, technique, sheet music, harmony, accompaniment. R&B, pop, musical, jazz. Also combining playing with singing — vocals and instrument simultaneously." },
         enrollBtn: "Sign up with this teacher",
         langs: "Languages:",
       },
@@ -284,6 +273,7 @@
         disc8: "−8% off single",
         disc10: "−10% off single",
         disc12: "−12% off single",
+        discTpl: "−{n}% off single",
         vocal_basic_suffix: "",
         vocal_pro_suffix: " PRO",
         vocal_basic_sub: "Basic teachers · beginner and intermediate level, children and adults",
@@ -441,12 +431,6 @@
         pricingTitle_html: "Прайс-ліст <em>вакал</em>",
       },
       teachers: {
-        lina: { name: "Ліна Поверга", role: "Вакал TOP · Заснавальніца", bio: "Заснавальніца Wearevoice. Сучасныя тэхнікі: субтон, твэнг, бэлтынг, фальцэт, мікст, акадэмічны гук. Экстрым: фрай, скрым, гроўл, харш. Упрыгожанні: вібрата, мелізмы, ёдаль. Узровень: ад сярэдняга да прафесійнага.", level: "Узровень: сярэдні — прафесійны · Падлеткі і дарослыя" },
-        kateryna: { name: "Кацярына Корніюк", role: "Вакал / Фартэпіяна PRO", bio: "Заснавальніца Wearevoice. R&B, поп, мюзікл, рок, соул, рэп. Пастаноўка голасу, дыханне, сцэнічны вобраз, рытм, імправізацыя. Тэхнікі: мікст, твэнг, бэлтынг, фальцэт, ёдаль, вібрата, край, фрай, дысторшн, рэтл.", langs: "Укр, Рус, Польскі, Італьянскі, Англійскі" },
-        ilona: { name: "Алена Люшнеўская", role: "Вакал Basic", bio: "Поп, эстрада, рок, альтэрнатыўны рок, індзі. Пастаноўка голасу, дыханне, інтанаванне, рытм, ансамблевае гучанне. Тэхнікі: бэлтынг, мікст, двухгалоссе. Расшчапленне: rasp, distortion.", langs: "Польскі, Рус, Англійскі" },
-        sergey: { name: "Сяргей Панасенка", role: "Гітара · Укулеле · Выкладчык інструментаў", bio: "Апліката і пастаноўка рук, праца з тэмпам і рытмам, гульня па табулатуры і акордамі, дынаміка, акампанемент. Знаёмства з тэорыяй музыкі. Дапамога ў выбары інструмента.", langs: "Украінскі, Рускі, Польскі" },
-        elena_drums: { name: "Алена Люшнеўская", role: "Барабаны Basic · Выкладчык інструментаў", bio: "Класічная і сучасная гульня на барабанах: пастаноўка рук, тэхніка, праца з нотным запісам, пачуццё рытму і метру, праца ў ансамблі. Поп, рок, джаз. Таксама спалучэнне перкусійнай базы са спевамі — разуменне рытму дапамагае дакладней трымаць тэмп і фразіроўку падчас спеваў.", langs: "Укр, Рус, Польскі, Англійскі" },
-        kateryna_piano: { name: "Кацярына Корніюк", role: "Фартэпіяна PRO · Выкладчык інструментаў", bio: "Заснавальніца Wearevoice. Класічная і сучасная гульня на фартэпіяна: пастаноўка рук, тэхніка, праца з нотамі, гармонія, акампанемент. R&B, поп, мюзікл, джаз. Таксама спалучэнне гульні са спевам — вакал і інструмент адначасова." },
         enrollBtn: "Запісацца да гэтага педагога",
         langs: "Мовы:",
       },
@@ -481,6 +465,7 @@
         disc8: "−8% ад разавага",
         disc10: "−10% ад разавага",
         disc12: "−12% ад разавага",
+        discTpl: "−{n}% ад разавага",
         vocal_basic_suffix: "",
         vocal_pro_suffix: " PRO",
         vocal_basic_sub: "Выкладчыкі Basic · пачатковы і сярэдні ўзровень, дзеці і дарослыя",
@@ -638,12 +623,6 @@
         pricingTitle_html: "Cennik <em>wokal</em>",
       },
       teachers: {
-        lina: { name: "Lina Poverga", role: "Wokal TOP · Założycielka", bio: "Założycielka Wearevoice. Nowoczesne techniki: subton, twang, belting, falsetto, mixt, dźwięk akademicki. Ekstrem: fry, scream, growl, grunt, harsh. Ozdobniki: vibrato, melizmaty, jodłowanie. Poziom zaawansowany i profesjonalny.", level: "Poziom: zaawansowany — profesjonalny · Młodzież i dorośli" },
-        kateryna: { name: "Kateryna Korniyuk", role: "Wokal / Fortepian PRO", bio: "Założycielka Wearevoice. R&B, pop, musical, rock, soul, rap. Emisja głosu, oddech, wizerunek sceniczny, rytm, improwizacja. Techniki: mixt, twang, belting, falsetto, jodłowanie, vibrato, edge, fry, distortion, rattle.", langs: "Ukr, Ros, Polski, Włoski, Angielski" },
-        ilona: { name: "Olena Lushnevska", role: "Wokal Basic", bio: "Pop, muzyka estradowa, rock, rock alternatywny, indie. Emisja głosu, oddech, intonacja, rytm, brzmienie zespołowe. Techniki: belting, mixt, dwugłos. Rozszczepienie: rasp, distortion.", langs: "Polski, Ros, Angielski" },
-        sergey: { name: "Serhiy Panasenko", role: "Gitara · Ukulele · Nauczyciel instrumentów", bio: "Palcowanie i ustawienie rąk, praca z tempem i rytmem, gra z tabulatury i akordami, dynamika, akompaniament. Wprowadzenie do teorii muzyki. Pomoc w wyborze instrumentu.", langs: "Ukraiński, Rosyjski, Polski" },
-        elena_drums: { name: "Olena Lushnevska", role: "Perkusja Basic · Nauczyciel instrumentów", bio: "Klasyczna i współczesna gra na perkusji: ustawienie rąk, technika, praca z zapisem nutowym, poczucie rytmu i metrum, gra zespołowa. Pop, rock, jazz. Także łączenie bazy perkusyjnej ze śpiewem — rozumienie rytmu pomaga precyzyjniej trzymać tempo i frazowanie podczas śpiewu.", langs: "Ukraiński, Rosyjski, Polski, Angielski" },
-        kateryna_piano: { name: "Kateryna Korniyuk", role: "Fortepian PRO · Nauczyciel instrumentów", bio: "Założycielka Wearevoice. Klasyczna i nowoczesna gra na fortepianie: ustawienie rąk, technika, praca z nutami, harmonia, akompaniament. R&B, pop, musical, jazz. Również łączenie gry ze śpiewem — wokal i instrument jednocześnie." },
         enrollBtn: "Zapisz się do tego nauczyciela",
         langs: "Języki:",
       },
@@ -678,6 +657,7 @@
         disc8: "−8% od jednorazowej",
         disc10: "−10% od jednorazowej",
         disc12: "−12% od jednorazowej",
+        discTpl: "−{n}% od jednorazowej",
         vocal_basic_suffix: "",
         vocal_pro_suffix: " PRO",
         vocal_basic_sub: "Nauczyciele Basic · poziom początkujący i średniozaawansowany, dzieci i dorośli",
@@ -815,14 +795,15 @@
 
     // Translate tags using tagMap
     const tagMap = dict.tagMap || {};
+    // Elements rendered from content.js carry their own data-i18n keys, so skip them here
     [".tc-tag", ".ftag", ".hf"].forEach((sel) => {
-      document.querySelectorAll(sel).forEach((el) => {
+      document.querySelectorAll(sel + ":not([data-i18n])").forEach((el) => {
         if (!el.dataset.tagRu) el.dataset.tagRu = el.textContent.trim();
         const translated = tagMap[el.dataset.tagRu];
         el.textContent = translated !== undefined ? translated : el.dataset.tagRu;
       });
     });
-    document.querySelectorAll(".vlink").forEach((el) => {
+    document.querySelectorAll(".vlink:not([data-i18n])").forEach((el) => {
       if (!el.dataset.tagRu) el.dataset.tagRu = el.textContent.trim();
       const raw = el.dataset.tagRu;
       const prefix = raw.startsWith("▶︎ ") ? "▶︎ " : "";
@@ -860,7 +841,30 @@
     return val !== undefined ? val : (fallback || key);
   }
 
-  window.i18n = { t, setLang: applyLang };
+  // Deep-merge extra strings (used by content-render.js for cards from content.js)
+  function addTranslations(extra) {
+    function merge(target, src) {
+      Object.keys(src).forEach((k) => {
+        const v = src[k];
+        if (v && typeof v === "object" && !Array.isArray(v)) {
+          if (!target[k] || typeof target[k] !== "object") target[k] = {};
+          merge(target[k], v);
+        } else {
+          target[k] = v;
+        }
+      });
+    }
+    Object.keys(extra).forEach((lang) => {
+      if (!translations[lang]) translations[lang] = {};
+      merge(translations[lang], extra[lang]);
+    });
+  }
+
+  function tr(lang, key) {
+    return get(translations[lang] || translations.ru, key);
+  }
+
+  window.i18n = { t, tr, setLang: applyLang, addTranslations };
   window._currentLang = "ru";
 
   document.addEventListener("DOMContentLoaded", function () {
