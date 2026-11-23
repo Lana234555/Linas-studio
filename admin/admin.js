@@ -560,7 +560,8 @@
         n("sub4disc", "Знижка 4, %"),
         n("sub8disc", "Знижка 8, %")
       ),
-      h("button", { class: "btn btn-ghost btn-small calc", onclick: () => { recalc(p); changed(); } }, "Порахувати суми і знижки")
+      h("button", { class: "btn btn-ghost btn-small calc", onclick: () => { recalc(p); changed(); } }, "Порахувати суми і знижки"),
+      h("label", { class: "field", style: "margin-top:12px" }, h("span", null, "Посилання кнопки «Записаться на урок»"), textInput(p.bookUrl || ENROLL_DEFAULT, (v) => { p.bookUrl = v.trim(); updateSavebar(); }))
     );
   }
 

@@ -192,6 +192,7 @@
         ${priceRow("pricing.single", minutes, p.single, "pricing.perLesson")}
         ${priceRow("pricing.sub4", minutes, p.sub4total, "pricing.perMonth", p.sub4per, p.sub4disc)}
         ${priceRow("pricing.sub8", minutes, p.sub8total, "pricing.perMonth", p.sub8per, p.sub8disc)}
+        <a class="plan-book" href="${esc(safeUrl(p.bookUrl || ENROLL_DEFAULT))}" target="_blank" rel="noopener" data-i18n="pricing.instrBookBtn">Записаться на урок →</a>
       </div>`;
   }
   ["vocal", "instruments"].forEach((grp) => {
