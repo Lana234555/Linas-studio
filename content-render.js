@@ -3,6 +3,19 @@
 // (edited through /admin/). Runs before script.js so reveal animations, the gallery
 // filter and the lightbox see the rendered elements.
 (function () {
+  // /?preview=1 shows the unpublished draft saved by the admin page in this browser
+  try {
+    if (/[?&]preview=1\b/.test(location.search)) {
+      const draft = JSON.parse(localStorage.getItem("linaAdminPreview") || "null");
+      if (draft) {
+        window.SITE_CONTENT = draft;
+        const bar = document.createElement("div");
+        bar.textContent = "Попередній перегляд: ці зміни ще не опубліковані";
+        bar.style.cssText = "position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:2000;background:#00c4b3;color:#041311;padding:8px 16px;border-radius:999px;font-size:13px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.4)";
+        document.body.appendChild(bar);
+      }
+    }
+  } catch (e) {}
   const C = window.SITE_CONTENT;
   if (!C) return;
   const LANGS = ["ru", "en", "pl"];
