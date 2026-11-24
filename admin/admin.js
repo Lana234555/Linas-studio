@@ -74,6 +74,20 @@
     clearTimeout(toast._t);
     toast._t = setTimeout(() => (t.hidden = true), bad ? 7000 : 4000);
   }
+
+  // ── small line icons for row actions ──
+  const ICONS = {
+    edit: '<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/>',
+    copy: '<rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
+    eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+    eyeOff: '<path d="M3 3l18 18"/><path d="M10.6 5.1A10.7 10.7 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4"/><path d="M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.8 9.8 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
+  };
+  function icon(name) {
+    const s = document.createElement("span");
+    s.className = "ib-ico";
+    s.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[name] + "</svg>";
+    return s;
+  }
   function imgUrl(path) {
     if (!path) return "";
     if (state.pending[path]) return state.pending[path].dataUrl;
@@ -465,8 +479,8 @@
               { class: "trow-actions" },
               h("button", { class: "icon-btn", title: "Вище", disabled: pos === 0, onclick: () => moveTeacher(i, list, pos, -1) }, "↑"),
               h("button", { class: "icon-btn", title: "Нижче", disabled: pos === list.length - 1, onclick: () => moveTeacher(i, list, pos, 1) }, "↓"),
-              h("button", { class: "btn btn-ghost btn-small", onclick: () => editTeacher(i) }, "Редагувати"),
-              h("button", { class: "btn btn-ghost btn-small", onclick: () => { t.hidden = !t.hidden; changed(); } }, t.hidden ? "Показати" : "Сховати"),
+              h("button", { class: "icon-btn act", title: "Редагувати", "aria-label": "Редагувати", onclick: () => editTeacher(i) }, icon("edit")),
+              h("button", { class: "icon-btn act", title: t.hidden ? "Показати на сайті" : "Сховати з сайту", "aria-label": t.hidden ? "Показати" : "Сховати", onclick: () => { t.hidden = !t.hidden; changed(); } }, icon(t.hidden ? "eyeOff" : "eye")),
               h("button", { class: "icon-btn danger", title: "Видалити", onclick: () => deleteTeacher(i) }, "✕")
             )
           )
@@ -1069,8 +1083,8 @@
             { class: "trow-actions" },
             h("button", { class: "icon-btn", title: "Вище", disabled: i === 0, onclick: () => { [H.rooms[i - 1], H.rooms[i]] = [H.rooms[i], H.rooms[i - 1]]; changed(); } }, "↑"),
             h("button", { class: "icon-btn", title: "Нижче", disabled: i === H.rooms.length - 1, onclick: () => { [H.rooms[i + 1], H.rooms[i]] = [H.rooms[i], H.rooms[i + 1]]; changed(); } }, "↓"),
-            h("button", { class: "btn btn-ghost btn-small", onclick: () => editRoom(i) }, "Редагувати"),
-            h("button", { class: "btn btn-ghost btn-small", onclick: () => { r.hidden = !r.hidden; changed(); } }, r.hidden ? "Показати" : "Сховати"),
+            h("button", { class: "icon-btn act", title: "Редагувати", "aria-label": "Редагувати", onclick: () => editRoom(i) }, icon("edit")),
+            h("button", { class: "icon-btn act", title: r.hidden ? "Показати на сайті" : "Сховати з сайту", "aria-label": r.hidden ? "Показати" : "Сховати", onclick: () => { r.hidden = !r.hidden; changed(); } }, icon(r.hidden ? "eyeOff" : "eye")),
             h("button", { class: "icon-btn danger", title: "Видалити", onclick: () => { if (confirm(`Видалити «${ru.name || "цей зал"}»? Після публікації картка зникне з сайту.`)) { H.rooms.splice(i, 1); changed(); } } }, "✕")
           )
         )
@@ -1381,7 +1395,9 @@
               h(
                 "div",
                 { class: "trow-name" },
-                ru.title || "(без назви)",
+                ru.title || "(без назви)"
+              ),
+              h("div", { class: "trow-badges" },
                 h("span", { class: "badge st " + STATUS[s][1] }, STATUS[s][0]),
                 e.banner ? h("span", { class: "badge star" }, "★ Банер") : null
               ),
@@ -1391,8 +1407,8 @@
             h(
               "div",
               { class: "trow-actions" },
-              h("button", { class: "btn btn-ghost btn-small", onclick: () => editEvent(i) }, "Редагувати"),
-              h("button", { class: "btn btn-ghost btn-small", title: "Створити копію (наприклад, для наступного такого ж івенту)", onclick: () => { const c = clone(e); c.id = "e" + Date.now().toString(36); c.hidden = true; events.push(c); changed(); toast("Копію створено як чернетку."); } }, "Копія"),
+              h("button", { class: "icon-btn act", title: "Редагувати", "aria-label": "Редагувати", onclick: () => editEvent(i) }, icon("edit")),
+              h("button", { class: "icon-btn act", "aria-label": "Копіювати", title: "Копіювати (наприклад, для наступного такого ж івенту)", onclick: () => { const c = clone(e); c.id = "e" + Date.now().toString(36); c.hidden = true; events.push(c); changed(); toast("Копію створено як чернетку."); } }, icon("copy")),
               h("button", { class: "icon-btn danger", title: "Видалити", onclick: () => { if (confirm(`Видалити подію «${ru.title || "без назви"}»?`)) { events.splice(i, 1); changed(); } } }, "✕")
             )
           )
