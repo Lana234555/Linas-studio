@@ -1503,9 +1503,10 @@
                 ru.title || "(без назви)"
               ),
               h("div", { class: "trow-badges" },
-                h("span", { class: "badge st " + STATUS[s][1] }, STATUS[s][0]),
+                h("span", { class: "badge st " + STATUS[s][1] }, s === "scheduled" ? "⏰ Заплановано" : STATUS[s][0]),
                 e.banner ? h("span", { class: "badge star" }, "★ Банер") : null
               ),
+              s === "scheduled" ? h("div", { class: "ev-appears" }, icon("clock"), h("span", null, "З'явиться на сайті ", h("b", null, nice(showFrom(e))), e.publishFrom ? "" : "")) : null,
               h("div", { class: "trow-role" }, "🗓 " + niceDate(e.date)),
               h("div", { class: "ev-sched" }, scheduleText(e))
             ),
@@ -1657,6 +1658,7 @@
         if (isNew) state.content.events.push(e);
         else state.content.events[index] = e;
         if (eventStatus(e) === "ended") setTimeout(() => toast("Увага: за цими датами подія вже не показується на сайті.", true), 50);
+        else if (eventStatus(e) === "scheduled") setTimeout(() => toast("Подію заплановано: вона з'явиться на сайті " + nice(showFrom(e)) + ". Не забудьте натиснути «Опублікувати на сайті», щоб розклад запрацював."), 50);
         return true;
       }, () => "afisha")
     );

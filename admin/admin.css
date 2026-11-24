@@ -815,3 +815,15 @@ body {
   .tab.active::after { box-shadow: 8px -8px 0 8px #151918; }
   @keyframes pill-in { from { background-color: rgba(21, 25, 24, 0); transform: translateX(-6px); } to { background-color: #151918; transform: none; } }
 }
+
+/* scheduled events: clearly visible */
+.badge.st.scheduled { font-size: 0.7rem; padding: 5px 12px; }
+.ev-appears {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; padding: 7px 12px; border-radius: 12px;
+  background: rgba(106, 168, 255, 0.12); border: 1px solid rgba(106, 168, 255, 0.45); color: #cfe0ff; font-size: 0.86rem;
+}
+.ev-appears b { color: #fff; font-weight: 500; }
+.ev-appears .ib-ico, .ev-appears svg { width: 16px; height: 16px; color: #6aa8ff; }
+.evrow.st-scheduled, .evrow.st-scheduled.has-draft[data-draft] { border-left: 4px solid #6aa8ff !important; }
+.evrow.st-live.has-draft[data-draft] { border-left: 4px solid #2fd27a !important; }
+.evrow.st-draft.has-draft[data-draft] { border-left: 4px solid var(--muted) !important; }
