@@ -217,14 +217,75 @@
     const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
     return { dataUrl, base64: dataUrl.split(",")[1] };
   }
-  async function addPendingImage(file, folder, baseName, maxSide) {
-    const res = await resizeToJpeg(file, maxSide);
+  // Photo editor presets per place on the site
+  const PHOTO_KINDS = {
+    teachers: { maxSide: 1000, aspect: 4 / 3, aspects: [["Як на картці", 4 / 3], ["Квадрат", 1], ["Вертикальне 3:4", 3 / 4], ["Оригінал", null]] },
+    gallery: { maxSide: 1600, aspect: null, aspects: [["Оригінал", null], ["1:1", 1], ["4:3", 4 / 3], ["3:4", 3 / 4], ["16:9", 16 / 9]] },
+    events: { maxSide: 1600, aspect: 1.6, aspects: [["Як в афіші 16:10", 1.6], ["Оригінал", null], ["1:1", 1], ["4:5", 0.8]] },
+  };
+  function newPath(folder, baseName) {
     const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, "");
     const rand = Math.random().toString(36).slice(2, 7);
-    const path = `photo/${folder}/${baseName ? baseName + "-" : ""}${stamp}-${rand}.jpg`;
-    state.pending[path] = res;
+    return `photo/${folder}/${baseName ? baseName + "-" : ""}${stamp}-${rand}.jpg`;
+  }
+  // Big phone photos are first scaled to 3000px so the editor stays fast
+  async function fileToSource(file) {
+    const res = await resizeToJpeg(file, 3000);
+    return res.dataUrl;
+  }
+  // Opens the editor; returns the new pending path, or null when cancelled.
+  async function editIntoPending(src, folder, baseName, title, extra) {
+    const kind = PHOTO_KINDS[folder] || PHOTO_KINDS.gallery;
+    const res = await window.PhotoEditor.open(src, Object.assign({ title, aspects: kind.aspects, aspect: kind.aspect, maxSide: kind.maxSide }, extra || {}));
+    if (!res) return null;
+    const path = newPath(folder, baseName);
+    state.pending[path] = Object.assign(res, { orig: src });
     return path;
   }
+  async function addPendingImage(file, folder, baseName, maxSide, title) {
+    progress.show("Відкриваю фото…", null);
+    let src;
+    try {
+      src = await fileToSource(file);
+    } finally {
+      progress.hide();
+    }
+    return editIntoPending(src, folder, baseName, title || "Нове фото");
+  }
+  // Re-edit a photo that is already in the content (pending or published)
+  async function reeditImage(path, folder, baseName) {
+    const src = (state.pending[path] && state.pending[path].orig) || imgUrl(path);
+    try {
+      return await editIntoPending(src, folder, baseName, "Редагування фото");
+    } catch (e) {
+      toast("Не вдалося відкрити фото для редагування: " + e.message, true);
+      return null;
+    }
+  }
+
+  // ── progress bar (photo processing and publishing) ──
+  const progress = (function () {
+    let box = null;
+    function ensure() {
+      if (box) return box;
+      box = h("div", { class: "progress", hidden: true }, h("div", { class: "progress-text" }), h("div", { class: "progress-track" }, h("div", { class: "progress-bar" })));
+      document.body.appendChild(box);
+      return box;
+    }
+    return {
+      show(text, frac) {
+        const b = ensure();
+        b.hidden = false;
+        b.querySelector(".progress-text").textContent = text;
+        const bar = b.querySelector(".progress-bar");
+        bar.classList.toggle("indeterminate", frac == null);
+        bar.style.width = frac == null ? "" : Math.round(Math.max(0.03, Math.min(1, frac)) * 100) + "%";
+      },
+      hide() {
+        if (box) box.hidden = true;
+      },
+    };
+  })();
 
   // ── modal ──
   function openModal(node) {
@@ -233,6 +294,25 @@
     body.appendChild(node);
     $("modal").hidden = false;
     document.body.style.overflow = "hidden";
+  }
+  // Buttons at the bottom of every editor window.
+  // apply() validates and saves the draft into the content; returns true on success.
+  function editorActions(apply, section) {
+    const done = (then) => () => {
+      if (!apply()) return;
+      closeModal();
+      changed();
+      if (then) then();
+    };
+    return h(
+      "div",
+      { class: "modal-actions" },
+      h("button", { class: "btn btn-ghost", type: "button", onclick: closeModal }, "Скасувати"),
+      h("span", { class: "pe-spacer" }),
+      h("button", { class: "btn btn-ghost", type: "button", title: "Подивитися, як це виглядатиме на сайті", onclick: done(() => preview(section ? section() : "")) }, "👁 Переглянути на сайті"),
+      h("button", { class: "btn btn-ghost", type: "button", onclick: done(null) }, "Готово"),
+      h("button", { class: "btn btn-teal", type: "button", onclick: done(() => publish()) }, "Опублікувати на сайті")
+    );
   }
   function closeModal() {
     $("modal").hidden = true;
@@ -355,8 +435,9 @@
         const file = input.files[0];
         if (!file) return;
         try {
-          t.photo = await addPendingImage(file, "teachers", slugify(t.text.ru.name) || "teacher", 1000);
-          drawPhoto();
+          const p = await addPendingImage(file, "teachers", slugify(t.text.ru.name) || "teacher", 1000, "Фото викладача");
+          input.value = "";
+          if (p) { t.photo = p; drawPhoto(); }
         } catch (e) {
           toast(e.message, true);
         }
@@ -366,6 +447,7 @@
           "div",
           null,
           h("span", { class: "btn btn-ghost btn-small file-btn" }, t.photo ? "Змінити фото" : "Завантажити фото", input),
+          t.photo ? h("button", { class: "btn btn-ghost btn-small", type: "button", style: "margin-left:8px", onclick: async () => { const p = await reeditImage(t.photo, "teachers", slugify(t.text.ru.name) || "teacher"); if (p) { t.photo = p; drawPhoto(); } } }, "✎ Редагувати фото") : null,
           t.photo ? h("button", { class: "link", type: "button", style: "margin-left:10px", onclick: () => { t.photo = ""; drawPhoto(); } }, "прибрати") : null,
           h("p", { class: "muted", style: "margin-top:8px" }, "Вертикальне або квадратне фото, обличчя в центрі.")
         )
@@ -447,28 +529,14 @@
       h("div", { class: "sub-head" }, "Відео", h("button", { class: "btn btn-ghost btn-small", type: "button", onclick: () => { t.videos.push({ url: "", label: { ru: "Видео", en: "Video", pl: "Wideo" } }); drawVideos(); } }, "+ Відео")),
       videosBox,
       field("Куди веде кнопка «Записаться» (#contact = розділ «Контакти»)", textInput(t.enrollUrl, (v) => (t.enrollUrl = v.trim()))),
-      h(
-        "div",
-        { class: "modal-actions" },
-        h("button", { class: "btn btn-ghost", type: "button", onclick: closeModal }, "Скасувати"),
-        h(
-          "button",
-          {
-            class: "btn btn-teal",
-            type: "button",
-            onclick: () => {
-              if (!t.text.ru.name.trim()) return toast("Вкажіть ім'я російською (RU), це основна мова сайту.", true);
-              t.tags = t.tags.filter((x) => (x.ru || x.en || x.pl || "").trim());
-              t.videos = t.videos.filter((x) => (x.url || "").trim());
-              if (isNew) state.content.teachers.push(t);
-              else state.content.teachers[index] = t;
-              closeModal();
-              changed();
-            },
-          },
-          "Готово"
-        )
-      )
+      editorActions(() => {
+        if (!t.text.ru.name.trim()) return toast("Вкажіть ім'я російською (RU), це основна мова сайту.", true), false;
+        t.tags = t.tags.filter((x) => (x.ru || x.en || x.pl || "").trim());
+        t.videos = t.videos.filter((x) => (x.url || "").trim());
+        if (isNew) state.content.teachers.push(t);
+        else state.content.teachers[index] = t;
+        return true;
+      }, () => (t.section === "instruments" ? "instruments" : "vocal"))
     );
     openModal(node);
   }
@@ -620,18 +688,22 @@
     fileInput.addEventListener("change", async () => {
       const files = Array.from(fileInput.files || []);
       if (!files.length) return;
-      toast(`Обробляю ${files.length} фото…`);
+      fileInput.value = "";
       let added = 0;
-      for (const f of files) {
+      for (let i = 0; i < files.length; i++) {
+        const f = files[i];
+        const title = files.length > 1 ? `Фото ${i + 1} з ${files.length}` : "Нове фото";
         try {
-          const path = await addPendingImage(f, "gallery", "", 1600);
+          const path = await addPendingImage(f, "gallery", "", 1600, title);
+          if (!path) continue;
           g.photos.unshift({ src: path, tags: state.uploadTags.slice() });
           added++;
+          changed();
         } catch (e) {
           toast(f.name + ": " + e.message, true);
         }
       }
-      if (added) toast(`Додано ${added} фото. Не забудьте опублікувати.`);
+      if (added) toast(`Додано ${added} фото. Їх видно лише тут, поки ви не натиснете «Опублікувати на сайті».`);
       changed();
     });
     view.appendChild(
@@ -704,6 +776,18 @@
                 "div",
                 { class: "photo-foot" },
                 state.pending[p.src] ? h("span", { class: "new-mark" }, "нове") : h("span"),
+                h(
+                  "button",
+                  {
+                    class: "icon-btn",
+                    title: "Редагувати фото (обрізати, наблизити, повернути)",
+                    onclick: async () => {
+                      const np = await reeditImage(p.src, "gallery", "");
+                      if (np) { p.src = np; changed(); }
+                    },
+                  },
+                  "✎"
+                ),
                 h(
                   "button",
                   {
@@ -922,8 +1006,9 @@
         const file = input.files[0];
         if (!file) return;
         try {
-          e.image = await addPendingImage(file, "events", slugify(e.text.ru.title) || "event", 1600);
-          drawPhoto();
+          const p = await addPendingImage(file, "events", slugify(e.text.ru.title) || "event", 1600, "Фото / афіша події");
+          input.value = "";
+          if (p) { e.image = p; drawPhoto(); }
         } catch (err) {
           toast(err.message, true);
         }
@@ -933,6 +1018,7 @@
           "div",
           null,
           h("span", { class: "btn btn-ghost btn-small file-btn" }, e.image ? "Змінити фото / афішу" : "Завантажити фото / афішу", input),
+          e.image ? h("button", { class: "btn btn-ghost btn-small", type: "button", style: "margin-left:8px", onclick: async () => { const p = await reeditImage(e.image, "events", slugify(e.text.ru.title) || "event"); if (p) { e.image = p; drawPhoto(); } } }, "✎ Редагувати фото") : null,
           e.image ? h("button", { class: "link", type: "button", style: "margin-left:10px", onclick: () => { e.image = ""; drawPhoto(); } }, "прибрати") : null,
           h("p", { class: "muted", style: "margin-top:8px" }, "Краще горизонтальне фото. Без фото буде красивий фон з мікрофоном.")
         )
@@ -1028,30 +1114,17 @@
       h("div", { class: "field" }, h("span", null, "Скільки показувати"), untilBox),
       draftBox,
       summary,
-      h(
-        "div",
-        { class: "modal-actions" },
-        h("button", { class: "btn btn-ghost", type: "button", onclick: closeModal }, "Скасувати"),
-        h(
-          "button",
-          {
-            class: "btn btn-teal",
-            type: "button",
-            onclick: () => {
-              if (!e.text.ru.title.trim()) return toast("Вкажіть назву російською (RU), це основна мова сайту.", true);
-              if (!e.date) return toast("Вкажіть дату і час початку події.", true);
-              if (e.endDate && warsawTime(e.endDate) < warsawTime(e.date)) return toast("Кінець події раніше за початок.", true);
-              if (e.publishFrom && e.publishUntil && warsawTime(e.publishUntil) <= warsawTime(e.publishFrom)) return toast("«Показувати до» має бути пізніше, ніж «Показати з».", true);
-              if (isNew) state.content.events.push(e);
-              else state.content.events[index] = e;
-              closeModal();
-              changed();
-              if (eventStatus(e) === "ended") toast("Увага: за цими датами подія вже не показується на сайті.", true);
-            },
-          },
-          "Готово"
-        )
-      )
+      editorActions(() => {
+        const bad = (msg) => (toast(msg, true), false);
+        if (!e.text.ru.title.trim()) return bad("Вкажіть назву російською (RU), це основна мова сайту.");
+        if (!e.date) return bad("Вкажіть дату і час початку події.");
+        if (e.endDate && warsawTime(e.endDate) < warsawTime(e.date)) return bad("Кінець події раніше за початок.");
+        if (e.publishFrom && e.publishUntil && warsawTime(e.publishUntil) <= warsawTime(e.publishFrom)) return bad("«Показувати до» має бути пізніше, ніж «Показати з».");
+        if (isNew) state.content.events.push(e);
+        else state.content.events[index] = e;
+        if (eventStatus(e) === "ended") setTimeout(() => toast("Увага: за цими датами подія вже не показується на сайті.", true), 50);
+        return true;
+      }, () => "afisha")
     );
     openModal(node);
   }
@@ -1070,6 +1143,7 @@
 
   // ── publish ──
   async function publish() {
+    if (!isDirty()) { toast("Немає змін для публікації."); return false; }
     const btn = $("publishBtn");
     btn.disabled = true;
     btn.textContent = "Публікую…";
@@ -1087,11 +1161,15 @@
       const now = referencedPaths(state.content);
       const before = referencedPaths(state.original);
       const tree = [];
-      for (const path of Object.keys(state.pending)) {
-        if (!now.has(path)) continue;
+      const toUpload = Object.keys(state.pending).filter((path) => now.has(path));
+      const steps = toUpload.length + 2;
+      for (let i = 0; i < toUpload.length; i++) {
+        const path = toUpload[i];
+        progress.show(`Завантажую фото ${i + 1} з ${toUpload.length}…`, i / steps);
         const blob = await gh("/git/blobs", { method: "POST", body: { content: state.pending[path].base64, encoding: "base64" } });
         tree.push({ path, mode: "100644", type: "blob", sha: blob.sha });
       }
+      progress.show("Зберігаю тексти та порядок карток…", toUpload.length / steps);
       const contentBlob = await gh("/git/blobs", { method: "POST", body: { content: utf8ToB64(serializeContent(state.content)), encoding: "base64" } });
       tree.push({ path: CONTENT_PATH, mode: "100644", type: "blob", sha: contentBlob.sha });
       before.forEach((path) => {
@@ -1100,7 +1178,9 @@
 
       const newTree = await gh("/git/trees", { method: "POST", body: { base_tree: headCommit.tree.sha, tree } });
       const commit = await gh("/git/commits", { method: "POST", body: { message: "Оновлення контенту через адмінку", tree: newTree.sha, parents: [headSha] } });
+      progress.show("Публікую на сайті…", (toUpload.length + 1) / steps);
       await gh("/git/refs/heads/" + BRANCH, { method: "PATCH", body: { sha: commit.sha } });
+      progress.show("Готово! Сайт оновиться за 1–2 хвилини.", 1);
 
       const fresh = await fetchContentFile();
       state.contentSha = fresh.sha;
@@ -1109,30 +1189,71 @@
       try { localStorage.removeItem(PREVIEW_KEY); } catch (e) {}
       toast("Опубліковано! Сайт оновиться приблизно за 1–2 хвилини.");
       render();
+      return true;
     } catch (e) {
       console.error(e);
+      progress.hide();
       toast(e.status === 401 || e.status === 403 ? "GitHub не дозволив запис. Перевірте, що ключ має доступ Contents: Read and write." : "Не вдалося опублікувати: " + e.message, true);
     } finally {
       btn.textContent = "Опублікувати на сайті";
+      setTimeout(() => progress.hide(), 1500);
       updateSavebar();
     }
   }
 
-  function preview() {
+  // ── preview: the real site in a frame, with the unsaved changes ──
+  const PREVIEW_PAGE = window.__LINA_PREVIEW_PAGE || "../index.html";
+  function previewDraft() {
     const c = clone(state.content);
     const swap = (p) => (state.pending[p] ? state.pending[p].dataUrl : p);
     c.teachers.forEach((t) => (t.photo = swap(t.photo)));
     c.gallery.photos.forEach((p) => (p.src = swap(p.src)));
     (c.events || []).forEach((e) => (e.image = swap(e.image)));
-    try {
-      localStorage.setItem(PREVIEW_KEY, JSON.stringify(c));
-    } catch (e) {
-      // too many new photos for browser storage: preview without them
-      Object.keys(state.pending).length && toast("Нових фото забагато для перегляду, вони не покажуться.", true);
-      const lite = clone(state.content);
-      try { localStorage.setItem(PREVIEW_KEY, JSON.stringify(lite)); } catch (e2) { return toast("Не вдалося зробити перегляд.", true); }
-    }
-    window.open("../?preview=1", "_blank");
+    return c;
+  }
+  const SECTION_FOR_TAB = { events: "afisha", teachers: "vocal", prices: "pricing", gallery: "gallery" };
+  function preview(section) {
+    if (typeof section !== "string") section = SECTION_FOR_TAB[state.tab] || "";
+    window.__linaPreviewDraft = previewDraft();
+    window.__linaPreviewBanner = section === "afisha";
+    let ov = $("previewOverlay");
+    if (ov) ov.remove();
+    const frame = h("iframe", { name: "linaPreview", class: "pv-frame", title: "Перегляд сайту" });
+    const wrap = h("div", { class: "pv-wrap" }, frame);
+    const setDevice = (mode) => {
+      wrap.classList.toggle("phone", mode === "phone");
+      ov.querySelectorAll(".pv-dev").forEach((b) => b.classList.toggle("on", b.dataset.mode === mode));
+      // keep the same part of the page in view after the width changes
+      setTimeout(() => {
+        try {
+          const target = section && frame.contentDocument.getElementById(section);
+          if (target) target.scrollIntoView();
+        } catch (e) {}
+      }, 350);
+    };
+    const close = () => { ov.remove(); document.body.style.overflow = $("modal").hidden ? "" : "hidden"; };
+    const pubBtn = h("button", { class: "btn btn-teal btn-small", disabled: !isDirty(), onclick: async () => { const ok = await publish(); if (ok) close(); } }, "Опублікувати на сайті");
+    ov = h(
+      "div",
+      { class: "pv-overlay", id: "previewOverlay" },
+      h(
+        "div",
+        { class: "pv-bar" },
+        h("div", { class: "pv-title" }, h("b", null, "Попередній перегляд"), h("span", { class: "muted" }, isDirty() ? "Так сайт виглядатиме після публікації. Відвідувачі цього ще не бачать." : "Змін немає: так сайт виглядає зараз.")),
+        h(
+          "div",
+          { class: "pv-actions" },
+          h("button", { class: "pv-dev on", "data-mode": "desktop", onclick: () => setDevice("desktop") }, "Комп'ютер"),
+          h("button", { class: "pv-dev", "data-mode": "phone", onclick: () => setDevice("phone") }, "Телефон"),
+          pubBtn,
+          h("button", { class: "btn btn-ghost btn-small", onclick: close }, "Закрити")
+        )
+      ),
+      wrap
+    );
+    document.body.appendChild(ov);
+    document.body.style.overflow = "hidden";
+    frame.src = PREVIEW_PAGE + (section ? "#" + section : "");
   }
 
   // ── boot ──
@@ -1192,7 +1313,12 @@
     changed();
   });
   $("modal").addEventListener("click", (e) => { if (e.target === $("modal")) closeModal(); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("modal").hidden) closeModal(); });
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    const pv = $("previewOverlay");
+    if (pv) { pv.querySelector(".pv-actions .btn-ghost").click(); return; }
+    if (!$("modal").hidden) closeModal();
+  });
   window.addEventListener("beforeunload", (e) => {
     if (state.content && isDirty()) {
       e.preventDefault();

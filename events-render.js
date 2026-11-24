@@ -27,6 +27,11 @@
     if (/^#/.test(String(u || "").trim())) return inBanner ? " data-evb-close" : "";
     return ' target="_blank" rel="noopener"';
   }
+  // Photos: also allow unsaved photos (data:image) that the admin preview passes in
+  function safeImg(u) {
+    u = String(u || "").trim();
+    return /^data:image\/(jpeg|png|webp);base64,/i.test(u) ? u : safeUrl(u);
+  }
   function safeUrl(u) {
     u = String(u || "").trim();
     return /^(https?:\/\/|#|mailto:|tel:|photo\/|data:image\/)/i.test(u) ? u : "#";
@@ -158,7 +163,7 @@
       desc: info(e, "desc"),
       btnText,
       url: esc(safeUrl(e.buttonUrl || ENROLL_DEFAULT)),
-      img: e.image ? esc(safeUrl(e.image)) : "",
+      img: e.image ? esc(safeImg(e.image)) : "",
     };
   }
 
@@ -315,6 +320,11 @@
       }
     } catch (e) {}
     if (/[?&]preview=1\b/.test(location.search)) auto = true;
+    if (window.name === "linaPreview") {
+      let want = false;
+      try { want = !!window.parent.__linaPreviewBanner; } catch (e) {}
+      auto = want;
+    }
     if (auto) setTimeout(open, 700);
   }
 

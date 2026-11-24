@@ -4,15 +4,22 @@
 // filter and the lightbox see the rendered elements.
 (function () {
   // /?preview=1 shows the unpublished draft saved by the admin page in this browser
+  // Inside the admin's preview panel (iframe named "linaPreview") the draft comes from the admin page itself
   try {
-    if (/[?&]preview=1\b/.test(location.search)) {
-      const draft = JSON.parse(localStorage.getItem("linaAdminPreview") || "null");
+    let draft = null;
+    if (window.name === "linaPreview" && window.parent !== window && window.parent.__linaPreviewDraft) {
+      draft = window.parent.__linaPreviewDraft;
+      window.__linaInAdminPreview = true;
+    } else if (/[?&]preview=1\b/.test(location.search)) {
+      draft = JSON.parse(localStorage.getItem("linaAdminPreview") || "null");
+    }
+    {
       if (draft) {
         window.SITE_CONTENT = draft;
         const bar = document.createElement("div");
         bar.textContent = "Попередній перегляд: ці зміни ще не опубліковані";
         bar.style.cssText = "position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:2000;background:#00c4b3;color:#041311;padding:8px 16px;border-radius:999px;font-size:13px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.4)";
-        document.body.appendChild(bar);
+        if (!window.__linaInAdminPreview) document.body.appendChild(bar);
       }
     }
   } catch (e) {}
@@ -28,6 +35,11 @@
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
+  }
+  // Photos: also allow unsaved photos (data:image) that the admin preview passes in
+  function safeImg(u) {
+    u = String(u || "").trim();
+    return /^data:image\/(jpeg|png|webp);base64,/i.test(u) ? u : safeUrl(u);
   }
   function safeUrl(u) {
     u = String(u || "").trim();
@@ -83,7 +95,7 @@
       tags,
       videos,
       enroll: esc(safeUrl(t.enrollUrl || ENROLL_DEFAULT)),
-      photo: esc(safeUrl(t.photo)),
+      photo: esc(safeImg(t.photo)),
       alt: esc(ru.name),
       emoji: esc(t.emoji || "🎵"),
       badge: LEVEL_LABEL[t.level] || "Basic",
@@ -228,7 +240,7 @@
       .map(
         (ph) => `
         <div class="gallery-item" data-tags="${esc((ph.tags || []).join(" "))}">
-          <img data-src="${esc(safeUrl(ph.src))}" alt="${esc(ph.alt || "")}" loading="lazy" />
+          <img data-src="${esc(safeImg(ph.src))}" alt="${esc(ph.alt || "")}" loading="lazy" />
           <div class="gallery-overlay"></div>
         </div>`
       )

@@ -206,6 +206,14 @@ function showInstrPricing(id, btn) { showPricingTab(id, btn, ".instr-pricing-pan
     const j = Math.floor(Math.random() * (i + 1));
     [items[i], items[j]] = [items[j], items[i]];
   }
+  // Admin preview: show the new, not yet published photos first
+  if (window.__linaInAdminPreview) {
+    const isNew = (it) => {
+      const im = it.querySelector("img");
+      return !!im && /^data:/.test(im.getAttribute("data-src") || "");
+    };
+    items = items.filter(isNew).concat(items.filter((it) => !isNew(it)));
+  }
   if (items.length) {
     const parent = items[0].parentNode;
     items.forEach((item) => parent.appendChild(item));
