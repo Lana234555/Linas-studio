@@ -277,9 +277,6 @@
       document.documentElement.style.overflow = "";
       clearInterval(timer);
       setTimeout(() => (modal.hidden = true), 250);
-      try {
-        sessionStorage.setItem("evbSeen", seenId);
-      } catch (e) {}
     }
     modal.addEventListener("click", (ev) => {
       if (ev.target === modal || ev.target.closest("[data-evb-close]")) close();
@@ -297,13 +294,23 @@
       document.body.classList.remove("has-evr");
     });
 
-    // Show once per visit (a new banner event shows again)
-    const seenId = main.map((e) => e.id).join(",");
-    let seen = "";
+    // Opens by itself only when someone enters the site (once per visit),
+    // and at most 2 times a day per browser. The ribbon can always reopen it.
+    const MAX_PER_DAY = 2;
+    const today = fmt(now, "en", { year: "numeric", month: "2-digit", day: "2-digit" });
+    let auto = true;
     try {
-      seen = sessionStorage.getItem("evbSeen") || "";
+      if (sessionStorage.getItem("evbShown")) auto = false;
+      const log = JSON.parse(localStorage.getItem("evbDaily") || "{}");
+      const count = log.day === today ? log.count || 0 : 0;
+      if (count >= MAX_PER_DAY) auto = false;
+      if (auto) {
+        sessionStorage.setItem("evbShown", "1");
+        localStorage.setItem("evbDaily", JSON.stringify({ day: today, count: count + 1 }));
+      }
     } catch (e) {}
-    if (seen !== seenId || /[?&]preview=1\b/.test(location.search)) setTimeout(open, 900);
+    if (/[?&]preview=1\b/.test(location.search)) auto = true;
+    if (auto) setTimeout(open, 700);
   }
 
   if (window.i18n && window.i18n.addTranslations) window.i18n.addTranslations(tr);
