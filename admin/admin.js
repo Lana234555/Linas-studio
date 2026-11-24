@@ -1147,6 +1147,7 @@
     const btn = $("publishBtn");
     btn.disabled = true;
     btn.textContent = "Публікую…";
+    progress.show("Готую публікацію…", 0);
     try {
       const latest = await fetchContentFile();
       if (latest.sha !== state.contentSha) {
