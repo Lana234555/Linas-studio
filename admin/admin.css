@@ -365,8 +365,9 @@ textarea.short { min-height: 80px; }
   .multi-row.multi-head { display: none; }
 }
 
-/* photo picker: buttons one under another, in colour */
-.photo-pick > div { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+/* photo picker: buttons in one line, in colour */
+.photo-pick > div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.photo-pick > div > p { flex-basis: 100%; }
 .photo-pick > div > * { margin-left: 0 !important; margin-top: 0 !important; }
 .photo-pick .file-btn { background: var(--teal); border-color: var(--teal); color: #041311; font-weight: 500; }
 .photo-pick .file-btn:hover { background: var(--teal2); color: #041311; }
