@@ -184,6 +184,7 @@
     $("saveStatus").textContent = dirty ? "Є неопубліковані зміни" : "Усі зміни опубліковані";
     $("publishBtn").disabled = !dirty;
     $("discardBtn").disabled = !dirty;
+    renderSide();
   }
   function changed() {
     render();
@@ -1540,9 +1541,98 @@
     openModal(node);
   }
 
+
+  // ── right info panel (desktop) ──
+  const SECTION_KEYS = { events: ["events"], teachers: ["teachers"], prices: ["prices"], halls: ["halls"], about: ["founder"], cert: ["cert"], gallery: ["gallery"] };
+  const TAB_NAMES = { events: "Події", teachers: "Викладачі", prices: "Ціни", halls: "Зали", about: "Про студію", cert: "Сертифікат", gallery: "Галерея" };
+  const TAB_TIPS = {
+    events: "Подія з'являється на сайті сама в день початку і зникає після завершення. Публікувати вдруге не треба.",
+    teachers: "Порядок карток тут такий самий, як на сайті. Стрілками можна міняти місцями.",
+    prices: "Позначте тариф як «Популярний», і він буде виділений на сайті.",
+    halls: "Приховані зали лишаються тут, але на сайті їх не видно.",
+    about: "Тексти можна заповнити лише російською. Інші мови візьмуть переклад або російський текст.",
+    cert: "Фото сертифіката найкраще виглядає горизонтальним.",
+    gallery: "Теги допомагають відвідувачам фільтрувати фото. Одне фото може мати кілька тегів.",
+  };
+  function changedTabs() {
+    if (!state.content || !state.original) return [];
+    return ALL_TABS.filter((t) => SECTION_KEYS[t].some((k) => JSON.stringify(state.content[k]) !== JSON.stringify(state.original[k])));
+  }
+  function goTab(t) {
+    if (state.tab === t) return;
+    state.tab = t;
+    render();
+    $("app").scrollTop = 0;
+    window.scrollTo(0, 0);
+  }
+  function countPrices(p) {
+    let n = 0;
+    Object.values(p || {}).forEach((arr) => (arr || []).forEach((x) => { if (!x.hidden) n++; }));
+    return n;
+  }
+  function renderSide() {
+    const el = $("sidePanel");
+    if (!el || !state.content) return;
+    const c = state.content;
+    const now = Date.now();
+    const evs = c.events || [];
+    const live = evs.filter((e) => eventStatus(e, now) === "live").length;
+    const sched = evs.filter((e) => eventStatus(e, now) === "scheduled");
+    const upcoming = evs.filter((e) => ["live", "scheduled"].includes(eventStatus(e, now)) && e.date)
+      .sort((a, b) => warsawTime(a.date) - warsawTime(b.date))[0];
+    const changed = changedTabs();
+    const today = new Intl.DateTimeFormat("uk-UA", { weekday: "long", day: "numeric", month: "long" }).format(new Date());
+    const stat = (tab, num, label) => h("button", { class: "sp-stat" + (state.tab === tab ? " on" : ""), type: "button", title: "Відкрити розділ «" + TAB_NAMES[tab] + "»", onclick: () => goTab(tab) },
+      h("b", {}, String(num)), h("span", {}, label));
+    el.replaceChildren(
+      h("div", { class: "sp-hello" },
+        h("span", { class: "sp-avatar" }, "Л"),
+        h("div", {}, h("div", { class: "sp-hi" }, "Вітаю, Лано!"), h("div", { class: "sp-date" }, today))),
+      h("div", { class: "sp-card sp-status" + (changed.length ? " dirty" : "") },
+        h("div", { class: "sp-label" }, "Стан сайту"),
+        h("div", { class: "sp-state" }, h("i", { class: "sp-dot" }), changed.length ? "Є неопубліковані зміни" : "Усе опубліковано"),
+        changed.length
+          ? h("div", { class: "sp-chips" }, ...changed.map((t) => h("button", { class: "sp-chip", type: "button", onclick: () => goTab(t) }, TAB_NAMES[t])))
+          : h("p", { class: "sp-note" }, "Сайт показує те саме, що й тут."),
+        changed.length
+          ? h("div", { class: "sp-btns" },
+              h("button", { class: "btn btn-ghost btn-small", type: "button", onclick: () => $("previewBtn").click() }, "👁 Перегляд"),
+              h("button", { class: "btn btn-teal btn-small", type: "button", onclick: () => $("publishBtn").click() }, "Опублікувати"))
+          : null),
+      h("div", { class: "sp-card" },
+        h("div", { class: "sp-label" }, "На сайті зараз"),
+        h("div", { class: "sp-stats" },
+          stat("events", live, live === 1 ? "подія" : "подій"),
+          stat("teachers", (c.teachers || []).filter((t) => !t.hidden).length, "викладачів"),
+          stat("prices", countPrices(c.prices), "тарифів"),
+          stat("halls", ((c.halls && c.halls.rooms) || []).filter((r) => !r.hidden).length, "залів"),
+          stat("gallery", ((c.gallery && c.gallery.photos) || []).length, "фото"),
+          stat("events", sched.length, "заплановано"))),
+      upcoming
+        ? h("button", { class: "sp-card sp-event", type: "button", title: "Відкрити розділ «Події»", onclick: () => goTab("events") },
+            upcoming.image ? h("img", { src: imgUrl(upcoming.image), alt: "" }) : h("span", { class: "sp-event-ph" }, "🎵"),
+            h("div", { class: "sp-event-body" },
+              h("div", { class: "sp-label" }, "Найближча подія"),
+              h("div", { class: "sp-event-title" }, ((upcoming.text && upcoming.text.ru) || {}).title || "Без назви"),
+              h("div", { class: "sp-event-date" }, niceDate(upcoming.date))))
+        : null,
+      h("div", { class: "sp-card sp-tip" },
+        h("div", { class: "sp-label" }, "Підказка · " + TAB_NAMES[state.tab]),
+        h("p", {}, TAB_TIPS[state.tab] || "")),
+    );
+  }
+
   // ── render ──
   function render() {
+    const switched = render._tab !== state.tab;
+    render._tab = state.tab;
     ALL_TABS.forEach((t) => ($(t + "View").hidden = state.tab !== t));
+    if (switched) {
+      const v = $(state.tab + "View");
+      v.classList.remove("view-enter");
+      void v.offsetWidth;
+      v.classList.add("view-enter");
+    }
     document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("active", b.dataset.tab === state.tab));
     const y = window.scrollY;
     if (state.tab === "events") renderEvents();
@@ -1552,6 +1642,7 @@
     if (state.tab === "halls") renderHalls();
     if (state.tab === "about") renderAbout();
     if (state.tab === "cert") renderCert();
+    renderSide();
     window.scrollTo(0, y);
   }
 
@@ -1689,6 +1780,8 @@
       $("tabs").hidden = false;
       $("topbarRight").hidden = false;
       $("savebar").hidden = false;
+      $("sidePanel").hidden = false;
+      document.body.classList.add("has-side");
       render();
       updateSavebar();
     } catch (e) {
@@ -1701,6 +1794,8 @@
     $("tabs").hidden = true;
     $("topbarRight").hidden = true;
     $("savebar").hidden = true;
+    $("sidePanel").hidden = true;
+    document.body.classList.remove("has-side");
     ALL_TABS.forEach((t) => ($(t + "View").hidden = true));
     $("loginError").hidden = !err;
     $("loginError").textContent = err || "";
@@ -1721,7 +1816,7 @@
     state.original = state.content;
     showLogin();
   });
-  document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => { state.tab = b.dataset.tab; render(); window.scrollTo(0, 0); $("app").scrollTop = 0; }));
+  document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => goTab(b.dataset.tab)));
   $("publishBtn").addEventListener("click", publish);
   $("previewBtn").addEventListener("click", preview);
   $("discardBtn").addEventListener("click", () => {
