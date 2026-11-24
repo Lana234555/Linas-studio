@@ -787,3 +787,10 @@ main { scroll-behavior: smooth; }
 .pub-kind.changed { background: rgba(212, 160, 23, 0.16); color: var(--gold); }
 .pub-kind.deleted { background: rgba(229, 83, 75, 0.15); color: #f07a72; }
 .pub-review .modal-actions { margin-top: 24px; }
+/* saved & waiting for publishing = teal; unsaved draft (left without saving) = gold, dashed */
+.has-draft[data-draft] { border-color: rgba(0, 196, 179, 0.7) !important; box-shadow: 0 0 0 1px rgba(0, 196, 179, 0.2); }
+.has-draft[data-draft]::after { content: "✓ " attr(data-draft); background: var(--teal); color: #03201d; }
+.evrow.has-draft[data-draft] { border-left-color: var(--teal) !important; }
+.has-draft.is-unsaved[data-draft] { border-color: rgba(212, 160, 23, 0.85) !important; border-style: dashed !important; box-shadow: 0 0 0 1px rgba(212, 160, 23, 0.2); }
+.has-draft.is-unsaved[data-draft]::after { content: "✎ " attr(data-draft); background: var(--gold); color: #1a1405; }
+.evrow.has-draft.is-unsaved[data-draft] { border-left-color: var(--gold) !important; border-left-style: solid !important; }

@@ -201,7 +201,7 @@
   function saveDraft() {
     try {
       if (!state.content || !isDirty()) { localStorage.removeItem(DRAFT_KEY); state.draftSavedAt = null; return; }
-      const base = { base: state.contentSha, savedAt: new Date().toISOString(), content: state.content, restoredFrom: state.restoredFrom || null, restoreBlobs: state.restoreBlobs || {} };
+      const base = { base: state.contentSha, savedAt: new Date().toISOString(), content: state.content, restoredFrom: state.restoredFrom || null, restoreBlobs: state.restoreBlobs || {}, draftKeys: state.draftKeys || [] };
       const pending = {};
       Object.keys(state.pending).forEach((p) => (pending[p] = { dataUrl: state.pending[p].dataUrl }));
       try {
@@ -232,6 +232,7 @@
     state.pending = pending;
     state.restoreBlobs = d.restoreBlobs || {};
     state.restoredFrom = d.restoredFrom || null;
+    state.draftKeys = d.draftKeys || [];
     state.draftSavedAt = d.savedAt;
     const changedNow = changedTabs().map((t) => TAB_NAMES[t]);
     const when = fmtWhen(d.savedAt);
@@ -242,7 +243,7 @@
     saveDraft();
     const dirty = isDirty();
     $("savebar").classList.toggle("dirty", dirty);
-    $("saveStatus").textContent = dirty ? (state.draftSavedAt ? "Чернетку збережено · " + new Intl.DateTimeFormat("uk-UA", { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date(state.draftSavedAt)) : "Є неопубліковані зміни") : "Усі зміни опубліковані";
+    $("saveStatus").textContent = dirty ? (state.draftSavedAt ? "Чекає публікації · " + new Intl.DateTimeFormat("uk-UA", { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date(state.draftSavedAt)) : "Є неопубліковані зміни") : "Усі зміни опубліковані";
     $("publishBtn").disabled = !dirty;
     $("discardBtn").disabled = !dirty;
     renderSide();
@@ -440,12 +441,45 @@
   }
   // Buttons at the bottom of every editor window.
   // apply() validates and saves the draft into the content; returns true on success.
+  // every card as key -> JSON, to see which cards a save touched
+  function cardSnapshot(c) {
+    const m = new Map();
+    if (!c) return m;
+    (c.teachers || []).forEach((x) => m.set("teachers:" + x.id, JSON.stringify(x)));
+    (c.events || []).forEach((x) => m.set("events:" + x.id, JSON.stringify(x)));
+    ((c.halls && c.halls.rooms) || []).forEach((x) => m.set("rooms:" + x.id, JSON.stringify(x)));
+    ((c.halls && c.halls.prices) || []).forEach((x, i) => m.set("hallprices:" + i, JSON.stringify(x)));
+    ((c.gallery && c.gallery.photos) || []).forEach((x) => m.set("gallery:" + x.src, JSON.stringify(x)));
+    ["vocal", "instruments"].forEach((g) => (((c.prices || {})[g]) || []).forEach((x, i) => m.set("plans:" + g + ":" + i, JSON.stringify(x))));
+    return m;
+  }
+  // apply() and then remember whether the touched cards are an unsaved draft or saved
+  function applyAs(apply, asDraft) {
+    const before = cardSnapshot(state.content);
+    if (!apply()) return false;
+    const after = cardSnapshot(state.content);
+    state.draftKeys = state.draftKeys || [];
+    after.forEach((v, k) => {
+      if (before.get(k) === v) return;
+      state.draftKeys = state.draftKeys.filter((x) => x !== k);
+      if (asDraft) state.draftKeys.push(k);
+    });
+    return true;
+  }
   let modalApply = null;
+  let modalKey = null;
+  let lastCardKey = null;
+  document.addEventListener("click", (e) => {
+    const card = e.target.closest && e.target.closest("[data-dk]");
+    lastCardKey = card ? card.getAttribute("data-dk") : null;
+  }, true);
   let modalEdited = false;
   function editorActions(apply, section) {
     modalApply = apply;
+    const key = modalKey;
     const done = (then) => () => {
-      if (!apply()) return;
+      if (!applyAs(apply, false)) return;
+      if (key) state.draftKeys = (state.draftKeys || []).filter((x) => x !== key);
       closeModal();
       changed();
       if (then) then();
@@ -464,14 +498,15 @@
     document.body.style.overflow = "";
     modalApply = null;
     modalEdited = false;
+    modalKey = null;
   }
   // Accidental exit (Esc, click outside the window): keep what was typed in the draft instead of losing it.
   function softCloseModal() {
     if (modalApply && modalEdited) {
-      if (!modalApply()) return;
+      if (!applyAs(modalApply, true)) return;
       closeModal();
       changed();
-      toast("Правки збережено. На сайт вони потраплять після «Опублікувати на сайті» внизу.");
+      toast("Ви вийшли без збереження, тож правки лишилися чернеткою. Відкрийте картку й натисніть «Зберегти зміни».");
       return;
     }
     closeModal();
@@ -580,6 +615,7 @@
   }
 
   function editTeacher(index, section) {
+    modalKey = index >= 0 ? lastCardKey : null;
     const isNew = index < 0;
     const t = isNew ? emptyTeacher(section) : clone(state.content.teachers[index]);
     t.text = t.text || {};
@@ -1215,6 +1251,7 @@
   }
 
   function editRoom(index) {
+    modalKey = index >= 0 ? lastCardKey : null;
     const H = state.content.halls;
     const isNew = index < 0;
     const r = isNew ? emptyRoom() : clone(H.rooms[index]);
@@ -1487,6 +1524,7 @@
   }
 
   function editEvent(index) {
+    modalKey = index >= 0 ? lastCardKey : null;
     const isNew = index < 0;
     const e = isNew ? emptyEvent() : clone(state.content.events[index]);
     e.text = e.text || {};
@@ -1646,8 +1684,10 @@
       const cur = draftItem(state.content, key);
       const old = draftItem(state.original, key);
       const st = !cur ? "" : old === undefined ? "new" : JSON.stringify(cur) !== JSON.stringify(old) ? "changed" : "";
+      const unsaved = !!st && (state.draftKeys || []).includes(key);
       el.classList.toggle("has-draft", !!st);
-      if (st) el.setAttribute("data-draft", st === "new" ? "Нова · ще не на сайті" : "Чернетка · чекає публікації");
+      el.classList.toggle("is-unsaved", unsaved);
+      if (st) el.setAttribute("data-draft", unsaved ? (st === "new" ? "Нова · чернетка, не збережено" : "Чернетка · не збережено") : st === "new" ? "Нова · чекає публікації" : "Збережено · чекає публікації");
       else el.removeAttribute("data-draft");
     });
     const changedT = changedTabs();
@@ -1659,7 +1699,7 @@
       if (changedT.includes(t)) {
         if (!note) {
           note = h("div", { class: "view-draft-note" }, h("span", { class: "sp-dot" }),
-            h("span", null, h("b", null, "У цьому розділі є чернетка. "), "Позначені картки змінені, але відвідувачі їх ще не бачать. Щоб показати на сайті, натисніть «Опублікувати»."));
+            h("span", null, h("b", null, "У цьому розділі є неопубліковані зміни. "), "Бірюзова мітка: збережено й чекає публікації. Жовта: чернетка, з якої ви вийшли без збереження. Відвідувачі сайту поки не бачать жодної з них."));
           const head = view.querySelector(":scope > .view-head");
           if (head) head.after(note); else view.prepend(note);
         }
@@ -1743,6 +1783,10 @@
     changedTabs().forEach((t) => { if (!known.has(t)) res.push({ tab: t, lines: [["changed", "Зміни в розділі"]] }); });
     return res;
   }
+  function unsavedCount() {
+    const cur = cardSnapshot(state.content), old = cardSnapshot(state.original);
+    return (state.draftKeys || []).filter((k) => cur.has(k) && cur.get(k) !== old.get(k)).length;
+  }
   function openPublishReview() {
     if (!isDirty()) { toast("Немає змін для публікації."); return; }
     const sum = changeSummary();
@@ -1752,6 +1796,7 @@
       h("h3", null, "Перевірте перед публікацією"),
       h("p", { class: "muted" }, "Ось що зміниться на сайті (" + total + "). Натисніть на назву розділу, щоб повернутися до нього."),
       state.restoredFrom ? h("div", { class: "hist-restored" }, "Ви повертаєте версію сайту від " + fmtWhen(state.restoredFrom.date) + ".") : null,
+      unsavedCount() ? h("div", { class: "hist-restored" }, "Увага: " + unsavedCount() + " карт. ще чернетки (ви вийшли з них без збереження). Якщо опублікувати зараз, вони теж з'являться на сайті.") : null,
       h("div", { class: "pub-list" },
         sum.map((sec) => h("div", { class: "pub-sec" },
           h("button", { class: "pub-sec-name", type: "button", onclick: () => { closeModal(); goTab(sec.tab); } }, TAB_NAMES[sec.tab], h("span", { class: "count-pill" }, String(sec.lines.length))),
@@ -2074,6 +2119,7 @@
       state.pending = {};
       state.restoreBlobs = {};
       state.restoredFrom = null;
+      state.draftKeys = [];
       state.lastPublished = { date: new Date().toISOString(), sha: commit.sha };
       state.history = null;
       try { localStorage.removeItem(PREVIEW_KEY); } catch (e) {}
@@ -2214,6 +2260,7 @@
     state.pending = {};
     state.restoreBlobs = {};
     state.restoredFrom = null;
+    state.draftKeys = [];
     changed();
   });
   $("modal").addEventListener("click", (e) => { if (e.target === $("modal")) softCloseModal(); });
