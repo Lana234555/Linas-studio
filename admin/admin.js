@@ -1721,7 +1721,7 @@
     state.original = state.content;
     showLogin();
   });
-  document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => { state.tab = b.dataset.tab; render(); window.scrollTo(0, 0); }));
+  document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => { state.tab = b.dataset.tab; render(); window.scrollTo(0, 0); $("app").scrollTop = 0; }));
   $("publishBtn").addEventListener("click", publish);
   $("previewBtn").addEventListener("click", preview);
   $("discardBtn").addEventListener("click", () => {

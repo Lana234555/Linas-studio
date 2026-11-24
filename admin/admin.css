@@ -483,3 +483,101 @@ textarea.short { min-height: 80px; }
 }
 @keyframes tip-in { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
 @media (hover: none) { .tip { display: none; } }
+
+/* ══ App shell in the style of the reference: rounded frame, dark-teal side menu, pill tabs ══ */
+:root { --panel: #131312; --side1: #0f2d2a; --side2: #0a1d1b; --gold-soft: rgba(212, 160, 23, 0.85); }
+.tab-ico { width: 18px; height: 18px; flex: none; }
+.tab { display: inline-flex; align-items: center; gap: 8px; }
+.brand-logo {
+  width: 34px; height: 34px; border-radius: 50%; flex: none; display: inline-flex; align-items: center; justify-content: center;
+  border: 2px solid var(--teal); box-shadow: 0 0 0 3px rgba(0, 196, 179, 0.15);
+}
+.brand-logo .brand-note { font-size: 1.05rem; line-height: 1; }
+.brand-text { display: flex; flex-direction: column; }
+.brand { align-items: center; }
+.side-link { display: inline-flex; align-items: center; gap: 10px; }
+.side-link .tab-ico { width: 17px; height: 17px; }
+
+@media (min-width: 900px) {
+  body {
+    padding: 20px 20px 20px 284px;
+    background:
+      radial-gradient(520px 520px at -60px -80px, rgba(212, 160, 23, 0.22), transparent 70%),
+      radial-gradient(700px 600px at 105% 110%, rgba(0, 196, 179, 0.12), transparent 70%),
+      #070707;
+    background-attachment: fixed;
+  }
+  /* the big rounded app panel behind the content */
+  body::before {
+    content: ""; position: fixed; z-index: -1; top: 20px; bottom: 20px; left: 20px; right: 20px;
+    background: var(--panel); border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+  }
+  .topbar {
+    top: 20px; bottom: 20px; left: 20px; width: 252px;
+    padding: 30px 0 26px 18px; gap: 26px;
+    background: linear-gradient(180deg, var(--side1), var(--side2));
+    border: none; border-radius: 30px; box-shadow: 8px 0 30px rgba(0, 0, 0, 0.35);
+    overflow-x: visible;
+  }
+  .brand {
+    flex-direction: column; text-align: center; gap: 12px; padding: 0 18px 24px 0; flex-wrap: nowrap;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  .brand-logo { width: 78px; height: 78px; border-width: 2px; box-shadow: 0 0 0 6px rgba(0, 196, 179, 0.12), 0 0 0 7px rgba(212, 160, 23, 0.55); }
+  .brand-logo .brand-note { font-size: 2.1rem; }
+  .brand-text { align-items: center; gap: 4px; }
+  .brand-name { font-size: 1.3rem; letter-spacing: 0.02em; }
+  .brand-sub { flex-basis: auto; margin-top: 0; font-size: 0.72rem; letter-spacing: 0.16em; }
+
+  .tabs { gap: 6px; }
+  .tab {
+    gap: 14px; padding: 13px 18px; border-radius: 999px 0 0 999px; font-size: 0.95rem; letter-spacing: 0.02em;
+    color: #e6e6e2; background: transparent; box-shadow: none; position: relative;
+  }
+  .tab .tab-ico { width: 21px; height: 21px; color: var(--gold-soft); transition: color 0.15s; }
+  .tab:hover { background: rgba(255, 255, 255, 0.05); color: var(--white); }
+  .tab.active {
+    background: var(--panel); color: var(--teal); font-weight: 500; box-shadow: none;
+  }
+  .tab.active .tab-ico { color: var(--teal); }
+  /* soft inverted corners so the active pill flows into the panel */
+  .tab.active::before, .tab.active::after {
+    content: ""; position: absolute; right: 0; width: 22px; height: 22px; pointer-events: none;
+  }
+  .tab.active::before { top: -22px; border-bottom-right-radius: 22px; box-shadow: 8px 8px 0 8px var(--panel); }
+  .tab.active::after { bottom: -22px; border-top-right-radius: 22px; box-shadow: 8px -8px 0 8px var(--panel); }
+
+  .topbar-right { padding: 18px 18px 0 6px; gap: 14px; border-top: 1px solid rgba(255, 255, 255, 0.07); width: calc(100% - 18px); }
+  .side-link { color: #cfcfca; font-size: 0.88rem; }
+  .side-link .tab-ico { color: var(--gold-soft); }
+  .side-link:hover { color: var(--teal); }
+
+  main { max-width: 1180px; padding: 34px 34px 120px; }
+  .view-head h2 { font-size: 2.3rem; }
+
+  /* content blocks become rounded cards like in the reference */
+  .group { background: #1a1a18; border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px; padding: 22px 24px; }
+  .group .trow, .group .plan, .group .photo, .group .upload-box { background: #222220; }
+  .group .row-list .trow { border-radius: 18px; }
+  .trow, .plan, .photo { border-radius: 18px; }
+  .upload-box { border-radius: 20px; }
+
+  .savebar {
+    left: 292px; right: 40px; bottom: 34px; border-radius: 999px; padding: 10px 12px 10px 26px;
+    background: rgba(26, 26, 24, 0.96); border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  }
+  .savebar.dirty { border-color: var(--teal-border); }
+  .progress { left: calc(50% + 136px); }
+  .toast { left: calc(50% + 136px); bottom: 110px; }
+}
+@media (min-width: 900px) {
+  /* the content scrolls inside the rounded panel, so nothing slides over its edges */
+  main {
+    position: fixed; top: 21px; bottom: 21px; left: 272px; right: 21px; overflow-y: auto; max-width: none; margin: 0;
+    padding: 34px max(34px, calc((100% - 1180px) / 2)) 130px; border-radius: 0 29px 29px 0;
+    scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+  }
+  .login { margin-top: 60px; }
+}
