@@ -267,7 +267,7 @@
     let timer = null;
     function open() {
       modal.hidden = false;
-      requestAnimationFrame(() => modal.classList.add("show"));
+      requestAnimationFrame(() => requestAnimationFrame(() => modal.classList.add("show")));
       document.documentElement.style.overflow = "hidden";
       clearInterval(timer);
       if (main.length > 1) timer = setInterval(() => go(cur + 1), 7000);
@@ -276,7 +276,7 @@
       modal.classList.remove("show");
       document.documentElement.style.overflow = "";
       clearInterval(timer);
-      setTimeout(() => (modal.hidden = true), 250);
+      setTimeout(() => (modal.hidden = true), 700);
     }
     modal.addEventListener("click", (ev) => {
       if (ev.target === modal || ev.target.closest("[data-evb-close]")) close();
