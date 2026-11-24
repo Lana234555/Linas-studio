@@ -794,3 +794,24 @@ main { scroll-behavior: smooth; }
 .has-draft.is-unsaved[data-draft] { border-color: rgba(212, 160, 23, 0.85) !important; border-style: dashed !important; box-shadow: 0 0 0 1px rgba(212, 160, 23, 0.2); }
 .has-draft.is-unsaved[data-draft]::after { content: "✎ " attr(data-draft); background: var(--gold); color: #1a1405; }
 .evrow.has-draft.is-unsaved[data-draft] { border-left-color: var(--gold) !important; border-left-style: solid !important; }
+
+/* ══ Soft gradient background ══ */
+body {
+  background:
+    radial-gradient(900px 600px at 0% 0%, rgba(0, 196, 179, 0.10), transparent 65%),
+    radial-gradient(800px 700px at 100% 100%, rgba(212, 160, 23, 0.08), transparent 65%),
+    linear-gradient(160deg, #0f1514 0%, #0b0b0b 55%, #12100b 100%);
+  background-attachment: fixed;
+}
+@media (min-width: 900px) {
+  body::before {
+    background:
+      radial-gradient(1100px 700px at 15% 0%, rgba(0, 196, 179, 0.14), transparent 60%),
+      radial-gradient(900px 700px at 95% 100%, rgba(212, 160, 23, 0.11), transparent 60%),
+      linear-gradient(150deg, #161a19 0%, #131312 50%, #17150f 100%);
+  }
+  .tab.active { background: #151918; }
+  .tab.active::before { box-shadow: 8px 8px 0 8px #151918; }
+  .tab.active::after { box-shadow: 8px -8px 0 8px #151918; }
+  @keyframes pill-in { from { background-color: rgba(21, 25, 24, 0); transform: translateX(-6px); } to { background-color: #151918; transform: none; } }
+}
