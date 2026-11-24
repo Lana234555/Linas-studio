@@ -225,7 +225,7 @@
       ? `<button class="evb-arrow evb-prev" data-evb-step="-1" aria-label="‹">‹</button><button class="evb-arrow evb-next" data-evb-step="1" aria-label="›">›</button>`
       : "";
     const dots = multi
-      ? `<div class="evb-dots">${main.map((_, i) => `<button class="evb-dot${i === 0 ? " active" : ""}" data-evb-go="${i}" aria-label="${i + 1}"></button>`).join("")}</div>`
+      ? `<div class="evb-dots">${arrows.split("</button>")[0]}</button>${main.map((_, i) => `<button class="evb-dot${i === 0 ? " active" : ""}" data-evb-go="${i}" aria-label="${i + 1}"></button>`).join("")}${arrows.split("</button>")[1]}</button></div>`
       : "";
     const closeKey = put("ui.close", UI.close);
     const modal = document.createElement("div");
@@ -237,7 +237,6 @@
           <button class="evb-x" data-evb-close aria-label="${esc(UI.close.ru)}" data-i18n-aria="${closeKey}">✕</button>
           ${slides}
         </div>
-        ${arrows}
         ${dots}
       </div>`;
     document.body.appendChild(modal);
