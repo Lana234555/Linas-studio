@@ -863,7 +863,7 @@
   // ── shared widgets for the "all cards" sections ──
   // Photo with upload / edit / remove. get() and set(path) read and write the photo path.
   function photoPicker(get, set, kind, baseName, title, hint, emoji) {
-    const box = h("div", { class: "photo-pick" });
+    const box = h("div", { class: "photo-pick" + (kind === "cert" ? " wide contain" : kind === "halls" ? " wide" : "") });
     function draw() {
       box.innerHTML = "";
       const cur = get();
