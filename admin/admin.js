@@ -11,6 +11,7 @@
   const CONTENT_PATH = "content.js";
   const TOKEN_KEY = "linaAdminToken";
   const PREVIEW_KEY = "linaAdminPreview";
+  const DRAFT_KEY = "linaAdminDraft";
   const LANGS = [
     ["ru", "RU"],
     ["en", "EN"],
@@ -196,10 +197,52 @@
   function isDirty() {
     return JSON.stringify(state.content) !== JSON.stringify(state.original);
   }
+  // ── draft: unpublished changes survive closing or reloading the page ──
+  function saveDraft() {
+    try {
+      if (!state.content || !isDirty()) { localStorage.removeItem(DRAFT_KEY); state.draftSavedAt = null; return; }
+      const base = { base: state.contentSha, savedAt: new Date().toISOString(), content: state.content, restoredFrom: state.restoredFrom || null, restoreBlobs: state.restoreBlobs || {} };
+      const pending = {};
+      Object.keys(state.pending).forEach((p) => (pending[p] = { dataUrl: state.pending[p].dataUrl }));
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(Object.assign({ pending }, base)));
+        state.draftNoPhotos = false;
+      } catch (e) {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(Object.assign({ pending: {} }, base)));
+        state.draftNoPhotos = Object.keys(pending).length > 0;
+      }
+      state.draftSavedAt = base.savedAt;
+    } catch (e) {}
+  }
+  function loadDraft() {
+    let d = null;
+    try { d = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); } catch (e) {}
+    if (!d || !d.content || JSON.stringify(d.content) === JSON.stringify(state.original)) return;
+    const pending = {};
+    Object.keys(d.pending || {}).forEach((p) => {
+      const u = d.pending[p].dataUrl;
+      if (u) pending[p] = { dataUrl: u, base64: u.slice(u.indexOf(",") + 1) };
+    });
+    // drop photos that did not fit into the browser storage
+    const known = referencedPaths(state.original);
+    const strip = (p) => p && !pending[p] && !(d.restoreBlobs || {})[p] && !known.has(p) && /^photo\/(gallery|teachers|events|halls|about|cert)\//.test(p) && /-\d{6,}/.test(p);
+    const c = d.content;
+    if (c.gallery && c.gallery.photos) c.gallery.photos = c.gallery.photos.filter((x) => !strip(x.src));
+    state.content = c;
+    state.pending = pending;
+    state.restoreBlobs = d.restoreBlobs || {};
+    state.restoredFrom = d.restoredFrom || null;
+    state.draftSavedAt = d.savedAt;
+    const changedNow = changedTabs().map((t) => TAB_NAMES[t]);
+    const when = fmtWhen(d.savedAt);
+    const warn = d.base && d.base !== state.contentSha ? " Увага: після цього сайт уже публікували, тож перегляньте все перед публікацією." : "";
+    setTimeout(() => toast("Відновлено чернетку від " + when + (changedNow.length ? " (" + changedNow.join(", ") + ")" : "") + ". Можна продовжувати або натиснути «Скасувати»." + warn, !!warn), 300);
+  }
   function updateSavebar() {
+    saveDraft();
     const dirty = isDirty();
     $("savebar").classList.toggle("dirty", dirty);
-    $("saveStatus").textContent = dirty ? "Є неопубліковані зміни" : "Усі зміни опубліковані";
+    $("saveStatus").textContent = dirty ? (state.draftSavedAt ? "Чернетку збережено · " + new Intl.DateTimeFormat("uk-UA", { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date(state.draftSavedAt)) : "Є неопубліковані зміни") : "Усі зміни опубліковані";
     $("publishBtn").disabled = !dirty;
     $("discardBtn").disabled = !dirty;
     renderSide();
@@ -387,6 +430,7 @@
 
   // ── modal ──
   function openModal(node) {
+    modalEdited = false;
     const body = $("modalBody");
     body.innerHTML = "";
     body.appendChild(node);
@@ -395,7 +439,10 @@
   }
   // Buttons at the bottom of every editor window.
   // apply() validates and saves the draft into the content; returns true on success.
+  let modalApply = null;
+  let modalEdited = false;
   function editorActions(apply, section) {
+    modalApply = apply;
     const done = (then) => () => {
       if (!apply()) return;
       closeModal();
@@ -405,7 +452,7 @@
     return h(
       "div",
       { class: "modal-actions" },
-      h("button", { class: "btn btn-ghost", type: "button", onclick: closeModal }, "Скасувати"),
+      h("button", { class: "btn btn-ghost", type: "button", title: "Закрити вікно і не зберігати правки з нього", onclick: cancelModal }, "Скасувати"),
       h("span", { class: "pe-spacer" }),
       h("button", { class: "btn btn-ghost", type: "button", title: "Подивитися, як це виглядатиме на сайті", onclick: done(() => preview(section ? section() : "")) }, "👁 Переглянути на сайті"),
       h("button", { class: "btn btn-ghost", type: "button", onclick: done(null) }, "Готово"),
@@ -415,6 +462,23 @@
   function closeModal() {
     $("modal").hidden = true;
     document.body.style.overflow = "";
+    modalApply = null;
+    modalEdited = false;
+  }
+  // Accidental exit (Esc, click outside the window): keep what was typed in the draft instead of losing it.
+  function softCloseModal() {
+    if (modalApply && modalEdited) {
+      if (!modalApply()) return;
+      closeModal();
+      changed();
+      toast("Правки збережено в чернетку. На сайт вони потраплять після «Опублікувати».");
+      return;
+    }
+    closeModal();
+  }
+  function cancelModal() {
+    if (modalApply && modalEdited && !confirm("Закрити вікно і скасувати правки в ньому?")) return;
+    closeModal();
   }
 
   // small reusable widgets
@@ -1962,6 +2026,7 @@
       state.original = clone(f.content);
       state.content.teachers = state.content.teachers || [];
       state.content.events = state.content.events || [];
+      loadDraft();
       $("loadingView").hidden = true;
       $("tabs").hidden = false;
       $("topbarRight").hidden = false;
@@ -1997,7 +2062,7 @@
   });
   $("tokenInput").addEventListener("keydown", (e) => e.key === "Enter" && $("loginBtn").click());
   $("logoutBtn").addEventListener("click", () => {
-    if (isDirty() && !confirm("Є неопубліковані зміни. Вийти без збереження?")) return;
+    if (isDirty() && !confirm("Є неопубліковані зміни. Вони залишаться чернеткою в цьому браузері й відновляться, коли ви знову увійдете. Вийти?")) return;
     try { localStorage.removeItem(TOKEN_KEY); } catch (e) {}
     state.token = null;
     state.original = state.content;
@@ -2014,12 +2079,17 @@
     state.restoredFrom = null;
     changed();
   });
-  $("modal").addEventListener("click", (e) => { if (e.target === $("modal")) closeModal(); });
+  $("modal").addEventListener("click", (e) => { if (e.target === $("modal")) softCloseModal(); });
+  ["input", "change"].forEach((ev) => $("modalBody").addEventListener(ev, () => (modalEdited = true)));
+  $("modalBody").addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (b && !b.closest(".modal-actions") && !b.classList.contains("lang-tab")) modalEdited = true;
+  });
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
     const pv = $("previewOverlay");
     if (pv) { pv.querySelector(".pv-actions .btn-ghost").click(); return; }
-    if (!$("modal").hidden) closeModal();
+    if (!$("modal").hidden) softCloseModal();
   });
   window.addEventListener("beforeunload", (e) => {
     if (state.content && isDirty()) {

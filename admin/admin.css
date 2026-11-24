@@ -741,3 +741,12 @@ main { scroll-behavior: smooth; }
   .hist-item { grid-template-columns: 16px 1fr 170px; }
   .hist-item .trow-actions { justify-content: flex-end; }
 }
+#saveStatus { white-space: nowrap; }
+@media (min-width: 1280px) {
+  body.has-side #previewBtn .lg, body.has-side #discardBtn .lg { display: none; }
+  body.has-side #previewBtn .sm, body.has-side #discardBtn .sm { display: inline; }
+}
+@media (min-width: 1680px) {
+  body.has-side #previewBtn .lg, body.has-side #discardBtn .lg { display: inline; }
+  body.has-side #previewBtn .sm, body.has-side #discardBtn .sm { display: none; }
+}
