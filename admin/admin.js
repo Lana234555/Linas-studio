@@ -294,6 +294,33 @@
     };
   })();
 
+  // ── phone layout: label every input of the multi-column rows ──
+  // On a narrow screen the column headers are hidden, so each input gets its own small label
+  // taken from the header row (RU / EN / PL / Посилання …).
+  function labelRows(root) {
+    root.querySelectorAll(".multi-head").forEach((head) => {
+      const labels = Array.from(head.children).map((c) => c.textContent.trim());
+      let row = head.nextElementSibling;
+      while (row && row.classList.contains("multi-row")) {
+        if (!row.dataset.labelled) {
+          row.dataset.labelled = "1";
+          Array.from(row.children).forEach((cell, i) => {
+            if (!labels[i] || cell.tagName === "BUTTON" || cell.classList.contains("row-btns")) return;
+            const wrap = h("label", { class: "mr-cell" }, h("span", { class: "mr-lab" }, labels[i]));
+            row.insertBefore(wrap, cell);
+            wrap.appendChild(cell);
+          });
+        }
+        row = row.nextElementSibling;
+      }
+    });
+  }
+  new MutationObserver((muts) => {
+    const roots = new Set();
+    muts.forEach((m) => m.addedNodes.forEach((n) => n.nodeType === 1 && roots.add(n.parentElement || n)));
+    roots.forEach((r) => r && labelRows(r));
+  }).observe(document.body, { childList: true, subtree: true });
+
   // ── modal ──
   function openModal(node) {
     const body = $("modalBody");
@@ -1538,7 +1565,7 @@
       progress.hide();
       toast(e.status === 401 || e.status === 403 ? "GitHub не дозволив запис. Перевірте, що ключ має доступ Contents: Read and write." : "Не вдалося опублікувати: " + e.message, true);
     } finally {
-      btn.textContent = "Опублікувати на сайті";
+      btn.innerHTML = '<span class="lg">Опублікувати на сайті</span><span class="sm">Опублікувати</span>';
       setTimeout(() => progress.hide(), 1500);
       updateSavebar();
     }

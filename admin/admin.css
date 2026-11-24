@@ -375,3 +375,101 @@ textarea.short { min-height: 80px; }
 .photo-pick .btn-ghost:not(.file-btn):hover { border-color: var(--teal); }
 .photo-pick.contain img { object-fit: contain; background: #000; }
 .photo-pick .btn-small { padding: 8px 16px; font-size: 0.85rem; }
+
+/* ── phone and tablet layout ── */
+.savebar .sm { display: none; }
+.mr-cell { display: contents; }
+.mr-lab { display: none; }
+@media (max-width: 899px) {
+  /* top bar: brand + links in one line, sections as one scrollable strip */
+  .topbar { padding: 10px 16px 0; gap: 6px 12px; }
+  .brand-note { font-size: 1.15rem; }
+  .brand-name { font-size: 1.05rem; }
+  .topbar-right { margin-left: auto; gap: 14px; font-size: 0.82rem; }
+  .tabs {
+    order: 3; flex-basis: 100%; flex-wrap: nowrap; overflow-x: auto; gap: 6px;
+    padding: 4px 0 10px; margin: 0 -16px; padding-left: 16px; padding-right: 16px;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex: none; padding: 7px 14px; }
+}
+@media (max-width: 720px) {
+  body { padding-bottom: 84px; }
+  main { padding: 18px 16px 24px; }
+  .view-head { margin-bottom: 16px; }
+  .view-head h2 { font-size: 1.6rem; }
+  .group { margin-bottom: 28px; }
+  .group-head { flex-wrap: wrap; gap: 8px; }
+  .group-head h3 { font-size: 1.15rem; }
+
+  /* save bar: one compact line of buttons */
+  .savebar { padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px)); gap: 6px; flex-direction: column; align-items: stretch; }
+  #saveStatus { font-size: 0.75rem; text-align: center; }
+  .savebar-actions { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 6px; }
+  .savebar-actions .btn { padding: 10px 6px; font-size: 0.82rem; white-space: nowrap; }
+  .savebar .lg { display: none; }
+  .savebar .sm { display: inline; }
+  .toast { bottom: 100px; }
+
+  /* rows with several languages become small cards with a label on every field */
+  .multi-row.multi-head { display: none; }
+  .multi-row:not(.multi-head),
+  .multi-row.tags.wide:not(.multi-head),
+  .multi-row.tags:has(.row-btns):not(.multi-head),
+  .multi-row.stats:not(.multi-head),
+  .multi-row.videos:not(.multi-head) {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px;
+  }
+  .multi-row.videos:not(.multi-head) > .mr-cell:first-child,
+  .multi-row.stats:not(.multi-head) > .mr-cell:first-child { grid-column: 1 / -1; }
+  .mr-cell { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .mr-lab { display: block; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.04em; }
+  .multi-row .row-btns, .multi-row > .icon-btn { grid-column: 1 / -1; justify-self: end; }
+  .multi-row .row-btns { display: flex; gap: 6px; }
+  .multi-row input { padding: 8px 9px; min-width: 0; }
+
+  /* gallery: two photos per row */
+  .photos { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .upload-box { padding: 14px; }
+
+  /* price cards and tables */
+  .plans { grid-template-columns: 1fr; }
+  .price-grid { grid-template-columns: 1fr 1fr; }
+  .plan { padding: 12px; }
+
+  /* photo picker */
+  .photo-pick { align-items: flex-start; gap: 12px; }
+  .photo-pick img, .photo-pick .ph { width: 72px; height: 72px; flex: none; }
+  .photo-pick.wide img, .photo-pick.wide .ph { width: 110px; height: 70px; }
+
+  /* editor windows */
+  .modal-box { padding: 18px 16px 24px; }
+  .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .modal-actions .pe-spacer { display: none; }
+  .modal-actions .btn { padding: 11px 8px; font-size: 0.85rem; }
+  .modal-actions .btn-teal { grid-column: 1 / -1; }
+
+  /* preview bar */
+  .pv-bar { padding-block: 8px; }
+  .pv-title .muted { display: none; }
+  .pv-actions { width: 100%; }
+  .pv-actions .btn-teal { flex: 1; }
+
+  /* photo editor */
+  .pe-box { padding: 14px; gap: 10px; }
+  .pe-head h3 { font-size: 1.2rem; }
+  .pe-hint { display: none; }
+  .pe-actions { display: grid; grid-template-columns: 1fr 1fr; }
+  .pe-actions .pe-spacer { display: none; }
+  .pe-actions .btn-teal { grid-column: 1 / -1; order: -1; }
+}
+@media (max-width: 400px) {
+  .multi-row:not(.multi-head) { grid-template-columns: 1fr; }
+  .price-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .brand-sub { display: none; }
+  .topbar-right { gap: 12px; }
+}
