@@ -28,8 +28,9 @@
     ["kids", "Kids"],
   ];
   const ENROLL_DEFAULT = "#contact";
+  const ALL_TABS = ["events", "teachers", "prices", "halls", "about", "cert", "gallery"];
   // Only files inside these folders are ever deleted by the admin
-  const DELETABLE = /^photo\/(gallery|koncert|kvartirnyky|kemp|teachers|events)\//;
+  const DELETABLE = /^photo\/(gallery|koncert|kvartirnyky|kemp|teachers|events|halls|about|cert)\//;
 
   const state = {
     token: null,
@@ -166,6 +167,9 @@
     (c.teachers || []).forEach((t) => t.photo && set.add(t.photo));
     ((c.gallery && c.gallery.photos) || []).forEach((p) => p.src && set.add(p.src));
     (c.events || []).forEach((e) => e.image && set.add(e.image));
+    ((c.halls && c.halls.rooms) || []).forEach((r) => r.photo && set.add(r.photo));
+    if (c.founder && c.founder.photo) set.add(c.founder.photo);
+    if (c.cert && c.cert.image) set.add(c.cert.image);
     return set;
   }
 
@@ -222,6 +226,9 @@
     teachers: { maxSide: 1000, aspect: 4 / 3, aspects: [["Як на картці", 4 / 3], ["Квадрат", 1], ["Вертикальне 3:4", 3 / 4], ["Оригінал", null]] },
     gallery: { maxSide: 1600, aspect: null, aspects: [["Оригінал", null], ["1:1", 1], ["4:3", 4 / 3], ["3:4", 3 / 4], ["16:9", 16 / 9]] },
     events: { maxSide: 1600, aspect: 1.6, aspects: [["Як в афіші 16:10", 1.6], ["Оригінал", null], ["1:1", 1], ["4:5", 0.8]] },
+    halls: { maxSide: 1600, aspect: 3, aspects: [["Як на картці 3:1", 3], ["16:9", 16 / 9], ["4:3", 4 / 3], ["Оригінал", null]] },
+    about: { maxSide: 1400, aspect: 0.85, aspects: [["Як на сайті", 0.85], ["3:4", 3 / 4], ["Квадрат", 1], ["Оригінал", null]] },
+    cert: { maxSide: 1600, aspect: null, aspects: [["Оригінал", null], ["Як зараз 2:1", 2.16], ["16:9", 16 / 9], ["4:3", 4 / 3]] },
   };
   function newPath(folder, baseName) {
     const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, "");
@@ -852,6 +859,338 @@
     );
   }
 
+
+  // ── shared widgets for the "all cards" sections ──
+  // Photo with upload / edit / remove. get() and set(path) read and write the photo path.
+  function photoPicker(get, set, kind, baseName, title, hint, emoji) {
+    const box = h("div", { class: "photo-pick" });
+    function draw() {
+      box.innerHTML = "";
+      const cur = get();
+      box.appendChild(cur ? imgWithFallback(cur) : h("div", { class: "ph" }, emoji || "🖼"));
+      const input = h("input", { type: "file", accept: "image/*" });
+      input.addEventListener("change", async () => {
+        const file = input.files[0];
+        if (!file) return;
+        try {
+          const p = await addPendingImage(file, kind, baseName(), 1600, title);
+          input.value = "";
+          if (p) { set(p); draw(); }
+        } catch (e) {
+          toast(e.message, true);
+        }
+      });
+      box.appendChild(
+        h(
+          "div",
+          null,
+          h("span", { class: "btn btn-ghost btn-small file-btn" }, cur ? "Змінити фото" : "Завантажити фото", input),
+          cur ? h("button", { class: "btn btn-ghost btn-small", type: "button", style: "margin-left:8px", onclick: async () => { const p = await reeditImage(cur, kind, baseName()); if (p) { set(p); draw(); } } }, "✎ Редагувати фото") : null,
+          cur && emoji ? h("button", { class: "link", type: "button", style: "margin-left:10px", onclick: () => { set(""); draw(); } }, "прибрати") : null,
+          hint ? h("p", { class: "muted", style: "margin-top:8px" }, hint) : null
+        )
+      );
+    }
+    draw();
+    return box;
+  }
+  // Editable list of short texts in three languages, e.g. features, tags, conditions.
+  // onChange is called after every edit (use updateSavebar for inline sections).
+  function langList(arr, opts) {
+    opts = opts || {};
+    const box = h("div");
+    const onChange = opts.onChange || (() => {});
+    function draw() {
+      box.innerHTML = "";
+      if (arr.length) box.appendChild(h("div", { class: "multi-row tags multi-head" + (opts.wide ? " wide" : "") }, h("span", null, "RU"), h("span", null, "EN"), h("span", null, "PL"), h("span")));
+      arr.forEach((item, i) => {
+        box.appendChild(
+          h(
+            "div",
+            { class: "multi-row tags" + (opts.wide ? " wide" : "") },
+            LANGS.map(([l]) => textInput(item[l], (v) => { item[l] = v; onChange(); }, { placeholder: l.toUpperCase() })),
+            h(
+              "div",
+              { class: "row-btns" },
+              h("button", { class: "icon-btn", type: "button", title: "Вище", disabled: i === 0, onclick: () => { [arr[i - 1], arr[i]] = [arr[i], arr[i - 1]]; draw(); onChange(); } }, "↑"),
+              h("button", { class: "icon-btn danger", type: "button", title: "Видалити", onclick: () => { arr.splice(i, 1); draw(); onChange(); } }, "✕")
+            )
+          )
+        );
+      });
+      box.appendChild(h("button", { class: "btn btn-ghost btn-small", type: "button", onclick: () => { arr.push({ ru: "", en: "", pl: "" }); draw(); onChange(); const ins = box.querySelectorAll("input"); if (ins.length) ins[ins.length - 3].focus(); } }, opts.addLabel || "+ Додати"));
+    }
+    draw();
+    return box;
+  }
+  // Text fields per language with RU / EN / PL switch. fields: [[key, label, "area"?]]
+  function langFields(textObj, fields, onChange) {
+    let lang = "ru";
+    LANGS.forEach(([l]) => (textObj[l] = textObj[l] || {}));
+    const box = h("div");
+    function draw() {
+      const d = textObj[lang];
+      box.innerHTML = "";
+      fields.forEach(([key, label, kind]) => {
+        const inp =
+          kind === "area"
+            ? h("textarea", { oninput: (e) => { d[key] = e.target.value; onChange(); } }, d[key] || "")
+            : textInput(d[key], (v) => { d[key] = v; onChange(); });
+        box.appendChild(field(label + (lang === "ru" ? "" : " (" + lang.toUpperCase() + ")"), inp));
+      });
+    }
+    draw();
+    return h("div", null, langTabs((l) => { lang = l; draw(); }, lang), box);
+  }
+  function previewBtn(section) {
+    return h("button", { class: "btn btn-ghost btn-small", type: "button", onclick: () => preview(section) }, "👁 Переглянути на сайті");
+  }
+  // keep only rows with any text; tiny helper for clean data
+  const anyText = (o) => !!(o && LANGS.some(([l]) => (o[l] || "").trim()));
+
+  // ── HALLS (оренда залів) ──
+  function emptyRoom() {
+    const text = {};
+    LANGS.forEach(([l]) => (text[l] = { name: "", badge: "", desc: "" }));
+    return { id: "h" + Date.now().toString(36), photo: "", sqm: "", emoji: "🎵", text, features: [], bookUrl: ENROLL_DEFAULT };
+  }
+  function renderHalls() {
+    const view = $("hallsView");
+    view.innerHTML = "";
+    const H = (state.content.halls = state.content.halls || {});
+    H.rooms = H.rooms || [];
+    H.prices = H.prices || [];
+    H.conditions = H.conditions || [];
+    H.intro = H.intro || { ru: "", en: "", pl: "" };
+    view.appendChild(
+      h("div", { class: "view-head" }, h("div", null, h("div", { class: "chip" }, "Аренда залов"), h("h2", null, "Зали")), h("div", { class: "head-actions" }, h("p", { class: "muted" }, "Порядок тут такий самий, як на сайті."), previewBtn("halls")))
+    );
+
+    // intro text under the title
+    view.appendChild(
+      h(
+        "div",
+        { class: "group" },
+        h("div", { class: "group-head" }, h("h3", null, "Текст під заголовком")),
+        h("div", { class: "grid3" }, LANGS.map(([l, L]) => field(L, h("textarea", { class: "short", oninput: (e) => { H.intro[l] = e.target.value; updateSavebar(); } }, H.intro[l] || ""))))
+      )
+    );
+
+    // rooms
+    const rows = h("div", { class: "row-list" });
+    H.rooms.forEach((r, i) => {
+      const ru = (r.text && r.text.ru) || {};
+      rows.appendChild(
+        h(
+          "div",
+          { class: "trow wide-img" + (r.hidden ? " is-hidden" : "") },
+          r.photo ? imgWithFallback(r.photo) : h("div", { class: "ph" }, r.emoji || "🎵"),
+          h(
+            "div",
+            null,
+            h("div", { class: "trow-name" }, ru.name || "(без назви)", r.sqm ? h("span", { class: "badge basic" }, r.sqm + " m²") : null, r.hidden ? h("span", { class: "badge off" }, "приховано") : null),
+            h("div", { class: "trow-role" }, ru.badge || "")
+          ),
+          h(
+            "div",
+            { class: "trow-actions" },
+            h("button", { class: "icon-btn", title: "Вище", disabled: i === 0, onclick: () => { [H.rooms[i - 1], H.rooms[i]] = [H.rooms[i], H.rooms[i - 1]]; changed(); } }, "↑"),
+            h("button", { class: "icon-btn", title: "Нижче", disabled: i === H.rooms.length - 1, onclick: () => { [H.rooms[i + 1], H.rooms[i]] = [H.rooms[i], H.rooms[i + 1]]; changed(); } }, "↓"),
+            h("button", { class: "btn btn-ghost btn-small", onclick: () => editRoom(i) }, "Редагувати"),
+            h("button", { class: "btn btn-ghost btn-small", onclick: () => { r.hidden = !r.hidden; changed(); } }, r.hidden ? "Показати" : "Сховати"),
+            h("button", { class: "icon-btn danger", title: "Видалити", onclick: () => { if (confirm(`Видалити «${ru.name || "цей зал"}»? Після публікації картка зникне з сайту.`)) { H.rooms.splice(i, 1); changed(); } } }, "✕")
+          )
+        )
+      );
+    });
+    if (!H.rooms.length) rows.appendChild(h("p", { class: "muted" }, "Поки немає залів."));
+    view.appendChild(h("div", { class: "group" }, h("div", { class: "group-head" }, h("h3", null, "Картки залів"), h("button", { class: "btn btn-teal btn-small", onclick: () => editRoom(-1) }, "+ Додати зал")), rows));
+
+    // rent prices
+    const grid = h("div", { class: "plans hp-plans" });
+    H.prices.forEach((p, i) => {
+      p.title = p.title || {};
+      p.unit = p.unit || {};
+      grid.appendChild(
+        h(
+          "div",
+          { class: "plan" + (p.hidden ? " is-hidden" : "") },
+          h(
+            "div",
+            { class: "plan-head" },
+            h("div", null, h("span", { class: "plan-title" }, (p.title.ru || "Нова ціна") + " · " + (p.price || 0) + " zł"), p.featured ? h("span", { class: "badge top" }, "виділена") : null, p.hidden ? h("span", { class: "badge off" }, "приховано") : null),
+            h(
+              "div",
+              { class: "trow-actions" },
+              h("button", { class: "icon-btn", title: "Лівіше", disabled: i === 0, onclick: () => { [H.prices[i - 1], H.prices[i]] = [H.prices[i], H.prices[i - 1]]; changed(); } }, "←"),
+              h("button", { class: "icon-btn", title: "Правіше", disabled: i === H.prices.length - 1, onclick: () => { [H.prices[i + 1], H.prices[i]] = [H.prices[i], H.prices[i + 1]]; changed(); } }, "→"),
+              h("button", { class: "icon-btn", title: p.hidden ? "Показати" : "Сховати", onclick: () => { p.hidden = !p.hidden; changed(); } }, p.hidden ? "◌" : "◉"),
+              h("button", { class: "icon-btn danger", title: "Видалити", onclick: () => { if (confirm("Видалити цю ціну оренди?")) { H.prices.splice(i, 1); changed(); } } }, "✕")
+            )
+          ),
+          h(
+            "div",
+            { class: "grid2" },
+            field("Ціна, zł", numInput(p.price, (v) => { p.price = v; updateSavebar(); })),
+            h("label", { class: "check", style: "align-self:end;margin-bottom:10px" }, h("input", { type: "checkbox", checked: !!p.featured, onchange: (e) => { p.featured = e.target.checked; changed(); } }), "Виділити (бірюзова рамка)")
+          ),
+          h("div", { class: "grid3" }, LANGS.map(([l, L]) => field("Назва " + L, textInput(p.title[l], (v) => { p.title[l] = v; updateSavebar(); }, { placeholder: l === "ru" ? "Абонемент S · 4 ч" : "" })))),
+          h("div", { class: "grid3" }, LANGS.map(([l, L]) => field("Підпис " + L, textInput(p.unit[l], (v) => { p.unit[l] = v; updateSavebar(); }, { placeholder: l === "ru" ? "65 zł / час" : "" }))))
+        )
+      );
+    });
+    view.appendChild(
+      h(
+        "div",
+        { class: "group" },
+        h("div", { class: "group-head" }, h("h3", null, "Ціни оренди"), h("button", { class: "btn btn-teal btn-small", onclick: () => { H.prices.push({ title: { ru: "", en: "", pl: "" }, price: 0, unit: { ru: "", en: "", pl: "" }, featured: false }); changed(); } }, "+ Додати ціну")),
+        grid
+      )
+    );
+
+    // conditions
+    view.appendChild(
+      h(
+        "div",
+        { class: "group" },
+        h("div", { class: "group-head" }, h("h3", null, "Умови оренди (список під цінами)")),
+        langList(H.conditions, { wide: true, addLabel: "+ Додати умову", onChange: updateSavebar })
+      )
+    );
+  }
+
+  function editRoom(index) {
+    const H = state.content.halls;
+    const isNew = index < 0;
+    const r = isNew ? emptyRoom() : clone(H.rooms[index]);
+    r.text = r.text || {};
+    LANGS.forEach(([l]) => (r.text[l] = Object.assign({ name: "", badge: "", desc: "" }, r.text[l] || {})));
+    r.features = r.features || [];
+    const base = () => slugify(r.text.ru.name) || "hall";
+    const node = h(
+      "div",
+      null,
+      h("h3", null, isNew ? "Новий зал" : "Редагування залу"),
+      h("div", { class: "sub-head" }, "Фото"),
+      photoPicker(() => r.photo, (p) => (r.photo = p), "halls", base, "Фото залу", "Горизонтальне фото. На картці воно показується смугою 3:1.", r.emoji || "🎵"),
+      h("div", { class: "grid2" }, field("Площа, m²", textInput(r.sqm, (v) => (r.sqm = v.trim()), { placeholder: "20" })), field("Емодзі, якщо немає фото", textInput(r.emoji, (v) => (r.emoji = v)))),
+      h("div", { class: "sub-head" }, "Тексти"),
+      langFields(r.text, [["name", "Назва"], ["badge", "Підзаголовок (бірюзовий)"], ["desc", "Опис", "area"]], () => {}),
+      h("div", { class: "sub-head" }, "Що є в залі (плашки)"),
+      langList(r.features, { addLabel: "+ Додати плашку" }),
+      field("Куди веде кнопка «Забронировать зал» (#contact = розділ «Контакти»)", textInput(r.bookUrl || ENROLL_DEFAULT, (v) => (r.bookUrl = v.trim()))),
+      editorActions(() => {
+        if (!r.text.ru.name.trim()) return toast("Вкажіть назву російською (RU), це основна мова сайту.", true), false;
+        r.features = r.features.filter(anyText);
+        if (isNew) H.rooms.push(r);
+        else H.rooms[index] = r;
+        return true;
+      }, () => "halls")
+    );
+    openModal(node);
+  }
+
+  // ── ABOUT (блок засновниці «О студии») ──
+  function renderAbout() {
+    const view = $("aboutView");
+    view.innerHTML = "";
+    const F = (state.content.founder = state.content.founder || { photo: "", text: {}, stats: [], tags: [], videos: [] });
+    F.text = F.text || {};
+    F.stats = F.stats || [];
+    F.tags = F.tags || [];
+    F.videos = F.videos || [];
+    view.appendChild(h("div", { class: "view-head" }, h("div", null, h("div", { class: "chip" }, "О студии"), h("h2", null, "Про студію")), h("div", { class: "head-actions" }, previewBtn("founder"))));
+
+    view.appendChild(
+      h(
+        "div",
+        { class: "group" },
+        h("div", { class: "group-head" }, h("h3", null, "Фото і підпис на фото")),
+        photoPicker(() => F.photo, (p) => { F.photo = p; changed(); }, "about", () => "founder", "Фото засновниці", "Вертикальне фото. На сайті видно верхню частину."),
+        langFields(F.text, [["badgeTitle", "Маленький напис (бірюзовий)"], ["badgeVal", "Підпис під ним"]], updateSavebar)
+      )
+    );
+    view.appendChild(
+      h(
+        "div",
+        { class: "group" },
+        h("div", { class: "group-head" }, h("h3", null, "Заголовок і текст")),
+        langFields(F.text, [["title", "Заголовок, перший рядок"], ["titleEm", "Заголовок, другий рядок (бірюзовий курсив)"], ["p1", "Абзац 1", "area"], ["p2", "Абзац 2", "area"], ["p3", "Абзац 3", "area"]], updateSavebar)
+      )
+    );
+
+    // stats
+    const statsBox = h("div");
+    (function drawStats() {
+      statsBox.innerHTML = "";
+      if (F.stats.length) statsBox.appendChild(h("div", { class: "multi-row stats multi-head" }, h("span", null, "Число"), h("span", null, "Підпис RU"), h("span", null, "EN"), h("span", null, "PL"), h("span", null, "Золотий"), h("span")));
+      F.stats.forEach((st, i) => {
+        st.label = st.label || {};
+        statsBox.appendChild(
+          h(
+            "div",
+            { class: "multi-row stats" },
+            textInput(st.num, (v) => { st.num = v; updateSavebar(); }, { placeholder: "500+" }),
+            LANGS.map(([l]) => textInput(st.label[l], (v) => { st.label[l] = v; updateSavebar(); }, { placeholder: l.toUpperCase() })),
+            h("input", { type: "checkbox", checked: !!st.gold, title: "Золотий колір числа", onchange: (e) => { st.gold = e.target.checked; updateSavebar(); } }),
+            h("button", { class: "icon-btn danger", type: "button", title: "Видалити", onclick: () => { F.stats.splice(i, 1); drawStats(); updateSavebar(); } }, "✕")
+          )
+        );
+      });
+      statsBox.appendChild(h("button", { class: "btn btn-ghost btn-small", type: "button", onclick: () => { F.stats.push({ num: "", label: { ru: "", en: "", pl: "" } }); drawStats(); updateSavebar(); } }, "+ Додати число"));
+    })();
+    view.appendChild(h("div", { class: "group" }, h("div", { class: "group-head" }, h("h3", null, "Цифри (5+, 20+, 500+)")), statsBox));
+
+    view.appendChild(h("div", { class: "group" }, h("div", { class: "group-head" }, h("h3", null, "Жанри (плашки)")), langList(F.tags, { addLabel: "+ Додати жанр", onChange: updateSavebar })));
+
+    // videos
+    const vidBox = h("div");
+    (function drawVideos() {
+      vidBox.innerHTML = "";
+      if (F.videos.length) vidBox.appendChild(h("div", { class: "multi-row videos multi-head" }, h("span", null, "Посилання (YouTube)"), h("span", null, "Назва RU"), h("span", null, "EN"), h("span", null, "PL"), h("span")));
+      F.videos.forEach((v, i) => {
+        v.label = v.label || {};
+        vidBox.appendChild(
+          h(
+            "div",
+            { class: "multi-row videos" },
+            textInput(v.url, (x) => { v.url = x.trim(); updateSavebar(); }, { placeholder: "https://youtube.com/…" }),
+            LANGS.map(([l]) => textInput(v.label[l], (x) => { v.label[l] = x; updateSavebar(); }, { placeholder: "Назва " + l.toUpperCase() })),
+            h("button", { class: "icon-btn danger", type: "button", title: "Видалити відео", onclick: () => { F.videos.splice(i, 1); drawVideos(); updateSavebar(); } }, "✕")
+          )
+        );
+      });
+      vidBox.appendChild(h("button", { class: "btn btn-ghost btn-small", type: "button", onclick: () => { F.videos.push({ url: "", label: { ru: "Видео", en: "Video", pl: "Wideo" } }); drawVideos(); updateSavebar(); } }, "+ Додати відео"));
+    })();
+    view.appendChild(h("div", { class: "group" }, h("div", { class: "group-head" }, h("h3", null, "Відео (кнопки ▶)")), vidBox));
+  }
+
+  // ── CERTIFICATE ──
+  function renderCert() {
+    const view = $("certView");
+    view.innerHTML = "";
+    const G = (state.content.cert = state.content.cert || { image: "", price: "", currency: "PLN", text: {} });
+    G.text = G.text || {};
+    view.appendChild(h("div", { class: "view-head" }, h("div", null, h("div", { class: "chip" }, "Подарок"), h("h2", null, "Сертифікат")), h("div", { class: "head-actions" }, previewBtn("cert"))));
+    view.appendChild(
+      h(
+        "div",
+        { class: "group" },
+        h("div", { class: "group-head" }, h("h3", null, "Картинка сертифіката")),
+        photoPicker(() => G.image, (p) => { G.image = p; changed(); }, "cert", () => "certificate", "Картинка сертифіката", "Показується повністю, без обрізання.")
+      )
+    );
+    view.appendChild(
+      h(
+        "div",
+        { class: "group" },
+        h("div", { class: "group-head" }, h("h3", null, "Ціна і текст")),
+        h("div", { class: "grid2" }, field("Ціна «от …»", textInput(G.price, (v) => { G.price = v.trim(); updateSavebar(); }, { placeholder: "120" })), field("Валюта", textInput(G.currency, (v) => { G.currency = v.trim(); updateSavebar(); }, { placeholder: "PLN" }))),
+        langFields(G.text, [["p1", "Абзац 1", "area"], ["p2", "Абзац 2", "area"]], updateSavebar)
+      )
+    );
+  }
+
   // ── EVENTS (афіша і банер) ──
   // Dates are strings "YYYY-MM-DDTHH:mm" in Warsaw time, the same way the site reads them.
   const TZ = "Europe/Warsaw";
@@ -1131,13 +1470,16 @@
 
   // ── render ──
   function render() {
-    ["events", "teachers", "prices", "gallery"].forEach((t) => ($(t + "View").hidden = state.tab !== t));
+    ALL_TABS.forEach((t) => ($(t + "View").hidden = state.tab !== t));
     document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("active", b.dataset.tab === state.tab));
     const y = window.scrollY;
     if (state.tab === "events") renderEvents();
     if (state.tab === "teachers") renderTeachers();
     if (state.tab === "prices") renderPrices();
     if (state.tab === "gallery") renderGallery();
+    if (state.tab === "halls") renderHalls();
+    if (state.tab === "about") renderAbout();
+    if (state.tab === "cert") renderCert();
     window.scrollTo(0, y);
   }
 
@@ -1210,9 +1552,12 @@
     c.teachers.forEach((t) => (t.photo = swap(t.photo)));
     c.gallery.photos.forEach((p) => (p.src = swap(p.src)));
     (c.events || []).forEach((e) => (e.image = swap(e.image)));
+    ((c.halls && c.halls.rooms) || []).forEach((r) => (r.photo = swap(r.photo)));
+    if (c.founder) c.founder.photo = swap(c.founder.photo);
+    if (c.cert) c.cert.image = swap(c.cert.image);
     return c;
   }
-  const SECTION_FOR_TAB = { events: "afisha", teachers: "vocal", prices: "pricing", gallery: "gallery" };
+  const SECTION_FOR_TAB = { events: "afisha", teachers: "vocal", prices: "pricing", gallery: "gallery", halls: "halls", about: "founder", cert: "cert" };
   function preview(section) {
     if (typeof section !== "string") section = SECTION_FOR_TAB[state.tab] || "";
     window.__linaPreviewDraft = previewDraft();
@@ -1284,7 +1629,7 @@
     $("tabs").hidden = true;
     $("topbarRight").hidden = true;
     $("savebar").hidden = true;
-    ["events", "teachers", "prices", "gallery"].forEach((t) => ($(t + "View").hidden = true));
+    ALL_TABS.forEach((t) => ($(t + "View").hidden = true));
     $("loginError").hidden = !err;
     $("loginError").textContent = err || "";
   }

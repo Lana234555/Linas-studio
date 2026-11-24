@@ -247,5 +247,153 @@
       .join("");
   }
 
+  // ── Halls (rent): rooms, rent prices, conditions ──
+  const H = C.halls;
+  const SQM_ICON = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M9 3v18"/></svg>';
+  const COND_ICONS = [
+    '<circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>',
+    '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+    '<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 8v4l3 3"/>',
+    '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  ];
+  // text helper that also keeps an optional Belarusian ("be") translation
+  function txt(obj, field) {
+    const out = {};
+    LANGS.concat("be").forEach((l) => {
+      const v = obj && obj[l] && (field ? obj[l][field] : obj[l]);
+      if (v) out[l] = v;
+    });
+    return out;
+  }
+  function i18nEl(tag, attrs, key, byLang) {
+    return `<${tag}${attrs} data-i18n="${put(key, byLang)}">${esc(byLang.ru || "")}</${tag}>`;
+  }
+  if (H) {
+    const intro = document.querySelector('[data-content="halls-intro"]');
+    if (intro && H.intro && H.intro.ru) intro.setAttribute("data-i18n", put("h.intro", txt(H.intro)));
+    const grid = document.querySelector('[data-content="halls"]');
+    if (grid) {
+      grid.innerHTML = (H.rooms || [])
+        .filter((r) => !r.hidden)
+        .map((r, i) => {
+          const k = "h.r" + i;
+          const feats = (r.features || [])
+            .filter((f) => f && f.ru)
+            .map((f, j) => i18nEl("span", ' class="hf"', k + ".f" + j, txt(f)))
+            .join("");
+          const book = safeUrl(r.bookUrl || ENROLL_DEFAULT);
+          return `
+            <div class="hall-card reveal">
+              <div class="hall-img" style="padding: 0; overflow: hidden; position: relative">
+                ${r.sqm ? `<div class="hall-sqm">${SQM_ICON} ${esc(r.sqm)} m²</div>` : ""}
+                ${r.photo
+                  ? `<img src="${esc(safeImg(r.photo))}" loading="lazy" alt="${esc((r.text && r.text.ru && r.text.ru.name) || "")}" style="width: 100%; height: 100%; object-fit: cover; object-position: center; display: block" onerror="this.parentElement.innerHTML = '${esc(r.emoji || "🎵")}'" />`
+                  : `<span>${esc(r.emoji || "🎵")}</span>`}
+              </div>
+              <div class="hall-body">
+                ${i18nEl("div", ' class="hall-name"', k + ".name", txt(r.text, "name"))}
+                ${r.text && r.text.ru && r.text.ru.badge ? i18nEl("div", ' class="hall-badge"', k + ".badge", txt(r.text, "badge")) : ""}
+                ${i18nEl("p", ' class="hall-desc"', k + ".desc", txt(r.text, "desc"))}
+                ${feats ? `<div class="hall-features" style="margin-bottom: 0">${feats}</div>` : ""}
+                <a href="${esc(book)}"${tgt(book)} class="btn-pill btn-teal" style="margin-top: 20px; font-size: 0.82rem" data-i18n="halls.bookBtn">Забронировать зал →</a>
+              </div>
+            </div>`;
+        })
+        .join("");
+    }
+    const pgrid = document.querySelector('[data-content="hall-prices"]');
+    if (pgrid) {
+      pgrid.innerHTML = (H.prices || [])
+        .filter((p) => !p.hidden)
+        .map((p, i) => {
+          const k = "h.p" + i;
+          return `
+              <div class="hp-card${p.featured ? " hp-card--featured" : ""}">
+                ${i18nEl("div", ' class="hp-type"', k + ".title", txt(p.title))}
+                <div class="hp-price">${esc(p.price)} <span class="hp-cur">zł</span></div>
+                ${p.unit && p.unit.ru ? i18nEl("div", ' class="hp-unit"', k + ".unit", txt(p.unit)) : ""}
+              </div>`;
+        })
+        .join("");
+    }
+    const cbox = document.querySelector('[data-content="hall-conditions"]');
+    if (cbox) {
+      const conds = (H.conditions || []).filter((x) => x && x.ru);
+      cbox.hidden = !conds.length;
+      cbox.innerHTML = conds
+        .map(
+          (x, i) => `
+              <div class="hp-cond-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2">${COND_ICONS[i % COND_ICONS.length]}</svg>
+                ${i18nEl("span", "", "h.c" + i, txt(x))}
+              </div>`
+        )
+        .join("");
+    }
+  }
+
+  // ── Founder ("О студии") ──
+  const F = C.founder;
+  if (F) {
+    const img = document.querySelector('[data-content="founder-photo"]');
+    if (img && F.photo) img.src = safeImg(F.photo);
+    const badge = document.querySelector('[data-content="founder-badge"]');
+    if (badge)
+      badge.innerHTML =
+        i18nEl("div", ' class="founder-badge-title"', "f.bt", txt(F.text, "badgeTitle")) + i18nEl("div", ' class="founder-badge-val"', "f.bv", txt(F.text, "badgeVal"));
+    const body = document.querySelector('[data-content="founder-body"]');
+    if (body) {
+      const title = {};
+      LANGS.concat("be").forEach((l) => {
+        const t = F.text && F.text[l];
+        if (t && (t.title || t.titleEm)) title[l] = esc(t.title || "") + "<br /><em>" + esc(t.titleEm || "") + "</em>";
+      });
+      const stats = (F.stats || [])
+        .filter((s) => s && s.num)
+        .map(
+          (s, i) => `
+                <div class="fstat">
+                  <div class="fstat-num"${s.gold ? ' style="color: var(--gold)"' : ""}>${esc(s.num)}</div>
+                  ${i18nEl("div", ' class="fstat-label"', "f.s" + i, txt(s.label))}
+                </div>`
+        )
+        .join("");
+      const tags = (F.tags || []).filter((x) => x && x.ru).map((x, i) => i18nEl("span", ' class="ftag"', "f.t" + i, txt(x))).join("");
+      const vids = (F.videos || [])
+        .filter((v) => v && v.url)
+        .map((v, i) => {
+          const lab = {};
+          LANGS.concat("be").forEach((l) => {
+            const x = v.label && (v.label[l] || (l === "ru" ? "" : v.label.ru));
+            if (x) lab[l] = "▶︎ " + x;
+          });
+          if (!lab.ru) lab.ru = "▶︎ Видео";
+          return `<a href="${esc(safeUrl(v.url))}" target="_blank" rel="noopener" class="vlink" data-i18n="${put("f.v" + i, lab)}">${esc(lab.ru)}</a>`;
+        })
+        .join("");
+      body.innerHTML = `
+              <h2 data-i18n-html="${put("f.title", title)}">${title.ru || ""}</h2>
+              ${["p1", "p2", "p3"].filter((f) => F.text && F.text.ru && F.text.ru[f]).map((f) => i18nEl("p", "", "f." + f, txt(F.text, f))).join("")}
+              ${stats ? `<div class="founder-stats">${stats}</div>` : ""}
+              ${tags ? `<div class="founder-tags">${tags}</div>` : ""}
+              ${vids ? `<div class="vid-links">${vids}</div>` : ""}`;
+    }
+  }
+
+  // ── Gift certificate ──
+  const G = C.cert;
+  if (G) {
+    const img = document.querySelector('[data-content="cert-image"]');
+    if (img && G.image) img.src = safeImg(G.image);
+    ["p1", "p2"].forEach((f) => {
+      const el = document.querySelector(`[data-content="cert-${f}"]`);
+      if (el && G.text && G.text.ru && G.text.ru[f]) el.setAttribute("data-i18n", put("c." + f, txt(G.text, f)));
+    });
+    const price = document.querySelector('[data-content="cert-price"]');
+    if (price && G.price) price.textContent = G.price;
+    const cur = document.querySelector('[data-content="cert-cur"]');
+    if (cur && G.currency) cur.textContent = G.currency;
+  }
+
   if (window.i18n && window.i18n.addTranslations) window.i18n.addTranslations(tr);
 })();

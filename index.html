@@ -219,9 +219,10 @@
               <img
                 src="photo/site/founder.jpg"
                 alt="Лина Поверга"
+                data-content="founder-photo"
               />
               <div class="founder-photo-overlay"></div>
-              <div class="founder-badge">
+              <div class="founder-badge" data-content="founder-badge">
                 <div class="founder-badge-title" data-i18n="about.founderTitle">Основатель студии</div>
                 <div class="founder-badge-val" data-i18n="about.founderVal">
                   Lina's Music Studio · Варшава · 2020
@@ -230,6 +231,7 @@
             </div>
             <div class="founder-text reveal">
               <div class="chip" data-i18n="about.chip">О студии</div>
+              <div data-content="founder-body">
               <h2 data-i18n-html="about.h2_html">Лина Поверга —<br /><em>создатель студии</em></h2>
               <p data-i18n="about.p1">
                 Профессиональная вокалистка, автор песен и преподаватель
@@ -308,6 +310,7 @@
                   class="vlink"
                   >▶︎ Соул</a
                 >
+              </div>
               </div>
             </div>
           </div>
@@ -453,243 +456,19 @@
               max-width: 520px;
             "
             data-i18n="halls.sub"
+            data-content="halls-intro"
           >
             Аренда пространства для самостоятельных занятий, репетиций и
             мероприятий. Фото залов скоро появятся.
           </p>
-          <div class="halls-grid">
-            <div class="hall-card reveal">
-              <div class="hall-img" style="padding: 0; overflow: hidden; position: relative">
-                <div class="hall-sqm"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M9 3v18"/></svg> 20 m²</div>
-                <img
-                  src="photo/site/hall-1.jpg" loading="lazy"
-                  style="
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    object-position: center;
-                    display: block;
-                  "
-                  onerror="this.parentElement.innerHTML = '🎷'"
-                />
-              </div>
-              <div class="hall-body">
-                <div class="hall-name" data-i18n="halls.jazz.name">
-                  Зал «Jazz»
-                </div>
-                
-                <div class="hall-badge" data-i18n="halls.jazz.badge">
-                  Вокал · Фортепиано · Малый бенд
-                </div>
-                <p class="hall-desc" data-i18n="halls.jazz.desc">
-                  Оснащённый зал для занятий вокалом, фортепиано или небольшого
-                  бенда. Колонка, микрофон, планшет с доступом к минусам,
-                  интернет и фортепиано Roland.
-                </p>
-                <div class="hall-features" style="margin-bottom: 0">
-                  <span class="hf">Колонка + микрофон</span
-                  ><span class="hf">Фортепиано Roland</span>
-                  <span class="hf">Планшет с минусами</span
-                  ><span class="hf">Wi-Fi</span>
-                </div>
-
-                <a
-                  href="#contact"
-                  class="btn-pill btn-teal"
-                  style="margin-top: 20px; font-size: 0.82rem"
-                  data-i18n="halls.bookBtn"
-                  >Забронировать зал →</a
-                >
-              </div>
-            </div>
-            <div class="hall-card reveal">
-              <div class="hall-img" style="padding: 0; overflow: hidden; position: relative">
-                <div class="hall-sqm"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M9 3v18"/></svg> 10 m²</div>
-                <img
-                  src="photo/site/hall-2.jpg" loading="lazy"
-                  style="
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    object-position: center;
-                    display: block;
-                  "
-                  onerror="this.parentElement.innerHTML = '🎙️'"
-                />
-              </div>
-              <div class="hall-body">
-                <div class="hall-name" data-i18n="halls.blues.name">
-                  Зал «Blues»
-                </div>
-                
-                <div class="hall-badge" data-i18n="halls.blues.badge">
-                  Звукозапись · Вокал
-                </div>
-                <p class="hall-desc" data-i18n="halls.blues.desc">
-                  Небольшой акустически обработанный зал — идеален для
-                  качественной записи голоса. Если есть своя аппаратура и нужно
-                  тихое удобное помещение — зал Блюз.
-                </p>
-                <div class="hall-features" style="margin-bottom: 0">
-                  <span class="hf">Акустическая обработка</span
-                  ><span class="hf">Звукоизоляция</span>
-                  <span class="hf">Запись голоса</span>
-                </div>
-
-                <a
-                  href="#contact"
-                  class="btn-pill btn-teal"
-                  style="margin-top: 20px; font-size: 0.82rem"
-                  data-i18n="halls.bookBtn"
-                  >Забронировать зал →</a
-                >
-              </div>
-            </div>
-            <div class="hall-card reveal">
-              <div class="hall-img" style="padding: 0; overflow: hidden; position: relative">
-                <div class="hall-sqm"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M9 3v18"/></svg> 20 m²</div>
-                <img
-                  src="photo/site/hall-3.jpg" loading="lazy"
-                  style="
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    object-position: center;
-                    display: block;
-                  "
-                  onerror="this.parentElement.innerHTML = '🎹'"
-                />
-              </div>
-              <div class="hall-body">
-                <div class="hall-name" data-i18n="halls.count.name">
-                  Зал «Country»
-                </div>
-                
-                <div class="hall-badge" data-i18n="halls.count.badge">
-                  Вокал · Фортепиано · Группы
-                </div>
-                <p class="hall-desc" data-i18n="halls.count.desc">
-                  Просторный зал для занятий вокалом или игры на фортепиано.
-                  Подходит для небольших групповых занятий — собирайтесь вместе
-                  в комфортном пространстве.
-                </p>
-                <div class="hall-features" style="margin-bottom: 0">
-                  <span class="hf">Фортепиано</span
-                  ><span class="hf">Групповые занятия</span>
-                  <span class="hf">Вокал</span>
-                </div>
-
-                <a
-                  href="#contact"
-                  class="btn-pill btn-teal"
-                  style="margin-top: 20px; font-size: 0.82rem"
-                  data-i18n="halls.bookBtn"
-                  >Забронировать зал →</a
-                >
-              </div>
-            </div>
-            <div class="hall-card reveal">
-              <div class="hall-img" style="padding: 0; overflow: hidden; position: relative">
-                <div class="hall-sqm"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M9 3v18"/></svg> 30 m²</div>
-                <img
-                  src="photo/site/hall-4.jpg" loading="lazy"
-                  style="
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    object-position: center;
-                    display: block;
-                  "
-                  onerror="this.parentElement.innerHTML = '🎸'"
-                />
-              </div>
-              <div class="hall-body">
-                <div class="hall-name" data-i18n="halls.rock.name">
-                  Зал «Rock»
-                </div>
-                
-                <div class="hall-badge" data-i18n="halls.rock.badge">
-                  Самый большой · до 15 человек
-                </div>
-                <p class="hall-desc" data-i18n="halls.rock.desc">
-                  Самый большой зал студии — для репетиций со своим бендом,
-                  уроков вокала, фортепиано и мероприятий до 15 человек.
-                  Барабаны, профессиональный свет, кольцевые лампы.
-                </p>
-                <div class="hall-features" style="margin-bottom: 0">
-                  <span class="hf">Электронные барабаны</span
-                  ><span class="hf">Фортепиано</span>
-                  <span class="hf">Проф. свет</span
-                  ><span class="hf">Кольцевые лампы</span
-                  ><span class="hf">до 15 чел.</span>
-                </div>
-
-                <a
-                  href="#contact"
-                  class="btn-pill btn-teal"
-                  style="margin-top: 20px; font-size: 0.82rem"
-                  data-i18n="halls.bookBtn"
-                  >Забронировать зал →</a
-                >
-              </div>
-            </div>
-          </div>
+          <div class="halls-grid" data-content="halls"></div>
 
           <!-- HALL PRICING -->
           <div class="hall-pricing reveal" style="margin-top: 56px">
             <div class="chip" style="margin-bottom: 20px" data-i18n="halls.pricingChip">Аренда · Цены</div>
-            <div class="hall-price-grid">
+            <div class="hall-price-grid" data-content="hall-prices"></div>
 
-              <div class="hp-card">
-                <div class="hp-type" data-i18n="halls.hp_single">Разово</div>
-                <div class="hp-price">70 <span class="hp-cur">zł</span></div>
-                <div class="hp-unit" data-i18n="halls.hp_unit60">/ 60 минут</div>
-              </div>
-
-              <div class="hp-card hp-card--featured">
-                <div class="hp-type" data-i18n="halls.hp_sub4h">Абонемент S · 4 ч</div>
-                <div class="hp-price">260 <span class="hp-cur">zł</span></div>
-                <div class="hp-unit" data-i18n="halls.hp_perHour65">65 zł / час</div>
-              </div>
-
-              <div class="hp-card hp-card--featured">
-                <div class="hp-type" data-i18n="halls.hp_sub8h">Абонемент M · 8 ч</div>
-                <div class="hp-price">480 <span class="hp-cur">zł</span></div>
-                <div class="hp-unit" data-i18n="halls.hp_perHour60">60 zł / час</div>
-              </div>
-
-              <div class="hp-card">
-                <div class="hp-type" data-i18n="halls.hp_sub12h">Абонемент L · 12 ч</div>
-                <div class="hp-price">660 <span class="hp-cur">zł</span></div>
-                <div class="hp-unit" data-i18n="halls.hp_perHour55">55 zł / час</div>
-              </div>
-
-              <div class="hp-card">
-                <div class="hp-type" data-i18n="halls.hp_sub16h">Абонемент XL · 16 ч</div>
-                <div class="hp-price">800 <span class="hp-cur">zł</span></div>
-                <div class="hp-unit" data-i18n="halls.hp_perHour50">50 zł / час</div>
-              </div>
-
-            </div>
-
-            <div class="hp-conditions">
-              <div class="hp-cond-item">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-                <span data-i18n="halls.hp_cond1">Во время аренды доступна вся необходимая техника и помощь администратора</span>
-              </div>
-              <div class="hp-cond-item">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                <span data-i18n="halls.hp_cond2">Доступны 4 зала — Rock, Jazz, Country, Blues</span>
-              </div>
-              <div class="hp-cond-item">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 8v4l3 3"/></svg>
-                <span data-i18n="halls.hp_cond3">Бронь актуальна только после внесения предоплаты</span>
-              </div>
-              <div class="hp-cond-item">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                <span data-i18n="halls.hp_cond4">Мероприятия в нескольких залах и аренда техники — стоимость индивидуально</span>
-              </div>
-            </div>
+            <div class="hp-conditions" data-content="hall-conditions"></div>
           </div>
 
           <div style="text-align: center; margin-top: 40px">
@@ -724,7 +503,7 @@
         <div class="section">
           <div class="cert-grid">
             <div class="cert-visual reveal">
-              <img class="cert-img" src="photo/gift-certificate.jpg" alt="Lina's Music Studio — Gift Certificate" loading="lazy" width="1600" height="740" />
+              <img class="cert-img" data-content="cert-image" src="photo/gift-certificate.jpg" alt="Lina's Music Studio — Gift Certificate" loading="lazy" width="1600" height="740" />
             </div>
             <div class="reveal">
               <div class="chip" data-i18n="cert.chip">Подарок</div>
@@ -738,7 +517,7 @@
                   margin-bottom: 10px;
                 "
               >
-                <span data-i18n="cert.p1">Сертификат на занятия — идеальный подарок для тех, кто мечтает
+                <span data-content="cert-p1" data-i18n="cert.p1">Сертификат на занятия — идеальный подарок для тех, кто мечтает
                 петь, играть или открыть для себя мир музыки.</span>
               </p>
               <p
@@ -749,13 +528,13 @@
                   margin-bottom: 20px;
                 "
               >
-                <span data-i18n="cert.p2">Действует для любого направления: вокал, инструменты,
+                <span data-content="cert-p2" data-i18n="cert.p2">Действует для любого направления: вокал, инструменты,
                 мастер-классы.</span>
               </p>
               <div class="cert-price">
                 <span class="cert-from" data-i18n="cert.from">от</span>
-                <span class="cert-num">120</span>
-                <span class="cert-cur">PLN</span>
+                <span class="cert-num" data-content="cert-price">120</span>
+                <span class="cert-cur" data-content="cert-cur">PLN</span>
               </div>
               <a
                 href="#contact"

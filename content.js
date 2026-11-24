@@ -861,5 +861,530 @@ window.SITE_CONTENT = {
         ]
       }
     ]
+  },
+  "halls": {
+    "intro": {
+      "ru": "Аренда пространства для самостоятельных занятий, репетиций и мероприятий. Фото залов скоро появятся.",
+      "en": "Rental space for independent practice, rehearsals and events. Photos coming soon.",
+      "pl": "Wynajem przestrzeni do samodzielnych ćwiczeń, prób i wydarzeń. Zdjęcia sal pojawią się wkrótce.",
+      "be": "Арэнда прасторы для самастойных заняткаў, рэпетыцый і мерапрыемстваў. Фота залаў з'явяцца хутка."
+    },
+    "rooms": [
+      {
+        "id": "jazz",
+        "photo": "photo/site/hall-1.jpg",
+        "sqm": "20",
+        "emoji": "🎷",
+        "text": {
+          "ru": {
+            "name": "Зал «Jazz»",
+            "badge": "Вокал · Фортепиано · Малый бенд",
+            "desc": "Оснащённый зал для занятий вокалом, фортепиано или небольшого бенда. Колонка, микрофон, планшет с доступом к минусам, интернет и фортепиано Roland."
+          },
+          "en": {
+            "name": "«Jazz» Hall",
+            "badge": "Vocal · Piano · Small band",
+            "desc": "A well-equipped hall for vocal lessons, piano or a small band. Speaker, microphone, tablet with backing tracks, Wi-Fi and Roland piano."
+          },
+          "pl": {
+            "name": "Sala «Jazz»",
+            "badge": "Wokal · Fortepian · Mały band",
+            "desc": "Wyposażona sala do zajęć wokalnych, gry na fortepianie lub dla małego bandu. Kolumna, mikrofon, tablet z dostępem do podkładów, internet i fortepian Roland."
+          },
+          "be": {
+            "name": "Зала «Jazz»",
+            "badge": "Вакал · Фартэпіяна · Малы бэнд",
+            "desc": "Абсталяваная зала для заняткаў вакалам, фартэпіяна або невялікага бэнда. Калонка, мікрафон, планшэт з доступам да мінусаў, інтэрнэт і фартэпіяна Roland."
+          }
+        },
+        "features": [
+          {
+            "ru": "Колонка + микрофон",
+            "en": "Speaker + microphone",
+            "pl": "Głośnik + mikrofon",
+            "be": "Калонка + мікрафон"
+          },
+          {
+            "ru": "Фортепиано Roland",
+            "en": "Roland piano",
+            "pl": "Fortepian Roland",
+            "be": "Фартэпіяна Roland"
+          },
+          {
+            "ru": "Планшет с минусами",
+            "en": "Tablet with backing tracks",
+            "pl": "Tablet z podkładami",
+            "be": "Планшэт з мінусамі"
+          },
+          {
+            "ru": "Wi-Fi"
+          }
+        ],
+        "bookUrl": "#contact"
+      },
+      {
+        "id": "blues",
+        "photo": "photo/site/hall-2.jpg",
+        "sqm": "10",
+        "emoji": "🎙️",
+        "text": {
+          "ru": {
+            "name": "Зал «Blues»",
+            "badge": "Звукозапись · Вокал",
+            "desc": "Небольшой акустически обработанный зал — идеален для качественной записи голоса. Если есть своя аппаратура и нужно тихое удобное помещение — зал Блюз."
+          },
+          "en": {
+            "name": "«Blues» Hall",
+            "badge": "Recording · Vocal",
+            "desc": "A small acoustically treated room — ideal for quality voice recording. If you have your own equipment and need a quiet, comfortable space — the Blues hall."
+          },
+          "pl": {
+            "name": "Sala «Blues»",
+            "badge": "Nagrania · Wokal",
+            "desc": "Mała akustycznie wygłuszona sala — idealna do nagrywania głosu. Jeśli masz własny sprzęt i potrzebujesz cichego, wygodnego miejsca — sala Blues."
+          },
+          "be": {
+            "name": "Зала «Blues»",
+            "badge": "Гукозапіс · Вакал",
+            "desc": "Невялікая акустычна апрацаваная зала — ідэальная для якаснага запісу голасу. Калі ёсць уласная апаратура і патрэбна ціхае зручнае памяшканне — зала Блюз."
+          }
+        },
+        "features": [
+          {
+            "ru": "Акустическая обработка",
+            "en": "Acoustic treatment",
+            "pl": "Obróbka akustyczna",
+            "be": "Акустычная апрацоўка"
+          },
+          {
+            "ru": "Звукоизоляция",
+            "en": "Soundproofing",
+            "pl": "Izolacja dźwiękowa",
+            "be": "Гукаізаляцыя"
+          },
+          {
+            "ru": "Запись голоса",
+            "en": "Voice recording",
+            "pl": "Nagrywanie głosu",
+            "be": "Запіс голасу"
+          }
+        ],
+        "bookUrl": "#contact"
+      },
+      {
+        "id": "country",
+        "photo": "photo/site/hall-3.jpg",
+        "sqm": "20",
+        "emoji": "🎹",
+        "text": {
+          "ru": {
+            "name": "Зал «Country»",
+            "badge": "Вокал · Фортепиано · Группы",
+            "desc": "Просторный зал для занятий вокалом или игры на фортепиано. Подходит для небольших групповых занятий — собирайтесь вместе в комфортном пространстве."
+          },
+          "en": {
+            "name": "«Country» Hall",
+            "badge": "Vocal · Piano · Groups",
+            "desc": "A spacious hall for vocal lessons or piano playing. Suitable for small group classes — come together in a comfortable space."
+          },
+          "pl": {
+            "name": "Sala «Country»",
+            "badge": "Wokal · Fortepian · Grupy",
+            "desc": "Przestronna sala do lekcji wokalu lub gry na fortepianie. Nadaje się do małych zajęć grupowych — spotkajcie się razem w komfortowej przestrzeni."
+          },
+          "be": {
+            "name": "Зала «Country»",
+            "badge": "Вакал · Фартэпіяна · Групы",
+            "desc": "Прасторная зала для заняткаў вакалам або іграе на фартэпіяна. Падыходзіць для невялікіх групавых заняткаў — збіраецеся разам у зручнай прасторы."
+          }
+        },
+        "features": [
+          {
+            "ru": "Фортепиано",
+            "en": "Piano",
+            "pl": "Fortepian",
+            "be": "Фартэпіяна"
+          },
+          {
+            "ru": "Групповые занятия",
+            "en": "Group classes",
+            "pl": "Zajęcia grupowe",
+            "be": "Групавыя заняткі"
+          },
+          {
+            "ru": "Вокал",
+            "en": "Vocal",
+            "pl": "Wokal",
+            "be": "Вакал"
+          }
+        ],
+        "bookUrl": "#contact"
+      },
+      {
+        "id": "rock",
+        "photo": "photo/site/hall-4.jpg",
+        "sqm": "30",
+        "emoji": "🎸",
+        "text": {
+          "ru": {
+            "name": "Зал «Rock»",
+            "badge": "Самый большой · до 15 человек",
+            "desc": "Самый большой зал студии — для репетиций со своим бендом, уроков вокала, фортепиано и мероприятий до 15 человек. Барабаны, профессиональный свет, кольцевые лампы."
+          },
+          "en": {
+            "name": "«Rock» Hall",
+            "badge": "Largest · up to 15 people",
+            "desc": "The studio's largest hall — for band rehearsals, vocal lessons, piano and events up to 15 people. Drums, professional lighting, ring lights."
+          },
+          "pl": {
+            "name": "Sala «Rock»",
+            "badge": "Największa · do 15 osób",
+            "desc": "Największa sala studia — do prób z własnym bandem, lekcji wokalu, fortepianu i wydarzeń do 15 osób. Perkusja, profesjonalne oświetlenie, lampy pierścieniowe."
+          },
+          "be": {
+            "name": "Зала «Rock»",
+            "badge": "Самая вялікая · да 15 чалавек",
+            "desc": "Самая вялікая зала студыі — для рэпетыцый з уласным бэндам, урокаў вакалу, фартэпіяна і мерапрыемстваў да 15 чалавек. Барабаны, прафесійнае святло, кальцавыя лямпы."
+          }
+        },
+        "features": [
+          {
+            "ru": "Электронные барабаны",
+            "en": "Electronic drums",
+            "pl": "Perkusja elektroniczna",
+            "be": "Электронныя барабаны"
+          },
+          {
+            "ru": "Фортепиано",
+            "en": "Piano",
+            "pl": "Fortepian",
+            "be": "Фартэпіяна"
+          },
+          {
+            "ru": "Проф. свет",
+            "en": "Prof. lighting",
+            "pl": "Oświetlenie prof.",
+            "be": "Праф. свят."
+          },
+          {
+            "ru": "Кольцевые лампы",
+            "en": "Ring lights",
+            "pl": "Lampy pierścieniowe",
+            "be": "Кальцавыя лямпы"
+          },
+          {
+            "ru": "до 15 чел.",
+            "en": "up to 15 people",
+            "pl": "do 15 osób",
+            "be": "да 15 чал."
+          }
+        ],
+        "bookUrl": "#contact"
+      }
+    ],
+    "prices": [
+      {
+        "title": {
+          "ru": "Разово",
+          "en": "One-time",
+          "pl": "Jednorazowo",
+          "be": "Разава"
+        },
+        "price": 70,
+        "unit": {
+          "ru": "/ 60 минут",
+          "en": "/ 60 minutes",
+          "pl": "/ 60 minut",
+          "be": "/ 60 хвілін"
+        },
+        "featured": false
+      },
+      {
+        "title": {
+          "ru": "Абонемент S · 4 ч",
+          "en": "Package S · 4 hrs",
+          "pl": "Karnet S · 4 godz.",
+          "be": "Абанемент S · 4 г"
+        },
+        "price": 260,
+        "unit": {
+          "ru": "65 zł / час",
+          "en": "65 zł / hr",
+          "pl": "65 zł / godz.",
+          "be": "65 zł / гадз."
+        },
+        "featured": true
+      },
+      {
+        "title": {
+          "ru": "Абонемент M · 8 ч",
+          "en": "Package M · 8 hrs",
+          "pl": "Karnet M · 8 godz.",
+          "be": "Абанемент M · 8 г"
+        },
+        "price": 480,
+        "unit": {
+          "ru": "60 zł / час",
+          "en": "60 zł / hr",
+          "pl": "60 zł / godz.",
+          "be": "60 zł / гадз."
+        },
+        "featured": true
+      },
+      {
+        "title": {
+          "ru": "Абонемент L · 12 ч",
+          "en": "Package L · 12 hrs",
+          "pl": "Karnet L · 12 godz.",
+          "be": "Абанемент L · 12 г"
+        },
+        "price": 660,
+        "unit": {
+          "ru": "55 zł / час",
+          "en": "55 zł / hr",
+          "pl": "55 zł / godz.",
+          "be": "55 zł / гадз."
+        },
+        "featured": false
+      },
+      {
+        "title": {
+          "ru": "Абонемент XL · 16 ч",
+          "en": "Package XL · 16 hrs",
+          "pl": "Karnet XL · 16 godz.",
+          "be": "Абанемент XL · 16 г"
+        },
+        "price": 800,
+        "unit": {
+          "ru": "50 zł / час",
+          "en": "50 zł / hr",
+          "pl": "50 zł / godz.",
+          "be": "50 zł / гадз."
+        },
+        "featured": false
+      }
+    ],
+    "conditions": [
+      {
+        "ru": "Во время аренды доступна вся необходимая техника и помощь администратора",
+        "en": "All necessary equipment and administrator assistance available during rental",
+        "pl": "Podczas wynajmu dostępny jest cały niezbędny sprzęt i pomoc administratora",
+        "be": "Падчас арэнды даступная ўся неабходная тэхніка і дапамога адміністратара"
+      },
+      {
+        "ru": "Доступны 4 зала — Rock, Jazz, Country, Blues",
+        "en": "4 halls available — Rock, Jazz, Country, Blues",
+        "pl": "Dostępne 4 sale — Rock, Jazz, Country, Blues",
+        "be": "Даступны 4 залы — Rock, Jazz, Country, Blues"
+      },
+      {
+        "ru": "Бронь актуальна только после внесения предоплаты",
+        "en": "Booking confirmed only after prepayment",
+        "pl": "Rezerwacja potwierdzona dopiero po wpłacie zaliczki",
+        "be": "Бронь актуальная толькі пасля ўнясення перадаплаты"
+      },
+      {
+        "ru": "Мероприятия в нескольких залах и аренда техники — стоимость индивидуально",
+        "en": "Events in multiple halls and equipment rental — price on request",
+        "pl": "Wydarzenia w kilku salach i wynajem sprzętu — cena indywidualna",
+        "be": "Мерапрыемствы ў некалькіх залах і арэнда тэхнікі — кошт індывідуальна"
+      }
+    ]
+  },
+  "founder": {
+    "photo": "photo/site/founder.jpg",
+    "text": {
+      "ru": {
+        "title": "Лина Поверга —",
+        "titleEm": "создатель студии",
+        "p1": "Профессиональная вокалистка, автор песен и преподаватель современного вокала. Наставник преподавателей вокала и автор вокальных курсов.",
+        "p2": "Музыкальное образование: артист, инструменталист, дирижёр оркестра, преподаватель вокала. Сценический опыт более 20 лет. Поёт и преподаёт: поп, джаз, соул, фолк, рок, экстрим, опера.",
+        "p3": "Жюри музыкальных конкурсов. Ивент-менеджер с 5-летним опытом работы с артистами.",
+        "badgeTitle": "Основатель студии",
+        "badgeVal": "Lina's Music Studio · Варшава · 2020"
+      },
+      "en": {
+        "title": "Lina Poverga —",
+        "titleEm": "studio founder",
+        "p1": "Professional vocalist, songwriter and modern vocal teacher. Mentor for vocal teachers and author of vocal courses.",
+        "p2": "Music education: performer, instrumentalist, orchestra conductor, vocal teacher. Stage experience of over 20 years. Performs and teaches: pop, jazz, soul, folk, rock, extreme, opera.",
+        "p3": "Judge at music competitions. Event manager with 5 years of experience working with artists.",
+        "badgeTitle": "Studio founder",
+        "badgeVal": "Lina's Music Studio · Warsaw · 2020"
+      },
+      "pl": {
+        "title": "Lina Poverga —",
+        "titleEm": "założycielka studia",
+        "p1": "Profesjonalna wokalistka, autorka piosenek i nauczycielka współczesnego wokalu. Mentorka nauczycieli wokalu i autorka kursów wokalnych.",
+        "p2": "Wykształcenie muzyczne: artysta, instrumentalista, dyrygent orkiestry, nauczycielka wokalu. Ponad 20 lat doświadczenia scenicznego. Śpiewa i naucza: pop, jazz, soul, folk, rock, ekstrem, opera.",
+        "p3": "Juror konkursów muzycznych. Menedżer eventów z 5-letnim doświadczeniem w pracy z artystami.",
+        "badgeTitle": "Założycielka studia",
+        "badgeVal": "Lina's Music Studio · Warszawa · 2020"
+      },
+      "be": {
+        "title": "Ліна Поверга —",
+        "titleEm": "заснавальніца студыі",
+        "p1": "Прафесійная вакалістка, аўтар песень і выкладчык сучаснага вакалу. Настаўнік выкладчыкаў вакалу і аўтар вакальных курсаў.",
+        "p2": "Музычная адукацыя: артыст, інструменталіст, дырыжор аркестра, выкладчык вакалу. Сцэнічны вопыт больш за 20 гадоў. Спявае і выкладае: поп, джаз, соул, фолк, рок, экстрым, опера.",
+        "p3": "Журы музычных конкурсаў. Івент-мэнеджар з 5-гадовым вопытам працы з артыстамі.",
+        "badgeTitle": "Заснавальніца студыі",
+        "badgeVal": "Lina's Music Studio · Варшава · 2020"
+      }
+    },
+    "stats": [
+      {
+        "num": "5+",
+        "gold": false,
+        "label": {
+          "ru": "лет студии",
+          "en": "years of studio",
+          "pl": "lat studia",
+          "be": "гадоў студыі"
+        }
+      },
+      {
+        "num": "20+",
+        "gold": true,
+        "label": {
+          "ru": "лет на сцене",
+          "en": "years on stage",
+          "pl": "lat na scenie",
+          "be": "гадоў на сцэне"
+        }
+      },
+      {
+        "num": "500+",
+        "gold": false,
+        "label": {
+          "ru": "учеников",
+          "en": "students",
+          "pl": "uczniów",
+          "be": "вучняў"
+        }
+      }
+    ],
+    "tags": [
+      {
+        "ru": "Поп",
+        "en": "Pop",
+        "pl": "Pop",
+        "be": "Поп"
+      },
+      {
+        "ru": "Джаз",
+        "en": "Jazz",
+        "pl": "Jazz",
+        "be": "Джаз"
+      },
+      {
+        "ru": "Соул",
+        "en": "Soul",
+        "pl": "Soul",
+        "be": "Соул"
+      },
+      {
+        "ru": "Фолк",
+        "en": "Folk",
+        "pl": "Folk",
+        "be": "Фолк"
+      },
+      {
+        "ru": "Рок",
+        "en": "Rock",
+        "pl": "Rock",
+        "be": "Рок"
+      },
+      {
+        "ru": "Опера",
+        "en": "Opera",
+        "pl": "Opera",
+        "be": "Опера"
+      },
+      {
+        "ru": "Экстрим",
+        "en": "Extreme",
+        "pl": "Ekstrem",
+        "be": "Экстрым"
+      }
+    ],
+    "videos": [
+      {
+        "url": "https://youtu.be/Vx3nzS7va9E",
+        "label": {
+          "ru": "Видео студии",
+          "en": "Studio video",
+          "pl": "Wideo studia",
+          "be": "Відэа студыі"
+        }
+      },
+      {
+        "url": "https://youtu.be/SR2O4he66WY",
+        "label": {
+          "ru": "Концерт",
+          "en": "Concert",
+          "pl": "Koncert",
+          "be": "Канцэрт"
+        }
+      },
+      {
+        "url": "https://www.youtube.com/shorts/eAMj4xuMc4o",
+        "label": {
+          "ru": "Поп",
+          "en": "Pop",
+          "pl": "Pop",
+          "be": "Поп"
+        }
+      },
+      {
+        "url": "https://youtube.com/shorts/cJypggrLK9s?feature=share",
+        "label": {
+          "ru": "Опера",
+          "en": "Opera",
+          "pl": "Opera",
+          "be": "Опера"
+        }
+      },
+      {
+        "url": "https://youtube.com/shorts/guZ1A7CkUnk?feature=share",
+        "label": {
+          "ru": "Рок",
+          "en": "Rock",
+          "pl": "Rock",
+          "be": "Рок"
+        }
+      },
+      {
+        "url": "https://youtube.com/shorts/Y99iUkq7AjA?feature=share",
+        "label": {
+          "ru": "Соул",
+          "en": "Soul",
+          "pl": "Soul",
+          "be": "Соул"
+        }
+      }
+    ]
+  },
+  "cert": {
+    "image": "photo/gift-certificate.jpg",
+    "price": "120",
+    "currency": "PLN",
+    "text": {
+      "ru": {
+        "p1": "Сертификат на занятия — идеальный подарок для тех, кто мечтает петь, играть или открыть для себя мир музыки.",
+        "p2": "Действует для любого направления: вокал, инструменты, мастер-классы."
+      },
+      "en": {
+        "p1": "A lesson certificate — the perfect gift for those who dream of singing, playing or discovering the world of music.",
+        "p2": "Valid for any direction: vocals, instruments, masterclasses."
+      },
+      "pl": {
+        "p1": "Certyfikat na lekcje — idealny prezent dla tych, którzy marzą o śpiewaniu, graniu lub odkryciu świata muzyki.",
+        "p2": "Ważny dla dowolnego kierunku: wokal, instrumenty, masterclassy."
+      },
+      "be": {
+        "p1": "Сертыфікат на заняткі — ідэальны падарунак для тых, хто марыць спяваць, граць або адкрыць для сябе свет музыкі.",
+        "p2": "Дзейнічае для любога кірунку: вакал, інструменты, майстар-класы."
+      }
+    }
   }
 };
