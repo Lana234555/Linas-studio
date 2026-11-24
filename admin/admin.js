@@ -29,7 +29,8 @@
     ["kids", "Kids"],
   ];
   const ENROLL_DEFAULT = "#contact";
-  const ALL_TABS = ["events", "teachers", "prices", "halls", "about", "cert", "gallery"];
+  const ALL_TABS = ["events", "teachers", "prices", "halls", "about", "cert", "gallery", "history"];
+  const HISTORY_DAYS = 30;
   // Only files inside these folders are ever deleted by the admin
   const DELETABLE = /^photo\/(gallery|koncert|kvartirnyky|kemp|teachers|events|halls|about|cert)\//;
 
@@ -80,6 +81,8 @@
     edit: '<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/>',
     copy: '<rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
     eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>',
     eyeOff: '<path d="M3 3l18 18"/><path d="M10.6 5.1A10.7 10.7 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4"/><path d="M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.8 9.8 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
   };
   function icon(name) {
@@ -91,6 +94,7 @@
   function imgUrl(path) {
     if (!path) return "";
     if (state.pending[path]) return state.pending[path].dataUrl;
+    if (state.restoreBlobs && state.restoreBlobs[path]) return state.restoreBlobs[path].url;
     return "../" + path;
   }
   function imgWithFallback(path, attrs) {
@@ -1558,9 +1562,158 @@
   }
 
 
+  // ── history of publications (last 30 days) and rollback ──
+  const COMMIT_TAG = "[адмінка]";
+  function commitMessage() {
+    if (state.restoredFrom) return "Адмінка: повернуто версію від " + fmtWhen(state.restoredFrom.date) + " " + COMMIT_TAG;
+    const names = changedTabs().map((t) => TAB_NAMES[t]);
+    return "Адмінка: " + (names.length ? names.join(", ") : "оновлення контенту") + " " + COMMIT_TAG;
+  }
+  function fmtWhen(iso, long) {
+    const d = new Date(iso);
+    if (!isFinite(d)) return "";
+    return new Intl.DateTimeFormat("uk-UA", long ? { weekday: "short", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", hourCycle: "h23" } : { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(d);
+  }
+  function ago(iso) {
+    const m = Math.round((Date.now() - new Date(iso)) / 60000);
+    if (m < 1) return "щойно";
+    if (m < 60) return m + " хв тому";
+    const hh = Math.round(m / 60);
+    if (hh < 24) return hh + " год тому";
+    const dd = Math.round(hh / 24);
+    return dd === 1 ? "вчора" : dd + " дн. тому";
+  }
+  function niceMessage(msg) {
+    const first = String(msg || "").split("\n")[0].replace(" " + COMMIT_TAG, "").trim();
+    if (/^Оновлення контенту через адмінку$/.test(first)) return "Зміни через адмінку";
+    return first.replace(/^Адмінка:\s*/, "") || "Зміни";
+  }
+  async function loadHistory(force) {
+    if (state.history && !force) return state.history;
+    const since = new Date(Date.now() - HISTORY_DAYS * 86400000).toISOString();
+    const list = await gh("/commits?path=" + encodeURIComponent(CONTENT_PATH) + "&sha=" + BRANCH + "&since=" + since + "&per_page=100");
+    state.history = (list || []).map((c) => ({
+      sha: c.sha,
+      date: (c.commit && (c.commit.committer || c.commit.author || {}).date) || "",
+      message: (c.commit && c.commit.message) || "",
+      byAdmin: /адмінк/i.test((c.commit && c.commit.message) || ""),
+    }));
+    if (state.history[0]) state.lastPublished = { date: state.history[0].date, sha: state.history[0].sha };
+    return state.history;
+  }
+  async function loadLastPublished() {
+    try {
+      const list = await gh("/commits?path=" + encodeURIComponent(CONTENT_PATH) + "&sha=" + BRANCH + "&per_page=1");
+      if (list && list[0]) state.lastPublished = { date: list[0].commit.committer.date, sha: list[0].sha };
+      renderSide();
+    } catch (e) {}
+  }
+  async function fetchVersion(sha) {
+    const f = await gh("/contents/" + CONTENT_PATH + "?ref=" + sha);
+    return parseContent(b64ToUtf8(f.content));
+  }
+  // photos that the old version uses but that were deleted later: take them back from that version
+  async function findRestoreBlobs(sha, content) {
+    const out = {};
+    try {
+      const [oldTree, headTree] = await Promise.all([gh("/git/trees/" + sha + "?recursive=1"), gh("/git/trees/" + BRANCH + "?recursive=1")]);
+      if (!oldTree || !oldTree.tree || !headTree || !headTree.tree) return out;
+      const head = new Set(headTree.tree.map((x) => x.path));
+      const old = {};
+      oldTree.tree.forEach((x) => (old[x.path] = x.sha));
+      referencedPaths(content).forEach((p) => {
+        if (!head.has(p) && old[p]) out[p] = { sha: old[p], url: `https://raw.githubusercontent.com/${OWNER}/${REPO}/${sha}/${p}` };
+      });
+    } catch (e) {}
+    return out;
+  }
+  function diffSections(a, b) {
+    return ALL_TABS.filter((t) => SECTION_KEYS[t].some((k) => JSON.stringify(a[k]) !== JSON.stringify(b[k]))).map((t) => TAB_NAMES[t]);
+  }
+  async function previewVersion(item) {
+    progress.show("Завантажую версію…", 0.5);
+    try {
+      const c = await fetchVersion(item.sha);
+      const blobs = await findRestoreBlobs(item.sha, c);
+      const keep = { content: state.content, pending: state.pending, restoreBlobs: state.restoreBlobs };
+      state.content = c; state.pending = {}; state.restoreBlobs = blobs;
+      const draft = previewDraft();
+      Object.assign(state, keep);
+      window.__linaPreviewDraft = draft;
+      progress.hide();
+      preview("", { draft, title: "Версія від " + fmtWhen(item.date) });
+    } catch (e) {
+      progress.hide();
+      toast("Не вдалося завантажити версію: " + e.message, true);
+    }
+  }
+  async function restoreVersion(item) {
+    if (isDirty() && !confirm("Зараз є неопубліковані зміни. Замінити їх цією старою версією?")) return;
+    progress.show("Завантажую версію від " + fmtWhen(item.date) + "…", 0.4);
+    try {
+      const c = await fetchVersion(item.sha);
+      const blobs = await findRestoreBlobs(item.sha, c);
+      state.content = c;
+      state.pending = {};
+      state.restoreBlobs = blobs;
+      state.restoredFrom = { sha: item.sha, date: item.date };
+      progress.hide();
+      changed();
+      const diff = diffSections(c, state.original);
+      toast(diff.length ? "Версію завантажено. Зміниться: " + diff.join(", ") + ". Перегляньте й натисніть «Опублікувати»." : "Ця версія така сама, як зараз на сайті.");
+    } catch (e) {
+      progress.hide();
+      toast("Не вдалося завантажити версію: " + e.message, true);
+    }
+  }
+  function renderHistory() {
+    const view = $("historyView");
+    const head = h("div", { class: "view-head" },
+      h("div", null, h("div", { class: "chip" }, "Публікації"), h("h2", null, "Історія змін")),
+      h("p", { class: "muted" }, "Видно публікації за останні " + HISTORY_DAYS + " днів."));
+    const last = state.lastPublished
+      ? h("div", { class: "hist-last" },
+          h("span", { class: "hist-last-ico" }, icon("clock")),
+          h("div", null, h("div", { class: "sp-label" }, "Остання публікація сайту"),
+            h("div", { class: "hist-last-when" }, fmtWhen(state.lastPublished.date, true), h("span", { class: "muted" }, " · " + ago(state.lastPublished.date)))))
+      : null;
+    const body = h("div", { class: "group" });
+    view.replaceChildren(head, last, body);
+    if (state.restoredFrom) {
+      view.insertBefore(h("div", { class: "hist-restored" },
+        "Завантажено версію від " + fmtWhen(state.restoredFrom.date) + ". Вона ще не на сайті: натисніть «Опублікувати» внизу або «Скасувати», щоб повернутися."), body);
+    }
+    if (!state.history) {
+      body.append(h("p", { class: "muted" }, "Завантажую історію…"));
+      loadHistory().then(() => state.tab === "history" && renderHistory(), (e) => {
+        body.replaceChildren(h("p", { class: "error" }, "Не вдалося завантажити історію: " + e.message));
+      });
+      return;
+    }
+    if (!state.history.length) {
+      body.append(h("p", { class: "muted" }, "За останні " + HISTORY_DAYS + " днів публікацій не було."));
+      return;
+    }
+    body.append(h("div", { class: "group-head" }, h("h3", null, "Публікації", h("span", { class: "count-pill" }, String(state.history.length)))));
+    const list = h("div", { class: "hist-list" });
+    state.history.forEach((item, i) => {
+      const current = i === 0;
+      list.append(h("div", { class: "hist-item" + (current ? " current" : "") + (state.restoredFrom && state.restoredFrom.sha === item.sha ? " picked" : "") },
+        h("span", { class: "hist-dot" }),
+        h("div", { class: "hist-main" },
+          h("div", { class: "hist-when" }, fmtWhen(item.date, true), h("span", { class: "muted" }, " · " + ago(item.date))),
+          h("div", { class: "hist-msg" }, niceMessage(item.message)),
+          current ? h("div", { class: "trow-badges" }, h("span", { class: "badge st live" }, "Зараз на сайті")) : null),
+        h("div", { class: "trow-actions" },
+          h("button", { class: "icon-btn act", title: "Переглянути, як сайт виглядав у цій версії", "aria-label": "Переглянути", onclick: () => previewVersion(item) }, icon("eye")),
+          current ? null : h("button", { class: "btn btn-ghost btn-small hist-restore", title: "Завантажити цю версію в адмінку, щоб опублікувати її знову", onclick: () => restoreVersion(item) }, icon("undo"), "Повернути"))));
+    });
+    body.append(list);
+  }
+
   // ── right info panel (desktop) ──
-  const SECTION_KEYS = { events: ["events"], teachers: ["teachers"], prices: ["prices"], halls: ["halls"], about: ["founder"], cert: ["cert"], gallery: ["gallery"] };
-  const TAB_NAMES = { events: "Події", teachers: "Викладачі", prices: "Ціни", halls: "Зали", about: "Про студію", cert: "Сертифікат", gallery: "Галерея" };
+  const SECTION_KEYS = { events: ["events"], teachers: ["teachers"], prices: ["prices"], halls: ["halls"], about: ["founder"], cert: ["cert"], gallery: ["gallery"], history: [] };
+  const TAB_NAMES = { events: "Події", teachers: "Викладачі", prices: "Ціни", halls: "Зали", about: "Про студію", cert: "Сертифікат", gallery: "Галерея", history: "Історія змін" };
   const TAB_TIPS = {
     events: "Подія з'являється на сайті сама в день початку і зникає після завершення. Публікувати вдруге не треба.",
     teachers: "Порядок карток тут такий самий, як на сайті. Стрілками можна міняти місцями.",
@@ -1569,6 +1722,7 @@
     about: "Тексти можна заповнити лише російською. Інші мови візьмуть переклад або російський текст.",
     cert: "Фото сертифіката найкраще виглядає горизонтальним.",
     gallery: "Теги допомагають відвідувачам фільтрувати фото. Одне фото може мати кілька тегів.",
+    history: "Повернення версії спершу завантажує її сюди. На сайті вона з'явиться лише після «Опублікувати».",
   };
   function changedTabs() {
     if (!state.content || !state.original) return [];
@@ -1600,13 +1754,17 @@
     const today = new Intl.DateTimeFormat("uk-UA", { weekday: "long", day: "numeric", month: "long" }).format(new Date());
     const stat = (tab, num, label) => h("button", { class: "sp-stat" + (state.tab === tab ? " on" : ""), type: "button", title: "Відкрити розділ «" + TAB_NAMES[tab] + "»", onclick: () => goTab(tab) },
       h("b", {}, String(num)), h("span", {}, label));
-    el.replaceChildren(
+    el.replaceChildren(...[
       h("div", { class: "sp-hello" },
         h("span", { class: "sp-avatar" }, "Л"),
         h("div", {}, h("div", { class: "sp-hi" }, "Вітаю, Лано!"), h("div", { class: "sp-date" }, today))),
       h("div", { class: "sp-card sp-status" + (changed.length ? " dirty" : "") },
         h("div", { class: "sp-label" }, "Стан сайту"),
         h("div", { class: "sp-state" }, h("i", { class: "sp-dot" }), changed.length ? "Є неопубліковані зміни" : "Усе опубліковано"),
+        state.lastPublished
+          ? h("button", { class: "sp-last", type: "button", title: "Відкрити історію змін", onclick: () => goTab("history") },
+              icon("clock"), h("span", null, "Остання публікація: ", h("b", null, fmtWhen(state.lastPublished.date)), h("br"), h("small", null, ago(state.lastPublished.date))))
+          : null,
         changed.length
           ? h("div", { class: "sp-chips" }, ...changed.map((t) => h("button", { class: "sp-chip", type: "button", onclick: () => goTab(t) }, TAB_NAMES[t])))
           : h("p", { class: "sp-note" }, "Сайт показує те саме, що й тут."),
@@ -1635,7 +1793,7 @@
       h("div", { class: "sp-card sp-tip" },
         h("div", { class: "sp-label" }, "Підказка · " + TAB_NAMES[state.tab]),
         h("p", {}, TAB_TIPS[state.tab] || "")),
-    );
+    ].filter(Boolean));
   }
 
   // ── render ──
@@ -1658,6 +1816,7 @@
     if (state.tab === "halls") renderHalls();
     if (state.tab === "about") renderAbout();
     if (state.tab === "cert") renderCert();
+    if (state.tab === "history") renderHistory();
     renderSide();
     window.scrollTo(0, y);
   }
@@ -1691,15 +1850,18 @@
         const blob = await gh("/git/blobs", { method: "POST", body: { content: state.pending[path].base64, encoding: "base64" } });
         tree.push({ path, mode: "100644", type: "blob", sha: blob.sha });
       }
+      Object.keys(state.restoreBlobs || {}).forEach((path) => {
+        if (now.has(path) && !state.pending[path]) tree.push({ path, mode: "100644", type: "blob", sha: state.restoreBlobs[path].sha });
+      });
       progress.show("Зберігаю тексти та порядок карток…", toUpload.length / steps);
       const contentBlob = await gh("/git/blobs", { method: "POST", body: { content: utf8ToB64(serializeContent(state.content)), encoding: "base64" } });
       tree.push({ path: CONTENT_PATH, mode: "100644", type: "blob", sha: contentBlob.sha });
       before.forEach((path) => {
-        if (!now.has(path) && DELETABLE.test(path) && !state.pending[path]) tree.push({ path, mode: "100644", type: "blob", sha: null });
+        if (!now.has(path) && DELETABLE.test(path) && !state.pending[path] && !(state.restoreBlobs || {})[path]) tree.push({ path, mode: "100644", type: "blob", sha: null });
       });
 
       const newTree = await gh("/git/trees", { method: "POST", body: { base_tree: headCommit.tree.sha, tree } });
-      const commit = await gh("/git/commits", { method: "POST", body: { message: "Оновлення контенту через адмінку", tree: newTree.sha, parents: [headSha] } });
+      const commit = await gh("/git/commits", { method: "POST", body: { message: commitMessage(), tree: newTree.sha, parents: [headSha] } });
       progress.show("Публікую на сайті…", (toUpload.length + 1) / steps);
       await gh("/git/refs/heads/" + BRANCH, { method: "PATCH", body: { sha: commit.sha } });
       progress.show("Готово! Сайт оновиться за 1–2 хвилини.", 1);
@@ -1708,6 +1870,10 @@
       state.contentSha = fresh.sha;
       state.original = clone(state.content);
       state.pending = {};
+      state.restoreBlobs = {};
+      state.restoredFrom = null;
+      state.lastPublished = { date: new Date().toISOString(), sha: commit.sha };
+      state.history = null;
       try { localStorage.removeItem(PREVIEW_KEY); } catch (e) {}
       toast("Опубліковано! Сайт оновиться приблизно за 1–2 хвилини.");
       render();
@@ -1728,18 +1894,20 @@
   function previewDraft() {
     const c = clone(state.content);
     const swap = (p) => (state.pending[p] ? state.pending[p].dataUrl : p);
-    c.teachers.forEach((t) => (t.photo = swap(t.photo)));
-    c.gallery.photos.forEach((p) => (p.src = swap(p.src)));
-    (c.events || []).forEach((e) => (e.image = swap(e.image)));
-    ((c.halls && c.halls.rooms) || []).forEach((r) => (r.photo = swap(r.photo)));
-    if (c.founder) c.founder.photo = swap(c.founder.photo);
-    if (c.cert) c.cert.image = swap(c.cert.image);
+    const sw = (p) => (state.restoreBlobs && state.restoreBlobs[p] ? state.restoreBlobs[p].url : swap(p));
+    (c.teachers || []).forEach((t) => (t.photo = sw(t.photo)));
+    ((c.gallery && c.gallery.photos) || []).forEach((p) => (p.src = sw(p.src)));
+    (c.events || []).forEach((e) => (e.image = sw(e.image)));
+    ((c.halls && c.halls.rooms) || []).forEach((r) => (r.photo = sw(r.photo)));
+    if (c.founder) c.founder.photo = sw(c.founder.photo);
+    if (c.cert) c.cert.image = sw(c.cert.image);
     return c;
   }
   const SECTION_FOR_TAB = { events: "afisha", teachers: "vocal", prices: "pricing", gallery: "gallery", halls: "halls", about: "founder", cert: "cert" };
-  function preview(section) {
+  function preview(section, opts) {
+    opts = opts || {};
     if (typeof section !== "string") section = SECTION_FOR_TAB[state.tab] || "";
-    window.__linaPreviewDraft = previewDraft();
+    window.__linaPreviewDraft = opts.draft || previewDraft();
     window.__linaPreviewBanner = section === "afisha";
     let ov = $("previewOverlay");
     if (ov) ov.remove();
@@ -1764,13 +1932,15 @@
       h(
         "div",
         { class: "pv-bar" },
-        h("div", { class: "pv-title" }, h("b", null, "Попередній перегляд"), h("span", { class: "muted" }, isDirty() ? "Так сайт виглядатиме після публікації. Відвідувачі цього ще не бачать." : "Змін немає: так сайт виглядає зараз.")),
+        opts.title
+          ? h("div", { class: "pv-title" }, h("b", null, opts.title), h("span", { class: "muted" }, "Так сайт виглядав після цієї публікації."))
+          : h("div", { class: "pv-title" }, h("b", null, "Попередній перегляд"), h("span", { class: "muted" }, isDirty() ? "Так сайт виглядатиме після публікації. Відвідувачі цього ще не бачать." : "Змін немає: так сайт виглядає зараз.")),
         h(
           "div",
           { class: "pv-actions" },
           h("button", { class: "pv-dev on", "data-mode": "desktop", onclick: () => setDevice("desktop") }, "Комп'ютер"),
           h("button", { class: "pv-dev", "data-mode": "phone", onclick: () => setDevice("phone") }, "Телефон"),
-          pubBtn,
+          opts.title ? null : pubBtn,
           h("button", { class: "btn btn-ghost btn-small", onclick: close }, "Закрити")
         )
       ),
@@ -1799,6 +1969,7 @@
       $("sidePanel").hidden = false;
       document.body.classList.add("has-side");
       render();
+      loadLastPublished();
       updateSavebar();
     } catch (e) {
       $("loadingView").hidden = true;
@@ -1839,6 +2010,8 @@
     if (!confirm("Скасувати всі неопубліковані зміни?")) return;
     state.content = clone(state.original);
     state.pending = {};
+    state.restoreBlobs = {};
+    state.restoredFrom = null;
     changed();
   });
   $("modal").addEventListener("click", (e) => { if (e.target === $("modal")) closeModal(); });
