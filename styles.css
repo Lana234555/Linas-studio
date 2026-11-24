@@ -499,6 +499,88 @@ body {
 .pr-unit { font-size: 0.66rem; color: var(--muted); margin-top: 1px; }
 .pr-discount { display: inline-block; background: rgba(0,196,179,0.1); border: 1px solid rgba(0,196,179,0.2); color: var(--teal); font-size: 0.63rem; font-weight: 600; padding: 2px 7px; border-radius: 100px; margin-top: 3px; }
 
+/* Plan cards: all plans visible side by side (no tabs) */
+.pricing-cards-row.plans-4 { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.pricing-cards-row.plans-3 { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.plan-card { padding: 26px 22px 22px; display: flex; flex-direction: column; }
+.plan-card .pc-title { font-size: 1.2rem; line-height: 1.25; }
+.plan-card .pc-sub { margin-bottom: 14px; flex-grow: 1; }
+.plan-card .price-row { padding: 9px 0; gap: 10px; }
+.plan-card .pr-label { font-size: 0.8rem; }
+.plan-card .pr-val { font-size: 1.4rem; line-height: 1.15; white-space: nowrap; }
+.plan-card .pr-discount { white-space: nowrap; }
+/* Each plan has its own accent colour: --plan (solid) and --plan-rgb (for tints) */
+.plan-basic { --plan: #00c4b3; --plan-rgb: 0,196,179; }
+.plan-pro   { --plan: #6aa8ff; --plan-rgb: 106,168,255; }
+.plan-top   { --plan: #e8b420; --plan-rgb: 232,180,32; }
+.plan-kids  { --plan: #ff7eb3; --plan-rgb: 255,126,179; }
+/* Frosted glass: soft colour glows sit behind the row, cards blur them */
+.pricing-cards-row.plans-4, .pricing-cards-row.plans-3 { position: relative; isolation: isolate; }
+.pricing-cards-row.plans-4::before, .pricing-cards-row.plans-3::before {
+  content: ""; position: absolute; inset: -4% -2%; z-index: -1; pointer-events: none; filter: blur(44px); opacity: 0.38;
+  background:
+    radial-gradient(closest-side at 12% 35%, rgba(0,196,179,0.9), transparent),
+    radial-gradient(closest-side at 38% 70%, rgba(106,168,255,0.85), transparent),
+    radial-gradient(closest-side at 64% 30%, rgba(232,180,32,0.8), transparent),
+    radial-gradient(closest-side at 90% 65%, rgba(255,126,179,0.9), transparent);
+}
+.pricing-cards-row.plans-3::before {
+  background:
+    radial-gradient(closest-side at 15% 40%, rgba(0,196,179,0.9), transparent),
+    radial-gradient(closest-side at 50% 65%, rgba(106,168,255,0.85), transparent),
+    radial-gradient(closest-side at 88% 40%, rgba(255,126,179,0.9), transparent);
+}
+.plan-card {
+  border-color: rgba(255,255,255,0.13);
+  background: linear-gradient(160deg, rgba(255,255,255,0.09) 0%, rgba(var(--plan-rgb), 0.07) 40%, rgba(12,12,11,0.4) 100%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%); backdrop-filter: blur(22px) saturate(160%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), inset 1px 0 0 rgba(255,255,255,0.05), 0 20px 40px -18px rgba(0,0,0,0.7);
+}
+.plan-card:hover { border-color: rgba(var(--plan-rgb), 0.6); background: linear-gradient(160deg, rgba(255,255,255,0.18) 0%, rgba(var(--plan-rgb), 0.14) 40%, rgba(255,255,255,0.06) 100%); }
+.plan-card::before { height: 4px; background: var(--plan); transform: scaleX(1); }
+.plan-card .pr-val { color: var(--plan); }
+.plan-card .pr-discount { color: var(--plan); background: rgba(var(--plan-rgb), 0.12); border-color: rgba(var(--plan-rgb), 0.3); }
+.plan-card .price-row { border-bottom-color: rgba(var(--plan-rgb), 0.14); }
+.plan-badge {
+  align-self: flex-start; margin-bottom: 12px; padding: 5px 14px; border-radius: 100px;
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: #0a0a0a; background: var(--plan); border: 1px solid var(--plan);
+}
+/* KIDS stands out the most: stronger tint, glow and a thicker frame */
+.plan-kids {
+  border-width: 2px; border-color: rgba(var(--plan-rgb), 0.7);
+  background: linear-gradient(160deg, rgba(255,255,255,0.14) 0%, rgba(var(--plan-rgb), 0.18) 40%, rgba(255,255,255,0.04) 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 0 0 4px rgba(var(--plan-rgb), 0.08), 0 12px 40px -12px rgba(var(--plan-rgb), 0.45);
+}
+.plan-kids .pc-title { color: var(--plan); }
+.plan-kids .plan-badge::before { content: "★ "; }
+.plan-book {
+  margin-top: 16px; display: block; text-align: center; padding: 11px 16px; border-radius: 100px;
+  font-size: 0.82rem; font-weight: 600; text-decoration: none; color: #0a0a0a; background: var(--plan);
+  transition: filter 0.2s, transform 0.2s;
+}
+.plan-book:hover { filter: brightness(1.12); transform: translateY(-1px); }
+.plan-book:focus-visible { outline: 2px solid var(--white); outline-offset: 3px; }
+@media (max-width: 1100px) {
+  .pricing-cards-row.plans-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .pricing-cards-row.plans-4, .pricing-cards-row.plans-3 { grid-template-columns: 1fr; gap: 12px; }
+  .plan-card { padding: 20px 18px 18px; }
+  .plan-card .pc-sub { margin-bottom: 10px; }
+  /* 2×2 price tiles on phones to keep each card short */
+  .plan-card { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8px; row-gap: 8px; }
+  .plan-card > .plan-badge, .plan-card > .pc-title, .plan-card > .pc-sub, .plan-card > .plan-book { grid-column: 1 / -1; margin-bottom: 0; }
+  .plan-card > .plan-book { margin-top: 6px; }
+  .plan-card > .plan-badge { justify-self: start; }
+  .plan-card .price-row, .plan-card .price-row:last-child {
+    flex-direction: column; justify-content: flex-start; gap: 4px; padding: 10px 12px;
+    border: 1px solid rgba(var(--plan-rgb), 0.22); border-radius: 12px; background: rgba(255,255,255,0.03); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  .plan-card .pr-right { text-align: left; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 6px; }
+  .plan-card .pr-discount { margin-top: 2px; }
+}
+
 /* ── INSTRUMENT TEACHERS ── */
 .instr-teachers-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(300px,1fr)); gap: 16px; }
 .it-card {
@@ -916,3 +998,29 @@ footer {
   .fstat-label { font-size: 0.58rem; }
   .vlink { font-size: 0.7rem; padding: 4px 10px; gap: 4px; }
 }
+
+/* ── SITE-WIDE FROSTED GLASS (same feel as the pricing cards) ── */
+.teachers-grid, .instr-teachers-grid, .halls-grid, .events-grid, .hall-price-grid { position: relative; isolation: isolate; }
+.teachers-grid::before, .instr-teachers-grid::before, .halls-grid::before, .events-grid::before, .hall-price-grid::before {
+  content: ""; position: absolute; inset: 0 2%; z-index: -1; pointer-events: none; filter: blur(48px); opacity: 0.3;
+  background:
+    radial-gradient(closest-side at 18% 30%, rgba(0,196,179,0.9), transparent),
+    radial-gradient(closest-side at 55% 75%, rgba(106,168,255,0.7), transparent),
+    radial-gradient(closest-side at 85% 35%, rgba(232,180,32,0.7), transparent);
+}
+.teacher-card, .it-card, .hall-card, .event-card, .hp-card, .hp-conditions,
+.contact-item, .instr-single-card, .glass-card, .cert-visual {
+  background: linear-gradient(160deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 45%, rgba(12,12,11,0.4) 100%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%); backdrop-filter: blur(20px) saturate(150%);
+  border-color: rgba(255,255,255,0.12);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 18px 36px -18px rgba(0,0,0,0.7);
+}
+.teacher-card:hover, .it-card:hover, .hall-card:hover, .event-card:hover, .hp-card:hover,
+.contact-item:hover, .instr-single-card:hover, .glass-card:hover {
+  background: linear-gradient(160deg, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.05) 45%, rgba(16,16,15,0.4) 100%);
+  border-color: rgba(0,196,179,0.35);
+}
+
+/* Gift certificate image */
+.cert-visual { aspect-ratio: auto; padding: 0; }
+.cert-img { display: block; width: 100%; height: auto; border-radius: inherit; }
