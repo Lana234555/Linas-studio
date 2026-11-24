@@ -750,3 +750,25 @@ main { scroll-behavior: smooth; }
   body.has-side #previewBtn .lg, body.has-side #discardBtn .lg { display: inline; }
   body.has-side #previewBtn .sm, body.has-side #discardBtn .sm { display: none; }
 }
+
+/* ══ Draft marks: changed or new cards that are not on the site yet ══ */
+.has-draft[data-draft] { position: relative; border-color: rgba(212, 160, 23, 0.75) !important; box-shadow: 0 0 0 1px rgba(212, 160, 23, 0.25); }
+.trow.has-draft, .plan.has-draft, .photo.has-draft { margin-top: 10px; }
+.has-draft[data-draft]::after {
+  content: "✎ " attr(data-draft); position: absolute; top: -11px; left: 18px; z-index: 2;
+  font-size: 0.66rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+  padding: 4px 10px; border-radius: 999px; background: var(--gold); color: #1a1405; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+.evrow.has-draft[data-draft] { border-left-color: var(--gold) !important; }
+.photo.has-draft[data-draft]::after { left: 10px; max-width: calc(100% - 20px); overflow: hidden; text-overflow: ellipsis; }
+.view-draft-note {
+  display: flex; gap: 12px; align-items: flex-start; margin: -6px 0 24px; padding: 14px 18px; border-radius: 18px;
+  background: rgba(212, 160, 23, 0.08); border: 1px solid rgba(212, 160, 23, 0.45); color: #e6e6e2; line-height: 1.55; font-size: 0.9rem;
+}
+.view-draft-note .sp-dot { margin-top: 7px; background: var(--gold); box-shadow: 0 0 0 4px rgba(212, 160, 23, 0.2); }
+.view-draft-note b { color: var(--gold); font-weight: 500; }
+.tab.has-draft { position: relative; }
+.tab.has-draft > span:last-child::after {
+  content: ""; display: inline-block; width: 8px; height: 8px; margin-left: 8px; border-radius: 50%; vertical-align: middle;
+  background: var(--gold); box-shadow: 0 0 0 3px rgba(212, 160, 23, 0.2);
+}

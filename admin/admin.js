@@ -246,6 +246,7 @@
     $("publishBtn").disabled = !dirty;
     $("discardBtn").disabled = !dirty;
     renderSide();
+    markDrafts();
   }
   function changed() {
     render();
@@ -534,7 +535,7 @@
         rows.appendChild(
           h(
             "div",
-            { class: "trow" + (t.hidden ? " is-hidden" : "") },
+            { class: "trow" + (t.hidden ? " is-hidden" : ""), "data-dk": "teachers:" + t.id },
             t.photo ? imgWithFallback(t.photo) : h("div", { class: "ph" }, t.emoji || "🎵"),
             h(
               "div",
@@ -756,7 +757,7 @@
     const n = (key, label) => h("label", null, h("span", null, label), numInput(p[key], (v) => { p[key] = v; updateSavebar(); }));
     return h(
       "div",
-      { class: "plan" + (p.hidden ? " is-hidden" : "") },
+      { class: "plan" + (p.hidden ? " is-hidden" : ""), "data-dk": "plans:" + (plans === state.content.prices.instruments ? "instruments" : "vocal") + ":" + i },
       h(
         "div",
         { class: "plan-head" },
@@ -911,7 +912,7 @@
         grid.appendChild(
           h(
             "div",
-            { class: "photo" },
+            { class: "photo", "data-dk": "gallery:" + p.src },
             imgWithFallback(p.src),
             h(
               "div",
@@ -1138,7 +1139,7 @@
       rows.appendChild(
         h(
           "div",
-          { class: "trow wide-img" + (r.hidden ? " is-hidden" : "") },
+          { class: "trow wide-img" + (r.hidden ? " is-hidden" : ""), "data-dk": "rooms:" + r.id },
           r.photo ? imgWithFallback(r.photo) : h("div", { class: "ph" }, r.emoji || "🎵"),
           h(
             "div",
@@ -1169,7 +1170,7 @@
       grid.appendChild(
         h(
           "div",
-          { class: "plan" + (p.hidden ? " is-hidden" : "") },
+          { class: "plan" + (p.hidden ? " is-hidden" : ""), "data-dk": "hallprices:" + i },
           h(
             "div",
             { class: "plan-head" },
@@ -1455,7 +1456,7 @@
         rows.appendChild(
           h(
             "div",
-            { class: "trow evrow st-" + s },
+            { class: "trow evrow st-" + s, "data-dk": "events:" + e.id },
             e.image ? imgWithFallback(e.image) : h("div", { class: "ph" }, "🎤"),
             h(
               "div",
@@ -1625,6 +1626,47 @@
     openModal(node);
   }
 
+
+  // ── which cards are still a draft (changed or new, not on the site yet) ──
+  function draftItem(c, key) {
+    const [kind, a, b] = key.split(":");
+    const rest = key.slice(kind.length + 1);
+    if (!c) return undefined;
+    if (kind === "teachers") return (c.teachers || []).find((x) => String(x.id) === rest);
+    if (kind === "events") return (c.events || []).find((x) => String(x.id) === rest);
+    if (kind === "rooms") return ((c.halls && c.halls.rooms) || []).find((x) => String(x.id) === rest);
+    if (kind === "gallery") return ((c.gallery && c.gallery.photos) || []).find((x) => x.src === rest);
+    if (kind === "plans") return ((c.prices && c.prices[a]) || [])[+b];
+    if (kind === "hallprices") return ((c.halls && c.halls.prices) || [])[+a];
+    return undefined;
+  }
+  function markDrafts() {
+    if (!state.content || !state.original) return;
+    document.querySelectorAll("[data-dk]").forEach((el) => {
+      const key = el.getAttribute("data-dk");
+      const cur = draftItem(state.content, key);
+      const old = draftItem(state.original, key);
+      const st = !cur ? "" : old === undefined ? "new" : JSON.stringify(cur) !== JSON.stringify(old) ? "changed" : "";
+      el.classList.toggle("has-draft", !!st);
+      if (st) el.setAttribute("data-draft", st === "new" ? "Нова · ще не на сайті" : "Чернетка · чекає публікації");
+      else el.removeAttribute("data-draft");
+    });
+    const changedT = changedTabs();
+    document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("has-draft", changedT.includes(b.dataset.tab)));
+    ALL_TABS.forEach((t) => {
+      const view = $(t + "View");
+      if (!view) return;
+      let note = view.querySelector(":scope > .view-draft-note");
+      if (changedT.includes(t)) {
+        if (!note) {
+          note = h("div", { class: "view-draft-note" }, h("span", { class: "sp-dot" }),
+            h("span", null, h("b", null, "У цьому розділі є чернетка. "), "Позначені картки змінені, але відвідувачі їх ще не бачать. Щоб показати на сайті, натисніть «Опублікувати»."));
+          const head = view.querySelector(":scope > .view-head");
+          if (head) head.after(note); else view.prepend(note);
+        }
+      } else if (note) note.remove();
+    });
+  }
 
   // ── history of publications (last 30 days) and rollback ──
   const COMMIT_TAG = "[адмінка]";
@@ -1882,6 +1924,7 @@
     if (state.tab === "cert") renderCert();
     if (state.tab === "history") renderHistory();
     renderSide();
+    markDrafts();
     window.scrollTo(0, y);
   }
 
