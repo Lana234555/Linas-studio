@@ -219,20 +219,25 @@
         </div>`;
       })
       .join("");
-    const dots =
-      main.length > 1
-        ? `<div class="evb-nav"><button class="evb-arrow" data-evb-step="-1" aria-label="‹">‹</button>${main
-            .map((_, i) => `<button class="evb-dot${i === 0 ? " active" : ""}" data-evb-go="${i}" aria-label="${i + 1}"></button>`)
-            .join("")}<button class="evb-arrow" data-evb-step="1" aria-label="›">›</button></div>`
-        : "";
+    // Navigation sits outside the card: arrows on the sides, dots underneath
+    const multi = main.length > 1;
+    const arrows = multi
+      ? `<button class="evb-arrow evb-prev" data-evb-step="-1" aria-label="‹">‹</button><button class="evb-arrow evb-next" data-evb-step="1" aria-label="›">›</button>`
+      : "";
+    const dots = multi
+      ? `<div class="evb-dots">${main.map((_, i) => `<button class="evb-dot${i === 0 ? " active" : ""}" data-evb-go="${i}" aria-label="${i + 1}"></button>`).join("")}</div>`
+      : "";
     const closeKey = put("ui.close", UI.close);
     const modal = document.createElement("div");
     modal.className = "evb";
     modal.hidden = true;
     modal.innerHTML = `
-      <div class="evb-box" role="dialog" aria-modal="true">
-        <button class="evb-x" data-evb-close aria-label="${esc(UI.close.ru)}" data-i18n-aria="${closeKey}">✕</button>
-        ${slides}
+      <div class="evb-wrap">
+        <div class="evb-box" role="dialog" aria-modal="true">
+          <button class="evb-x" data-evb-close aria-label="${esc(UI.close.ru)}" data-i18n-aria="${closeKey}">✕</button>
+          ${slides}
+        </div>
+        ${arrows}
         ${dots}
       </div>`;
     document.body.appendChild(modal);
