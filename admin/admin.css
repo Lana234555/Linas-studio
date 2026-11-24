@@ -229,3 +229,26 @@ main { max-width: 1120px; margin: 0 auto; padding: 28px 24px; }
   .modal { padding: 0; }
   .modal-box { border-radius: 0; min-height: 100vh; }
 }
+
+/* ── left sidebar menu (desktop) ── */
+@media (min-width: 900px) {
+  body { padding-left: 232px; }
+  .topbar {
+    position: fixed; top: 0; bottom: 0; left: 0; width: 232px;
+    flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: 32px;
+    padding: 26px 16px 24px; border-bottom: none; border-right: 1px solid var(--border);
+    background: var(--dark2); overflow-y: auto;
+  }
+  .brand { flex-wrap: wrap; padding: 0 8px; }
+  .brand-sub { flex-basis: 100%; margin-top: 2px; }
+  .tabs { flex-direction: column; gap: 4px; }
+  .tab {
+    text-align: left; border: none; border-radius: 10px; padding: 11px 14px; font-size: 0.95rem;
+    color: var(--text); background: transparent;
+  }
+  .tab:hover { background: var(--card); color: var(--white); }
+  .tab.active { background: var(--teal-faint); color: var(--teal); box-shadow: inset 3px 0 0 var(--teal); font-weight: 500; }
+  .topbar-right { margin-left: 0; margin-top: auto; flex-direction: column; align-items: flex-start; gap: 10px; padding: 0 8px; }
+  .savebar { left: 232px; }
+  main { margin: 0 auto; }
+}
