@@ -951,7 +951,7 @@
           field("Назва події", textInput(d.title, (v) => (d.title = v), { placeholder: "Новорічний концерт учнів" })),
           field("Місце", textInput(d.place, (v) => (d.place = v), { placeholder: "Lina's Music Studio, Warszawa" })),
           field("Опис", h("textarea", { oninput: (ev) => (d.desc = ev.target.value), placeholder: "Коротко: що буде, для кого, скільки коштує вхід" }, d.desc)),
-          field("Текст кнопки (необов'язково)", textInput(d.button, (v) => (d.button = v), { placeholder: lang === "ru" ? "Записаться" : lang === "en" ? "Sign up" : "Zapisz się" }))
+          field("Текст кнопки (необов'язково)", textInput(d.button, (v) => (d.button = v), { placeholder: lang === "ru" ? "Хочу пойти" : lang === "en" ? "I want to go" : "Chcę przyjść" }))
         )
       );
     }

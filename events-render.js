@@ -116,7 +116,7 @@
     chip: { ru: "Афиша", en: "Events", pl: "Wydarzenia" },
     title: { ru: "Ближайшие <em>события</em>", en: "Upcoming <em>events</em>", pl: "Najbliższe <em>wydarzenia</em>" },
     nav: { ru: "Афиша", en: "Events", pl: "Wydarzenia" },
-    btn: { ru: "Записаться", en: "Sign up", pl: "Zapisz się" },
+    btn: { ru: "Хочу пойти", en: "I want to go", pl: "Chcę przyjść" },
     main: { ru: "Главное событие", en: "Don't miss it", pl: "Nie przegap" },
     soon: { ru: "Скоро", en: "Soon", pl: "Wkrótce" },
     ribbon: { ru: "Ближайшее событие:", en: "Next event:", pl: "Najbliższe wydarzenie:" },
