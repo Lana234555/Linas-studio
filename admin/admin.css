@@ -270,3 +270,26 @@ input[type="datetime-local"] { color-scheme: dark; }
 .ev-summary.st-live { border-color: #2fd27a; background: rgba(47, 210, 122, 0.08); }
 .ev-summary.st-scheduled { border-color: #6aa8ff; background: rgba(106, 168, 255, 0.08); }
 .ev-summary.st-ended { border-color: var(--red); background: rgba(229, 83, 75, 0.08); }
+
+/* ── left sidebar menu (desktop) ── */
+@media (min-width: 900px) {
+  body { padding-left: 232px; }
+  .topbar {
+    position: fixed; top: 0; bottom: 0; left: 0; width: 232px;
+    flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: 32px;
+    padding: 26px 16px 24px; border-bottom: none; border-right: 1px solid var(--border);
+    background: var(--dark2); overflow-y: auto;
+  }
+  .brand { flex-wrap: wrap; padding: 0 8px; }
+  .brand-sub { flex-basis: 100%; margin-top: 2px; }
+  .tabs { flex-direction: column; gap: 4px; }
+  .tab {
+    text-align: left; border: none; border-radius: 10px; padding: 11px 14px; font-size: 0.95rem;
+    color: var(--text); background: transparent;
+  }
+  .tab:hover { background: var(--card); color: var(--white); }
+  .tab.active { background: var(--teal-faint); color: var(--teal); box-shadow: inset 3px 0 0 var(--teal); font-weight: 500; }
+  .topbar-right { margin-left: 0; margin-top: auto; flex-direction: column; align-items: flex-start; gap: 10px; padding: 0 8px; }
+  .savebar { left: 232px; }
+  main { margin: 0 auto; }
+}
