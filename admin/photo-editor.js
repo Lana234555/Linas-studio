@@ -177,7 +177,7 @@
         aspectRow.innerHTML = "";
         aspects.forEach(([label, r]) => {
           aspectRow.appendChild(
-            el("button", { type: "button", class: "pe-chip" + (st.aspect === r ? " on" : ""), onclick: () => { st.aspect = r; drawAspects(); layout(); } }, label)
+            el("button", { type: "button", class: "pe-chip" + (st.aspect === r ? " on" : ""), title: r ? "Обрізати фото під цю форму" : "Залишити форму фото як є", onclick: () => { st.aspect = r; drawAspects(); layout(); } }, label)
           );
         });
       }
@@ -218,12 +218,12 @@
             el(
               "div",
               { class: "pe-chips" },
-              el("button", { type: "button", class: "pe-chip", onclick: () => { st.ox = 0; st.oy = 0; clamp(); draw(); } }, "По центру"),
-              el("button", { type: "button", class: "pe-chip", onclick: () => { st.oy = 1e6; clamp(); draw(); } }, "Верх"),
-              el("button", { type: "button", class: "pe-chip", onclick: () => { st.oy = -1e6; clamp(); draw(); } }, "Низ"),
+              el("button", { type: "button", class: "pe-chip", title: "Поставити фото по центру кадру", onclick: () => { st.ox = 0; st.oy = 0; clamp(); draw(); } }, "По центру"),
+              el("button", { type: "button", class: "pe-chip", title: "Показати верхню частину фото", onclick: () => { st.oy = 1e6; clamp(); draw(); } }, "Верх"),
+              el("button", { type: "button", class: "pe-chip", title: "Показати нижню частину фото", onclick: () => { st.oy = -1e6; clamp(); draw(); } }, "Низ"),
               el("button", { type: "button", class: "pe-chip", title: "Повернути вліво", onclick: () => { st.rot = (st.rot + 270) % 360; st.ox = st.oy = 0; layout(); } }, "⟲ Повернути"),
               el("button", { type: "button", class: "pe-chip", title: "Повернути вправо", onclick: () => { st.rot = (st.rot + 90) % 360; st.ox = st.oy = 0; layout(); } }, "⟳"),
-              el("button", { type: "button", class: "pe-chip", onclick: () => { st.flip = !st.flip; draw(); } }, "⇋ Віддзеркалити")
+              el("button", { type: "button", class: "pe-chip", title: "Віддзеркалити зліва направо", onclick: () => { st.flip = !st.flip; draw(); } }, "⇋ Віддзеркалити")
             )
           ),
           el("div", { class: "pe-group pe-filters" }, el("span", { class: "pe-label" }, "Колір"), slider("Яскравість", "bright", 50, 150), slider("Контраст", "contrast", 50, 150), slider("Насиченість", "sat", 0, 200))

@@ -16,6 +16,7 @@
     ["en", "EN"],
     ["pl", "PL"],
   ];
+  const LANG_HINT = { ru: "Тексти російською (основна мова сайту)", en: "Тексти англійською", pl: "Тексти польською" };
   const LEVELS = [
     ["basic", "Basic"],
     ["pro", "Pro"],
@@ -294,6 +295,50 @@
     };
   })();
 
+  // ── hover hints: a small styled bubble for every element with a title ──
+  // The native title is moved to data-tip so the browser's own slow tooltip does not double it.
+  const tipBox = h("div", { class: "tip", role: "tooltip", hidden: true });
+  document.body.appendChild(tipBox);
+  let tipFor = null;
+  function showTip(el) {
+    if (el.hasAttribute("title")) {
+      const t = el.getAttribute("title");
+      el.removeAttribute("title");
+      if (t) el.setAttribute("data-tip", t);
+    }
+    const text = el.getAttribute("data-tip");
+    if (!text) return;
+    tipFor = el;
+    tipBox.textContent = text;
+    tipBox.hidden = false;
+    const r = el.getBoundingClientRect();
+    const b = tipBox.getBoundingClientRect();
+    let left = r.left + r.width / 2 - b.width / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - b.width - 8));
+    let top = r.top - b.height - 8;
+    tipBox.classList.toggle("below", top < 8);
+    if (top < 8) top = r.bottom + 8;
+    tipBox.style.left = left + "px";
+    tipBox.style.top = top + "px";
+  }
+  function hideTip() {
+    tipFor = null;
+    tipBox.hidden = true;
+  }
+  document.addEventListener("mouseover", (e) => {
+    const el = e.target.closest && e.target.closest("[title], [data-tip]");
+    if (el === tipFor) return;
+    if (el) showTip(el);
+    else hideTip();
+  });
+  document.addEventListener("focusin", (e) => {
+    const el = e.target.closest && e.target.closest("[title], [data-tip]");
+    if (el) showTip(el);
+  });
+  document.addEventListener("focusout", hideTip);
+  document.addEventListener("click", hideTip, true);
+  window.addEventListener("scroll", hideTip, true);
+
   // ── phone layout: label every input of the multi-column rows ──
   // On a narrow screen the column headers are hidden, so each input gets its own small label
   // taken from the header row (RU / EN / PL / Посилання …).
@@ -357,7 +402,7 @@
   function langTabs(onSwitch, initial) {
     const wrap = h("div", { class: "lang-tabs" });
     LANGS.forEach(([code, label]) => {
-      const b = h("button", { class: "lang-tab" + (code === initial ? " active" : ""), type: "button" }, label);
+      const b = h("button", { class: "lang-tab" + (code === initial ? " active" : ""), type: "button", title: LANG_HINT[code] }, label);
       b.addEventListener("click", () => {
         wrap.querySelectorAll(".lang-tab").forEach((x) => x.classList.remove("active"));
         b.classList.add("active");
