@@ -1474,9 +1474,14 @@
         "Події показуються на сайті в розділі «Афіша». Позначте ★ «Банер», щоб подія вискакувала великим вікном, коли людина відкриває сайт. Сайт сам вмикає і вимикає подію в указаний час. Після змін натисніть «Опублікувати на сайті» внизу."
       )
     );
-    const order = ["live", "scheduled", "draft", "ended"];
-    const titles = { live: "Зараз на сайті", scheduled: "Заплановані (з'являться самі)", draft: "Чернетки", ended: "Завершені (вже не показуються)" };
-    const items = events.map((e, i) => ({ e, i, s: eventStatus(e, now) }));
+    const order = ["pending", "live", "scheduled", "draft", "ended"];
+    const titles = { pending: "Нові, ще не опубліковані", live: "Зараз на сайті", scheduled: "Заплановані (з'являться самі)", draft: "Чернетки (приховані)", ended: "Архів минулих подій" };
+    const onSite = new Set((state.original.events || []).filter((o) => eventStatus(o, now) === "live").map((o) => o.id));
+    const items = events.map((e, i) => {
+      let st = eventStatus(e, now);
+      if (st === "live" && !onSite.has(e.id)) st = "pending";
+      return { e, i, s: st };
+    });
     if (!items.length) {
       view.appendChild(
         h("div", { class: "ev-empty" }, h("div", { class: "ev-empty-icon" }, "🎤"), h("p", null, "Поки немає жодної події."), h("button", { class: "btn btn-teal", onclick: () => editEvent(-1) }, "+ Додати першу подію"))
@@ -1503,10 +1508,11 @@
                 ru.title || "(без назви)"
               ),
               h("div", { class: "trow-badges" },
-                h("span", { class: "badge st " + STATUS[s][1] }, s === "scheduled" ? "⏰ Заплановано" : STATUS[s][0]),
+                h("span", { class: "badge st " + (s === "pending" ? "pending" : STATUS[s][1]) }, s === "scheduled" ? "⏰ Заплановано" : s === "pending" ? "Ще не на сайті" : STATUS[s][0]),
                 e.banner ? h("span", { class: "badge star" }, "★ Банер") : null
               ),
-              s === "scheduled" ? h("div", { class: "ev-appears" }, icon("clock"), h("span", null, "З'явиться на сайті ", h("b", null, nice(showFrom(e))), e.publishFrom ? "" : "")) : null,
+              s === "scheduled" ? h("div", { class: "ev-appears" }, icon("clock"), h("span", null, "З'явиться на сайті ", h("b", null, nice(showFrom(e))))) : null,
+              s === "pending" ? h("div", { class: "ev-appears pending" }, icon("clock"), h("span", null, "З'явиться на сайті ", h("b", null, "одразу після публікації"))) : null,
               h("div", { class: "trow-role" }, "🗓 " + niceDate(e.date)),
               h("div", { class: "ev-sched" }, scheduleText(e))
             ),
@@ -1520,6 +1526,15 @@
           )
         );
       });
+      if (s === "ended") {
+        const det = h("details", { class: "group ev-archive" },
+          h("summary", null, h("h3", null, titles[s], h("span", { class: "count-pill" }, String(list.length))), h("span", { class: "muted" }, "Вже не показуються на сайті. Натисніть, щоб відкрити.")),
+          rows);
+        if (state.archiveOpen) det.open = true;
+        det.addEventListener("toggle", () => (state.archiveOpen = det.open));
+        view.appendChild(det);
+        return;
+      }
       view.appendChild(h("div", { class: "group" }, h("div", { class: "group-head" }, h("h3", null, titles[s], h("span", { class: "count-pill" }, String(list.length)))), rows));
     });
   }
@@ -1658,6 +1673,7 @@
         if (isNew) state.content.events.push(e);
         else state.content.events[index] = e;
         if (eventStatus(e) === "ended") setTimeout(() => toast("Увага: за цими датами подія вже не показується на сайті.", true), 50);
+        else if (eventStatus(e) === "live") setTimeout(() => toast("Збережено. Подія з'явиться на сайті одразу після «Опублікувати на сайті». Щоб вона з'явилась пізніше, у полі «Показати на сайті» оберіть «З дати…»."), 50);
         else if (eventStatus(e) === "scheduled") setTimeout(() => toast("Подію заплановано: вона з'явиться на сайті " + nice(showFrom(e)) + ". Не забудьте натиснути «Опублікувати на сайті», щоб розклад запрацював."), 50);
         return true;
       }, () => "afisha")
@@ -1992,12 +2008,13 @@
   function renderSide() {
     const el = $("sidePanel");
     if (!el || !state.content) return;
-    const c = state.content;
+    const c = state.original || state.content;
     const now = Date.now();
     const evs = c.events || [];
+    const draftEvs = state.content.events || [];
     const live = evs.filter((e) => eventStatus(e, now) === "live").length;
     const sched = evs.filter((e) => eventStatus(e, now) === "scheduled");
-    const upcoming = evs.filter((e) => ["live", "scheduled"].includes(eventStatus(e, now)) && e.date)
+    const upcoming = draftEvs.filter((e) => ["live", "scheduled"].includes(eventStatus(e, now)) && e.date)
       .sort((a, b) => warsawTime(a.date) - warsawTime(b.date))[0];
     const changed = changedTabs();
     const today = new Intl.DateTimeFormat("uk-UA", { weekday: "long", day: "numeric", month: "long" }).format(new Date());

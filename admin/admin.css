@@ -827,3 +827,13 @@ body {
 .evrow.st-scheduled, .evrow.st-scheduled.has-draft[data-draft] { border-left: 4px solid #6aa8ff !important; }
 .evrow.st-live.has-draft[data-draft] { border-left: 4px solid #2fd27a !important; }
 .evrow.st-draft.has-draft[data-draft] { border-left: 4px solid var(--muted) !important; }
+.badge.st.pending { background: rgba(212, 160, 23, 0.18); color: var(--gold); border: 1px solid rgba(212, 160, 23, 0.5); }
+.evrow.st-pending, .evrow.st-pending.has-draft[data-draft] { border-left: 4px solid var(--gold) !important; }
+.ev-appears.pending { background: rgba(212, 160, 23, 0.1); border-color: rgba(212, 160, 23, 0.45); color: #f1e2b8; }
+.ev-appears.pending .ib-ico, .ev-appears.pending svg { color: var(--gold); }
+.ev-archive > summary { list-style: none; cursor: pointer; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+.ev-archive > summary::-webkit-details-marker { display: none; }
+.ev-archive > summary h3::before { content: "▸"; display: inline-block; margin-right: 10px; color: var(--muted); transition: transform 0.2s; }
+.ev-archive[open] > summary h3::before { transform: rotate(90deg); }
+.ev-archive[open] > summary { margin-bottom: 18px; }
+.ev-archive .evrow { opacity: 0.75; }
