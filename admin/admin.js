@@ -456,8 +456,7 @@
       h("button", { class: "btn btn-ghost", type: "button", title: "Закрити вікно і не зберігати правки з нього", onclick: cancelModal }, "Скасувати"),
       h("span", { class: "pe-spacer" }),
       h("button", { class: "btn btn-ghost", type: "button", title: "Подивитися, як це виглядатиме на сайті", onclick: done(() => preview(section ? section() : "")) }, "👁 Переглянути на сайті"),
-      h("button", { class: "btn btn-ghost", type: "button", onclick: done(null) }, "Готово"),
-      h("button", { class: "btn btn-teal", type: "button", onclick: done(() => publish()) }, "Опублікувати на сайті")
+      h("button", { class: "btn btn-teal", type: "button", title: "Зберегти в чернетку. На сайт зміни потраплять після загальної кнопки «Опублікувати на сайті» внизу", onclick: done(() => toast("Зміни збережено. Коли все буде готово, натисніть «Опублікувати на сайті» внизу.")) }, "Зберегти зміни")
     );
   }
   function closeModal() {
@@ -472,7 +471,7 @@
       if (!modalApply()) return;
       closeModal();
       changed();
-      toast("Правки збережено в чернетку. На сайт вони потраплять після «Опублікувати».");
+      toast("Правки збережено. На сайт вони потраплять після «Опублікувати на сайті» внизу.");
       return;
     }
     closeModal();
@@ -1668,6 +1667,103 @@
     });
   }
 
+  // ── review before publishing: what exactly changed ──
+  function ruName(o, field) {
+    const t = (o && o.text && o.text.ru) || {};
+    return t[field] || (o && o.title && o.title.ru) || "";
+  }
+  function diffList(cur, old, keyFn, nameFn) {
+    cur = cur || []; old = old || [];
+    const out = [];
+    const oldMap = new Map(old.map((x, i) => [keyFn(x, i), x]));
+    const curKeys = new Set();
+    cur.forEach((x, i) => {
+      const k = keyFn(x, i);
+      curKeys.add(k);
+      const o = oldMap.get(k);
+      if (!o) out.push(["new", nameFn(x)]);
+      else if (JSON.stringify(o) !== JSON.stringify(x)) {
+        const hid = !!x.hidden !== !!o.hidden ? (x.hidden ? " (сховано з сайту)" : " (знову показано)") : "";
+        out.push(["changed", nameFn(x) + hid]);
+      }
+    });
+    old.forEach((x, i) => { if (!curKeys.has(keyFn(x, i))) out.push(["deleted", nameFn(x)]); });
+    const oldOrder = old.map(keyFn).filter((k) => curKeys.has(k)).join("|");
+    const curOrder = cur.map(keyFn).filter((k) => oldMap.has(k)).join("|");
+    if (oldOrder !== curOrder) out.push(["changed", "змінено порядок карток"]);
+    return out;
+  }
+  const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  function changeSummary() {
+    const c = state.content, o = state.original;
+    const res = [];
+    const add = (tab, lines) => { if (lines.length) res.push({ tab, lines }); };
+    add("events", diffList(c.events, o.events, (x) => x.id, (x) => "Подія «" + (ruName(x, "title") || "без назви") + "»"));
+    add("teachers", diffList(c.teachers, o.teachers, (x) => x.id, (x) => "Викладач " + (ruName(x, "name") || "без імені")));
+    const pl = [];
+    ["vocal", "instruments"].forEach((g) => {
+      const label = g === "vocal" ? "Вокал" : "Інструменти";
+      diffList((c.prices || {})[g], (o.prices || {})[g], (x, i) => i, (x) => label + ": картка «" + ((x.title && x.title.ru) || "") + (x.badge ? " " + x.badge : "") + "»").forEach((l) => pl.push(l));
+    });
+    add("prices", pl);
+    const H = c.halls || {}, HO = o.halls || {};
+    const hl = [];
+    if (!same(H.intro, HO.intro)) hl.push(["changed", "Текст під заголовком «Оренда залів»"]);
+    diffList(H.rooms, HO.rooms, (x) => x.id, (x) => "Зал «" + (ruName(x, "name") || "без назви") + "»").forEach((l) => hl.push(l));
+    diffList(H.prices, HO.prices, (x, i) => i, (x) => "Ціна оренди «" + ((x.title && x.title.ru) || "") + "»").forEach((l) => hl.push(l));
+    if (!same(H.conditions, HO.conditions)) hl.push(["changed", "Умови оренди"]);
+    add("halls", hl);
+    const F = c.founder || {}, FO = o.founder || {};
+    const fl = [];
+    if (F.photo !== FO.photo) fl.push(["changed", "Фото засновниці"]);
+    if (!same(F.text, FO.text)) fl.push(["changed", "Тексти блоку «Про студію»"]);
+    if (!same(F.stats, FO.stats)) fl.push(["changed", "Цифри (досягнення)"]);
+    if (!same(F.tags, FO.tags)) fl.push(["changed", "Теги"]);
+    if (!same(F.videos, FO.videos)) fl.push(["changed", "Відео"]);
+    add("about", fl);
+    const C = c.cert || {}, CO = o.cert || {};
+    const cl = [];
+    if (C.image !== CO.image) cl.push(["changed", "Фото сертифіката"]);
+    if (C.price !== CO.price || C.currency !== CO.currency) cl.push(["changed", "Ціна: " + (C.price || "") + " " + (C.currency || "")]);
+    if (!same(C.text, CO.text)) cl.push(["changed", "Тексти сертифіката"]);
+    add("cert", cl);
+    const G = c.gallery || {}, GO = o.gallery || {};
+    const gl = [];
+    const curSrc = new Set((G.photos || []).map((x) => x.src)), oldSrc = new Set((GO.photos || []).map((x) => x.src));
+    const addedN = [...curSrc].filter((x) => !oldSrc.has(x)).length, delN = [...oldSrc].filter((x) => !curSrc.has(x)).length;
+    const oldBySrc = new Map((GO.photos || []).map((x) => [x.src, x]));
+    const tagN = (G.photos || []).filter((x) => oldBySrc.has(x.src) && !same(x, oldBySrc.get(x.src))).length;
+    if (addedN) gl.push(["new", "Додано фото: " + addedN]);
+    if (delN) gl.push(["deleted", "Видалено фото: " + delN]);
+    if (tagN) gl.push(["changed", "Змінено теги у фото: " + tagN]);
+    if (!same(G.tags, GO.tags)) gl.push(["changed", "Список тегів (кнопки фільтра)"]);
+    add("gallery", gl);
+    // anything else that changed but is not described above
+    const known = new Set(res.map((r) => r.tab));
+    changedTabs().forEach((t) => { if (!known.has(t)) res.push({ tab: t, lines: [["changed", "Зміни в розділі"]] }); });
+    return res;
+  }
+  function openPublishReview() {
+    if (!isDirty()) { toast("Немає змін для публікації."); return; }
+    const sum = changeSummary();
+    const KIND = { new: ["Нове", "new"], changed: ["Змінено", "changed"], deleted: ["Видалено", "deleted"] };
+    const total = sum.reduce((n, s2) => n + s2.lines.length, 0);
+    const node = h("div", { class: "pub-review" },
+      h("h3", null, "Перевірте перед публікацією"),
+      h("p", { class: "muted" }, "Ось що зміниться на сайті (" + total + "). Натисніть на назву розділу, щоб повернутися до нього."),
+      state.restoredFrom ? h("div", { class: "hist-restored" }, "Ви повертаєте версію сайту від " + fmtWhen(state.restoredFrom.date) + ".") : null,
+      h("div", { class: "pub-list" },
+        sum.map((sec) => h("div", { class: "pub-sec" },
+          h("button", { class: "pub-sec-name", type: "button", onclick: () => { closeModal(); goTab(sec.tab); } }, TAB_NAMES[sec.tab], h("span", { class: "count-pill" }, String(sec.lines.length))),
+          h("ul", null, sec.lines.map(([k, text]) => h("li", null, h("span", { class: "pub-kind " + KIND[k][1] }, KIND[k][0]), h("span", null, text))))))),
+      h("div", { class: "modal-actions" },
+        h("button", { class: "btn btn-ghost", type: "button", onclick: closeModal }, "Повернутися до редагування"),
+        h("span", { class: "pe-spacer" }),
+        h("button", { class: "btn btn-ghost", type: "button", onclick: () => { closeModal(); preview(); } }, "👁 Переглянути сайт"),
+        h("button", { class: "btn btn-teal", type: "button", onclick: async () => { closeModal(); await publish(); } }, "Опублікувати на сайті")));
+    openModal(node);
+  }
+
   // ── history of publications (last 30 days) and rollback ──
   const COMMIT_TAG = "[адмінка]";
   function commitMessage() {
@@ -1876,8 +1972,7 @@
           : h("p", { class: "sp-note" }, "Сайт показує те саме, що й тут."),
         changed.length
           ? h("div", { class: "sp-btns" },
-              h("button", { class: "btn btn-ghost btn-small", type: "button", onclick: () => $("previewBtn").click() }, "👁 Перегляд"),
-              h("button", { class: "btn btn-teal btn-small", type: "button", onclick: () => $("publishBtn").click() }, "Опублікувати"))
+              h("button", { class: "btn btn-ghost btn-small", type: "button", onclick: () => $("previewBtn").click() }, "👁 Перегляд сайту"))
           : null),
       h("div", { class: "sp-card" },
         h("div", { class: "sp-label" }, "На сайті зараз"),
@@ -2032,7 +2127,6 @@
       }, 350);
     };
     const close = () => { ov.remove(); document.body.style.overflow = $("modal").hidden ? "" : "hidden"; };
-    const pubBtn = h("button", { class: "btn btn-teal btn-small", disabled: !isDirty(), onclick: async () => { const ok = await publish(); if (ok) close(); } }, "Опублікувати на сайті");
     ov = h(
       "div",
       { class: "pv-overlay", id: "previewOverlay" },
@@ -2047,7 +2141,7 @@
           { class: "pv-actions" },
           h("button", { class: "pv-dev on", "data-mode": "desktop", onclick: () => setDevice("desktop") }, "Комп'ютер"),
           h("button", { class: "pv-dev", "data-mode": "phone", onclick: () => setDevice("phone") }, "Телефон"),
-          opts.title ? null : pubBtn,
+          null,
           h("button", { class: "btn btn-ghost btn-small", onclick: close }, "Закрити")
         )
       ),
@@ -2112,7 +2206,7 @@
     showLogin();
   });
   document.querySelectorAll(".tab").forEach((b) => b.addEventListener("click", () => goTab(b.dataset.tab)));
-  $("publishBtn").addEventListener("click", publish);
+  $("publishBtn").addEventListener("click", openPublishReview);
   $("previewBtn").addEventListener("click", preview);
   $("discardBtn").addEventListener("click", () => {
     if (!confirm("Скасувати всі неопубліковані зміни?")) return;
