@@ -50,7 +50,11 @@
     return out;
   }
 
-  const ENROLL_DEFAULT = "https://app.band-space.com/user/search/warszawa/linas_music_studio/tutors";
+  const ENROLL_DEFAULT = "#contact";
+  // Links inside the page (#contact) open in place, outside links in a new tab
+  function tgt(u) {
+    return /^#/.test(String(u || "").trim()) ? "" : ' target="_blank" rel="noopener"';
+  }
   const LEVEL_LABEL = { basic: "Basic", pro: "Pro", top: "Top" };
 
   function commonParts(t, key) {
@@ -104,7 +108,7 @@
           ${p.level}
           ${p.langs ? `<div class="tc-langs">${p.langs}</div>` : ""}
           ${p.videos ? `<div class="tc-links">${p.videos}</div>` : ""}
-          <a class="tc-enroll-btn" href="${p.enroll}" target="_blank" rel="noopener">
+          <a class="tc-enroll-btn" href="${p.enroll}"${tgt(p.enroll)}>
             <span data-i18n="teachers.enrollBtn">Записаться к этому педагогу</span><span class="tc-enroll-btn-arrow">→</span>
           </a>
         </div>
@@ -129,7 +133,7 @@
           ${p.level}
           ${p.langs ? `<div class="tc-langs" style="margin-bottom: 20px">${p.langs}</div>` : ""}
           ${p.videos ? `<div class="tc-links" style="margin-bottom: 16px">${p.videos}</div>` : ""}
-          <a class="tc-enroll-btn" style="max-width: 280px" href="${p.enroll}" target="_blank" rel="noopener">
+          <a class="tc-enroll-btn" style="max-width: 280px" href="${p.enroll}"${tgt(p.enroll)}>
             <span data-i18n="teachers.enrollBtn">Записаться к этому педагогу</span><span class="tc-enroll-btn-arrow">→</span>
           </a>
         </div>
@@ -192,7 +196,7 @@
         ${priceRow("pricing.single", minutes, p.single, "pricing.perLesson")}
         ${priceRow("pricing.sub4", minutes, p.sub4total, "pricing.perMonth", p.sub4per, p.sub4disc)}
         ${priceRow("pricing.sub8", minutes, p.sub8total, "pricing.perMonth", p.sub8per, p.sub8disc)}
-        <a class="plan-book" href="${esc(safeUrl(p.bookUrl || ENROLL_DEFAULT))}" target="_blank" rel="noopener" data-i18n="pricing.instrBookBtn">Записаться на урок →</a>
+        <a class="plan-book" href="${esc(safeUrl(p.bookUrl || ENROLL_DEFAULT))}"${tgt(p.bookUrl || ENROLL_DEFAULT)} data-i18n="pricing.instrBookBtn">Записаться на урок →</a>
       </div>`;
   }
   ["vocal", "instruments"].forEach((grp) => {

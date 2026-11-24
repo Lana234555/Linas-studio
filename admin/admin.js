@@ -27,7 +27,7 @@
     ["top", "Top (виділена)"],
     ["kids", "Kids"],
   ];
-  const ENROLL_DEFAULT = "https://app.band-space.com/user/search/warszawa/linas_music_studio/tutors";
+  const ENROLL_DEFAULT = "#contact";
   // Only files inside these folders are ever deleted by the admin
   const DELETABLE = /^photo\/(gallery|koncert|kvartirnyky|kemp|teachers|events)\//;
 
@@ -446,7 +446,7 @@
       tagsBox,
       h("div", { class: "sub-head" }, "Відео", h("button", { class: "btn btn-ghost btn-small", type: "button", onclick: () => { t.videos.push({ url: "", label: { ru: "Видео", en: "Video", pl: "Wideo" } }); drawVideos(); } }, "+ Відео")),
       videosBox,
-      field("Посилання кнопки «Записаться»", textInput(t.enrollUrl, (v) => (t.enrollUrl = v.trim()))),
+      field("Куди веде кнопка «Записаться» (#contact = розділ «Контакти»)", textInput(t.enrollUrl, (v) => (t.enrollUrl = v.trim()))),
       h(
         "div",
         { class: "modal-actions" },
@@ -951,7 +951,7 @@
           field("Назва події", textInput(d.title, (v) => (d.title = v), { placeholder: "Новорічний концерт учнів" })),
           field("Місце", textInput(d.place, (v) => (d.place = v), { placeholder: "Lina's Music Studio, Warszawa" })),
           field("Опис", h("textarea", { oninput: (ev) => (d.desc = ev.target.value), placeholder: "Коротко: що буде, для кого, скільки коштує вхід" }, d.desc)),
-          field("Текст кнопки (необов'язково)", textInput(d.button, (v) => (d.button = v), { placeholder: lang === "ru" ? "Подробнее" : lang === "en" ? "Learn more" : "Szczegóły" }))
+          field("Текст кнопки (необов'язково)", textInput(d.button, (v) => (d.button = v), { placeholder: lang === "ru" ? "Записаться" : lang === "en" ? "Sign up" : "Zapisz się" }))
         )
       );
     }
@@ -1022,7 +1022,7 @@
       h("div", { class: "sub-head" }, "Тексти"),
       langTabs((l) => { lang = l; drawText(); }, lang),
       textBox,
-      field("Посилання кнопки (запис, квитки, Instagram…)", textInput(e.buttonUrl, (v) => (e.buttonUrl = v.trim()), { placeholder: "https://…" })),
+      field("Куди веде кнопка (#contact = розділ «Контакти»; або посилання на квитки)", textInput(e.buttonUrl, (v) => (e.buttonUrl = v.trim()), { placeholder: "#contact" })),
       h("div", { class: "sub-head" }, "Публікація на сайті"),
       h("div", { class: "field" }, h("span", null, "Коли показати на сайті"), fromBox),
       h("div", { class: "field" }, h("span", null, "Скільки показувати"), untilBox),

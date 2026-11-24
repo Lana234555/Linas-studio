@@ -11,7 +11,7 @@
   const ALL = LANGS.concat("be");
   const TZ = "Europe/Warsaw";
   const LOCALE = { ru: "ru-RU", en: "en-GB", pl: "pl-PL", be: "ru-RU" };
-  const ENROLL_DEFAULT = "https://app.band-space.com/user/search/warszawa/linas_music_studio/tutors";
+  const ENROLL_DEFAULT = "#contact";
   const tr = {};
   ALL.forEach((l) => (tr[l] = { content: { ev: {} } }));
 
@@ -21,6 +21,11 @@
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;");
+  }
+  // Links inside the page (#contact) open in place (and close the banner), outside links in a new tab
+  function tgt(u, inBanner) {
+    if (/^#/.test(String(u || "").trim())) return inBanner ? " data-evb-close" : "";
+    return ' target="_blank" rel="noopener"';
   }
   function safeUrl(u) {
     u = String(u || "").trim();
@@ -111,7 +116,7 @@
     chip: { ru: "Афиша", en: "Events", pl: "Wydarzenia" },
     title: { ru: "Ближайшие <em>события</em>", en: "Upcoming <em>events</em>", pl: "Najbliższe <em>wydarzenia</em>" },
     nav: { ru: "Афиша", en: "Events", pl: "Wydarzenia" },
-    btn: { ru: "Подробнее", en: "Learn more", pl: "Szczegóły" },
+    btn: { ru: "Записаться", en: "Sign up", pl: "Zapisz się" },
     main: { ru: "Главное событие", en: "Don't miss it", pl: "Nie przegap" },
     soon: { ru: "Скоро", en: "Soon", pl: "Wkrótce" },
     ribbon: { ru: "Ближайшее событие:", en: "Next event:", pl: "Najbliższe wydarzenie:" },
@@ -189,7 +194,7 @@
               ${b.place.ru ? `<div>📍 ${span(b.key + ".place", b.place)}</div>` : ""}
             </div>
             ${b.desc.ru ? `<p class="afisha-desc" data-i18n="${put(b.key + ".desc", b.desc)}">${esc(b.desc.ru)}</p>` : ""}
-            <a class="afisha-btn" href="${b.url}" target="_blank" rel="noopener"><span data-i18n="${put(b.key + ".btn", b.btnText)}">${esc(b.btnText.ru)}</span><span>→</span></a>
+            <a class="afisha-btn" href="${b.url}"${tgt(b.url)}><span data-i18n="${put(b.key + ".btn", b.btnText)}">${esc(b.btnText.ru)}</span><span>→</span></a>
           </div>
         </article>`;
       })
@@ -212,7 +217,7 @@
             ${b.place.ru ? `<div class="evb-place">📍 <span data-i18n="content.ev.${b.key}.place">${esc(b.place.ru)}</span></div>` : ""}
             ${b.desc.ru ? `<p class="evb-desc" data-i18n="content.ev.${b.key}.desc">${esc(b.desc.ru)}</p>` : ""}
             <div class="evb-actions">
-              <a class="evb-btn" href="${b.url}" target="_blank" rel="noopener"><span data-i18n="content.ev.${b.key}.btn">${esc(b.btnText.ru)}</span><span>→</span></a>
+              <a class="evb-btn" href="${b.url}"${tgt(b.url, true)}><span data-i18n="content.ev.${b.key}.btn">${esc(b.btnText.ru)}</span><span>→</span></a>
               ${board ? `<a class="evb-all" href="#afisha" data-evb-close>${span("ui.all", UI.all)}</a>` : ""}
             </div>
           </div>

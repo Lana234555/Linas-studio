@@ -97,7 +97,7 @@ window.SITE_CONTENT = {
           }
         }
       ],
-      "enrollUrl": "https://app.band-space.com/user/search/warszawa/linas_music_studio/tutors"
+      "enrollUrl": "#contact"
     },
     {
       "id": "kateryna",
@@ -181,7 +181,7 @@ window.SITE_CONTENT = {
           }
         }
       ],
-      "enrollUrl": "https://app.band-space.com/user/search/warszawa/linas_music_studio/tutors"
+      "enrollUrl": "#contact"
     },
     {
       "id": "ilona",
@@ -252,7 +252,7 @@ window.SITE_CONTENT = {
           }
         }
       ],
-      "enrollUrl": "https://app.band-space.com/user/search/warszawa/linas_music_studio/tutors"
+      "enrollUrl": "#contact"
     },
     {
       "id": "sergey",
@@ -320,7 +320,7 @@ window.SITE_CONTENT = {
           }
         }
       ],
-      "enrollUrl": "https://app.band-space.com/user/search/warszawa/linas_music_studio/tutors"
+      "enrollUrl": "#contact"
     },
     {
       "id": "kateryna_piano",
@@ -406,7 +406,7 @@ window.SITE_CONTENT = {
           }
         }
       ],
-      "enrollUrl": "https://app.band-space.com/user/search/warszawa/linas_music_studio/tutors"
+      "enrollUrl": "#contact"
     },
     {
       "id": "elena_drums",
@@ -469,7 +469,7 @@ window.SITE_CONTENT = {
           }
         }
       ],
-      "enrollUrl": "https://app.band-space.com/user/search/warszawa/linas_music_studio/tutors"
+      "enrollUrl": "#contact"
     }
   ],
   "prices": {
