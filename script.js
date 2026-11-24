@@ -220,7 +220,7 @@ function showInstrPricing(id, btn) { showPricingTab(id, btn, ".instr-pricing-pan
   let sectionInView = false;
 
   function matches(item, tag) {
-    return tag === "all" || item.dataset.tag === tag;
+    return tag === "all" || (item.dataset.tags || item.dataset.tag || "").split(" ").includes(tag);
   }
 
   function loadImage(item) {
