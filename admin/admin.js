@@ -994,9 +994,9 @@
         ), (files) => handleFiles(files, tag.id)
       ));
     });
-    tagList.appendChild(dropTarget(h("span", { class: "tag-chip tag-drop-new" }, "＋ Новий тег — перетягніть фото сюди"), (files) => handleFiles(files, "")));
+    tagList.appendChild(dropTarget(h("span", { class: "tag-chip tag-drop-new", title: "Перетягніть сюди фото з папки — створиться новий тег" }, "＋ фото в новий тег"), (files) => handleFiles(files, "")));
     view.appendChild(
-      h("div", { class: "group" }, h("div", { class: "group-head" }, h("h3", null, "Теги"), h("button", { class: "btn btn-teal btn-small", onclick: () => editTag(null) }, "+ Новий тег")), tagList)
+      h("div", { class: "group tags-group" }, h("div", { class: "group-head" }, h("h3", null, "Теги"), h("button", { class: "btn btn-teal btn-small", onclick: () => editTag(null) }, "+ Новий тег")), tagList)
     );
 
     // upload: one photo → editor; many photos → quick batch (auto-resized, editable later with ✎)
@@ -1100,12 +1100,12 @@
       h(
         "div",
         { class: "upload-box" },
-        h("div", { class: "drop-hint" }, h("strong", null, "Перетягніть фото з папки сюди"), h("span", null, "або на потрібний тег вище — тоді вони одразу підуть у нього")),
         h("span", { class: "btn btn-teal file-btn" }, "+ Додати фото", fileInput),
-        h("span", { class: "muted" }, "Можна вибрати одразу багато фото (10, 30, 40…). Куди їх додати:"),
+        h("span", { class: "drop-hint" }, "або перетягніть фото з папки сюди чи прямо на тег (можна багато одразу)"),
         h(
           "div",
           { class: "check-list" },
+          h("span", { class: "up-to" }, "Куди:"),
           [["", "Виберу після завантаження"]].concat(g.tags.map((t) => [t.id, tagLabel(t.id)])).map(([id, label]) =>
             h(
               "label",

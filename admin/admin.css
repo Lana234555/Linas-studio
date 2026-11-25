@@ -1007,3 +1007,21 @@ body.files-dragging .tag-drop-new { color: var(--teal); }
 .photos-heading.is-new::before { background: var(--gold); box-shadow: 0 0 0 4px rgba(212, 160, 23, 0.2); }
 .photos-heading.is-old { color: var(--teal); margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border2); }
 .photos-heading.is-old::before { background: var(--teal); }
+
+/* ══ Gallery: compact tags + upload blocks ══ */
+.tags-group { padding: 16px 20px !important; margin-bottom: 14px; }
+.tags-group .group-head { margin-bottom: 10px; }
+.tags-group .group-head h3 { font-size: 1.15rem; }
+.tags-group .btn-small { padding: 6px 14px; font-size: 0.82rem; }
+.tags-group .tag-list { gap: 6px; }
+.tags-group .tag-chip { padding: 4px 6px 4px 12px; font-size: 0.85rem; gap: 4px; }
+.tags-group .tag-chip button { padding: 2px 5px; font-size: 0.8rem; }
+.tags-group .tag-drop-new { padding: 4px 12px; font-size: 0.8rem; }
+.upload-box { padding: 14px 18px !important; gap: 8px 12px; margin-bottom: 16px; }
+.upload-box .file-btn { padding: 8px 18px; font-size: 0.9rem; }
+.upload-box .drop-hint { flex: 1 1 260px; display: block; font-size: 0.82rem; color: var(--muted); }
+.upload-box .up-to { font-size: 0.82rem; color: var(--muted); }
+.upload-box .check-list { gap: 6px; flex: 1 1 auto; }
+.upload-box .check { padding: 3px 10px; font-size: 0.8rem; }
+.upload-box .check-list { flex-basis: 100%; align-items: center; }
+.upload-box .up-to { margin-right: 2px; }
