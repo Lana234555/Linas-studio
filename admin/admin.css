@@ -1025,3 +1025,7 @@ body.files-dragging .tag-drop-new { color: var(--teal); }
 .upload-box .check { padding: 3px 10px; font-size: 0.8rem; }
 .upload-box .check-list { flex-basis: 100%; align-items: center; }
 .upload-box .up-to { margin-right: 2px; }
+/* tags + upload in one block */
+.tags-group .upload-box { margin: 14px 0 0; padding: 14px 0 0 !important; border: 0; border-top: 1px solid var(--border2); border-radius: 0; background: transparent !important; }
+.tags-group .upload-box.drop-over { border-radius: 14px; padding: 12px !important; border: 1px solid var(--teal) !important; }
+body.files-dragging .tags-group .upload-box { border: 1px dashed var(--teal) !important; border-radius: 14px; padding: 12px !important; }

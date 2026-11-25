@@ -995,9 +995,10 @@
       ));
     });
     tagList.appendChild(dropTarget(h("span", { class: "tag-chip tag-drop-new", title: "Перетягніть сюди фото з папки — створиться новий тег" }, "＋ фото в новий тег"), (files) => handleFiles(files, "")));
-    view.appendChild(
+    const tagsGroup = (
       h("div", { class: "group tags-group" }, h("div", { class: "group-head" }, h("h3", null, "Теги"), h("button", { class: "btn btn-teal btn-small", onclick: () => editTag(null) }, "+ Новий тег")), tagList)
     );
+    view.appendChild(tagsGroup);
 
     // upload: one photo → editor; many photos → quick batch (auto-resized, editable later with ✎)
     const fileInput = h("input", { type: "file", accept: "image/*,.heic,.heif", multiple: true });
@@ -1096,7 +1097,7 @@
         )
       );
     }
-    view.appendChild(dropTarget(
+    tagsGroup.appendChild(dropTarget(
       h(
         "div",
         { class: "upload-box" },
