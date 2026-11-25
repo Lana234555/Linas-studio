@@ -991,6 +991,7 @@
           if (path) {
             const ph = { src: path, tags: useTag ? [useTag] : [], added: new Date().toISOString() };
             g.photos.unshift(ph);
+            state.galleryFilter = "all";
             changed();
             afterUpload([ph], useTag);
           }
@@ -1010,7 +1011,7 @@
       progress.hide();
       if (!added.length) return;
       g.photos = added.concat(g.photos);
-      if (!useTag) state.galleryFilter = "all";
+      state.galleryFilter = "all"; // show everything: new on top, old below
       changed();
       afterUpload(added, useTag);
     }
@@ -1047,7 +1048,7 @@
       const apply = (id) => {
         list.forEach((ph) => (ph.tags = id ? [id] : []));
         closeModal();
-        if (id) state.galleryFilter = id;
+        state.galleryFilter = "all";
         changed();
         toast(id ? `${n} ${word} додано в тег «${tagLabel(id)}».` : `Додано ${n} ${word} без тегу. Тег можна вибрати пізніше.`);
       };
@@ -1154,7 +1155,14 @@
     }
 
     const grid = h("div", { class: "photos mode-" + mode });
-    shown.forEach((p) => {
+    // new (not yet published) photos first with their own heading, then the ones already on the site
+    const isNewP = (p) => !!state.pending[p.src];
+    const newOnes = shown.filter(isNewP), oldOnes = shown.filter((p) => !isNewP(p));
+    const ordered = newOnes.concat(oldOnes);
+    const heading = (text, cls) => h("div", { class: "photos-heading " + cls }, text);
+    if (newOnes.length) grid.appendChild(heading(`Нові фото · ${newOnes.length} — з'являться на сайті після «Опублікувати на сайті»`, "is-new"));
+    ordered.forEach((p, i) => {
+      if (newOnes.length && i === newOnes.length && oldOnes.length) grid.appendChild(heading(`Уже на сайті · ${oldOnes.length}`, "is-old"));
       p.tags = p.tags || [];
       const isSel = sel.has(p.src);
       grid.appendChild(

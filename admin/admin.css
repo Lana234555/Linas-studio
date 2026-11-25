@@ -999,3 +999,11 @@ body.files-dragging .tag-drop-new { color: var(--teal); }
 .new-tag-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
 .new-tag-row input { flex: 1; min-width: 200px; }
 .small-note { font-size: 0.8rem; margin-top: 6px; }
+
+/* ══ Gallery: new photos on top, published below ══ */
+.photos-heading { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; font-size: 0.95rem; font-weight: 600; padding: 6px 2px 2px; }
+.photos-heading::before { content: ""; width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.photos-heading.is-new { color: var(--gold); }
+.photos-heading.is-new::before { background: var(--gold); box-shadow: 0 0 0 4px rgba(212, 160, 23, 0.2); }
+.photos-heading.is-old { color: var(--teal); margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border2); }
+.photos-heading.is-old::before { background: var(--teal); }
