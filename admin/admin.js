@@ -276,16 +276,13 @@
   }
   // iPhone photos (HEIC/HEIF): Safari opens them itself, other browsers need a converter (loaded only when needed)
   const isHeic = (f) => /image\/hei[cf]/i.test(f.type || "") || /\.hei[cf]$/i.test(f.name || "");
+  // converter: heic-to (newer libheif, works with recent iPhones, no eval) — loaded only when needed
   let heicLib = null;
   function loadHeicLib() {
-    if (window.heic2any) return Promise.resolve(window.heic2any);
-    if (!heicLib) heicLib = new Promise((resolve, reject) => {
-      const sc = document.createElement("script");
-      sc.src = (window.LINA_VENDOR_BASE || "vendor/") + "heic2any.min.js";
-      sc.onload = () => (window.heic2any ? resolve(window.heic2any) : reject(new Error("no heic2any")));
-      sc.onerror = () => { heicLib = null; reject(new Error("Не вдалося завантажити перетворювач HEIC")); };
-      document.head.appendChild(sc);
-    });
+    if (!heicLib) {
+      const url = new URL((window.LINA_VENDOR_BASE || "vendor/") + "heic-to.csp.js", document.baseURI).href;
+      heicLib = import(url).then((m) => m.heicTo).catch((e) => { heicLib = null; throw new Error("Не вдалося завантажити перетворювач HEIC (" + (e && e.message) + ")"); });
+    }
     return heicLib;
   }
   async function openAnyImage(file) {
@@ -293,9 +290,13 @@
       return await loadImage(await readFile(file));
     } catch (e) {
       if (!isHeic(file)) throw e;
-      const conv = await loadHeicLib();
-      let out = await conv({ blob: file, toType: "image/jpeg", quality: 0.92 });
-      if (Array.isArray(out)) out = out[0];
+      const heicTo = await loadHeicLib();
+      let out;
+      try {
+        out = await heicTo({ blob: file, type: "image/jpeg", quality: 0.92 });
+      } catch (err) {
+        throw new Error("Не вдалося перетворити фото HEIC: " + ((err && err.message) || err));
+      }
       return loadImage(await readFile(out));
     }
   }
