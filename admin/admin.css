@@ -809,11 +809,28 @@ body {
       radial-gradient(1100px 700px at 15% 0%, rgba(0, 196, 179, 0.14), transparent 60%),
       radial-gradient(900px 700px at 95% 100%, rgba(212, 160, 23, 0.11), transparent 60%),
       linear-gradient(150deg, #161a19 0%, #131312 50%, #17150f 100%);
+    background-attachment: fixed;
   }
-  .tab.active { background: #151918; }
-  .tab.active::before { box-shadow: 8px 8px 0 8px #151918; }
-  .tab.active::after { box-shadow: 8px -8px 0 8px #151918; }
-  @keyframes pill-in { from { background-color: rgba(21, 25, 24, 0); transform: translateX(-6px); } to { background-color: #151918; transform: none; } }
+  /* active tab = exactly the same gradient as the panel, so it melts into the background */
+  .tab.active, .tab.active::before, .tab.active::after {
+    background:
+      radial-gradient(1100px 700px at 15% 0%, rgba(0, 196, 179, 0.14), transparent 60%),
+      radial-gradient(900px 700px at 95% 100%, rgba(212, 160, 23, 0.11), transparent 60%),
+      linear-gradient(150deg, #161a19 0%, #131312 50%, #17150f 100%);
+    background-attachment: fixed;
+  }
+  .tab.active::before, .tab.active::after { box-shadow: none; border-radius: 0; }
+  .tab.active::before {
+    -webkit-mask: radial-gradient(circle at 0 0, transparent 21.5px, #000 22px);
+    mask: radial-gradient(circle at 0 0, transparent 21.5px, #000 22px);
+  }
+  .tab.active::after {
+    -webkit-mask: radial-gradient(circle at 0 100%, transparent 21.5px, #000 22px);
+    mask: radial-gradient(circle at 0 100%, transparent 21.5px, #000 22px);
+  }
+  @keyframes pill-in { from { opacity: 0.4; } to { opacity: 1; } }
+  /* no shadow between menu and panel: it made the active tab look like a separate block */
+  .topbar { box-shadow: none; }
 }
 
 /* scheduled events: clearly visible */
