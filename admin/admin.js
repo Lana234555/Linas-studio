@@ -43,7 +43,7 @@
     pending: {}, // path -> { dataUrl, base64 } for newly added photos
     tab: "events",
     galleryFilter: "all",
-    uploadTags: [],
+    uploadTag: "", // "" = choose after upload
   };
 
   // ── helpers ──
@@ -959,7 +959,7 @@
                 g.tags = g.tags.filter((x) => x !== tag);
                 g.photos.forEach((p) => (p.tags = (p.tags || []).filter((x) => x !== tag.id)));
                 if (state.galleryFilter === tag.id) state.galleryFilter = "all";
-                state.uploadTags = state.uploadTags.filter((x) => x !== tag.id);
+                if (state.uploadTag === tag.id) state.uploadTag = "";
                 changed();
               },
             },
@@ -982,9 +982,10 @@
         try {
           const path = await addPendingImage(files[0], "gallery", "", 1600, "Нове фото");
           if (path) {
-            g.photos.unshift({ src: path, tags: state.uploadTags.slice() });
-            toast("Фото додано. Його видно лише тут, поки ви не натиснете «Опублікувати на сайті».");
+            const ph = { src: path, tags: state.uploadTag ? [state.uploadTag] : [] };
+            g.photos.unshift(ph);
             changed();
+            afterUpload([ph]);
           }
         } catch (e) { toast(files[0].name + ": " + e.message, true); }
         return;
@@ -996,39 +997,57 @@
           const res = await resizeToJpeg(files[i], PHOTO_KINDS.gallery.maxSide);
           const path = newPath("gallery", "");
           state.pending[path] = Object.assign(res, { orig: res.dataUrl });
-          added.push({ src: path, tags: state.uploadTags.slice() });
+          added.push({ src: path, tags: state.uploadTag ? [state.uploadTag] : [] });
         } catch (e) { toast(files[i].name + ": " + e.message, true); }
       }
       progress.hide();
       if (!added.length) return;
       g.photos = added.concat(g.photos);
-      state.gallerySel = new Set(added.map((x) => x.src)); // ready for tagging
-      state.galleryFilter = "all";
-      toast(`Додано ${added.length} фото, вони вже виділені. Позначте їм теги на панелі «Вибрано» або змініть кожне кнопкою ✎.`);
+      if (!state.uploadTag) state.galleryFilter = "all";
       changed();
+      afterUpload(added);
     });
+    // after upload: photos already have the chosen tag, or we ask which tag to give them
+    function afterUpload(list) {
+      const n = list.length;
+      const word = n === 1 ? "фото" : "фото";
+      if (state.uploadTag || !g.tags.length) {
+        toast(state.uploadTag ? `Додано ${n} ${word} у тег «${tagLabel(state.uploadTag)}». Їх видно лише тут, поки ви не натиснете «Опублікувати на сайті».` : `Додано ${n} ${word}.`);
+        return;
+      }
+      const apply = (id) => {
+        list.forEach((ph) => (ph.tags = id ? [id] : []));
+        closeModal();
+        if (id) state.galleryFilter = id;
+        changed();
+        toast(id ? `${n} ${word} додано в тег «${tagLabel(id)}».` : `Додано ${n} ${word} без тегу. Тег можна вибрати пізніше.`);
+      };
+      openModal(
+        h(
+          "div",
+          { class: "after-upload" },
+          h("h3", null, `Додано ${n} ${word}`),
+          h("p", { class: "muted" }, "До якого тегу (події) їх додати? Одне фото — один тег."),
+          h("div", { class: "pick-tags" }, g.tags.map((t) => h("button", { class: "btn btn-teal", onclick: () => apply(t.id) }, tagLabel(t.id)))),
+          h("div", { class: "modal-actions" }, h("button", { class: "btn btn-ghost", onclick: () => apply("") }, "Просто додати всі фото без тегу"))
+        )
+      );
+    }
     view.appendChild(
       h(
         "div",
         { class: "upload-box" },
         h("span", { class: "btn btn-teal file-btn" }, "+ Додати фото", fileInput),
-        h("span", { class: "muted" }, "Можна вибрати одразу багато фото (10, 30, 40…). Нові фото отримають теги:"),
+        h("span", { class: "muted" }, "Можна вибрати одразу багато фото (10, 30, 40…). Куди їх додати:"),
         h(
           "div",
           { class: "check-list" },
-          g.tags.map((tag) =>
+          [["", "Виберу після завантаження"]].concat(g.tags.map((t) => [t.id, tagLabel(t.id)])).map(([id, label]) =>
             h(
               "label",
-              { class: "check" },
-              h("input", {
-                type: "checkbox",
-                checked: state.uploadTags.includes(tag.id),
-                onchange: (e) => {
-                  if (e.target.checked) state.uploadTags.push(tag.id);
-                  else state.uploadTags = state.uploadTags.filter((x) => x !== tag.id);
-                },
-              }),
-              (tag.label && tag.label.ru) || tag.id
+              { class: "check" + (state.uploadTag === id ? " on" : "") },
+              h("input", { type: "radio", name: "uploadTag", checked: state.uploadTag === id, onchange: () => { state.uploadTag = id; renderGallery(); } }),
+              label
             )
           )
         )
@@ -1052,7 +1071,7 @@
         "div",
         { class: "filter-row" },
         h("span", { class: "muted" }, "Показати:"),
-        select(filterOpts, state.galleryFilter, (v) => { state.galleryFilter = v; renderGallery(); }),
+        select(filterOpts, state.galleryFilter, (v) => { state.galleryFilter = v; if (g.tags.some((t) => t.id === v)) state.uploadTag = v; renderGallery(); }),
         h("button", { class: "btn btn-ghost btn-small sel-all", onclick: () => { shown.forEach((p) => (allShownSel ? sel.delete(p.src) : sel.add(p.src))); renderGallery(); } }, allShownSel ? "Зняти виділення" : "Вибрати всі"),
         h(
           "div",
@@ -1071,28 +1090,19 @@
           "div",
           { class: "bulk-bar" },
           h("strong", null, `Вибрано: ${sel.size}`),
-          h("span", { class: "muted" }, "Натисніть тег, щоб додати його всім вибраним (ще раз — зняти):"),
+          h("span", { class: "muted" }, "Перенести всі вибрані в тег:"),
           h(
             "div",
             { class: "bulk-tags" },
-            g.tags.map((tag) => {
-              const n = selPhotos.filter((p) => (p.tags || []).includes(tag.id)).length;
-              const all = n === selPhotos.length;
+            g.tags.map((t) => [t.id, tagLabel(t.id)]).concat([["", "Без тегу"]]).map(([id, label]) => {
+              const all = selPhotos.every((p) => (id ? (p.tags || [])[0] === id && p.tags.length === 1 : !(p.tags || []).length));
               return h(
                 "button",
                 {
-                  class: "ptag big" + (all ? " on" : n ? " part" : ""),
-                  title: all ? "Зняти цей тег з усіх вибраних" : "Додати цей тег усім вибраним",
-                  onclick: () => {
-                    selPhotos.forEach((p) => {
-                      p.tags = p.tags || [];
-                      if (all) p.tags = p.tags.filter((x) => x !== tag.id);
-                      else if (!p.tags.includes(tag.id)) p.tags = p.tags.concat(tag.id);
-                    });
-                    changed();
-                  },
+                  class: "ptag big" + (all ? " on" : ""),
+                  onclick: () => { selPhotos.forEach((p) => (p.tags = id ? [id] : [])); changed(); },
                 },
-                (all ? "✓ " : n ? "◐ " : "+ ") + tagLabel(tag.id)
+                (all ? "✓ " : "") + label
               );
             })
           ),
@@ -1118,6 +1128,7 @@
             "div",
             { class: "photo-img" },
             imgWithFallback(p.src),
+            h("span", { class: "photo-tag" + (p.tags.length ? "" : " none") }, p.tags.length ? tagLabel(p.tags[0]) : "Без тегу"),
             h(
               "label",
               { class: "photo-check", title: isSel ? "Зняти виділення" : "Виділити" },
@@ -1129,22 +1140,10 @@
             "div",
             { class: "photo-body" },
             h(
-              "div",
-              { class: "photo-tags" },
-              g.tags.map((tag) =>
-                h(
-                  "button",
-                  {
-                    class: "ptag" + (p.tags.includes(tag.id) ? " on" : ""),
-                    title: p.tags.includes(tag.id) ? "Зняти тег" : "Додати тег",
-                    onclick: () => {
-                      p.tags = p.tags.includes(tag.id) ? p.tags.filter((x) => x !== tag.id) : p.tags.concat(tag.id);
-                      changed();
-                    },
-                  },
-                  tagLabel(tag.id)
-                )
-              )
+              "label",
+              { class: "photo-tagsel", title: "Тег цього фото" },
+              h("span", null, "Тег"),
+              select([["", "Без тегу"]].concat(g.tags.map((t) => [t.id, tagLabel(t.id)])), p.tags[0] || "", (v) => { p.tags = v ? [v] : []; changed(); })
             ),
             h(
               "div",
@@ -1180,7 +1179,7 @@
       );
     });
     if (!shown.length) grid.appendChild(h("p", { class: "muted" }, "Тут поки немає фото."));
-    view.appendChild(grid);
+    view.appendChild(grid);    if (render._booted) markDrafts(); // keep draft marks after filter/selection redraws
   }
 
   function editTag(tag) {
