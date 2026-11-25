@@ -849,3 +849,25 @@ body {
 .del-actions .btn { justify-content: center; border-radius: 999px; }
 .btn-danger.solid { background: var(--red); color: #fff; border-color: var(--red); }
 .btn-danger.solid:hover { background: #c9433b; }
+
+/* drag handle and dragging state */
+.drag-handle {
+  width: 30px; height: 44px; flex: none; display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: none; border-radius: 10px; color: var(--muted); cursor: grab; touch-action: none; padding: 0;
+}
+.drag-handle .ib-ico, .drag-handle svg { width: 20px; height: 20px; }
+.drag-handle:hover { color: var(--teal); background: rgba(0, 196, 179, 0.08); }
+.trow:has(> .drag-handle) { grid-template-columns: 30px 64px 1fr auto; gap: 14px; padding-left: 8px; }
+.trow.wide-img:has(> .drag-handle) { grid-template-columns: 30px 120px 1fr auto; }
+.plan-head .drag-handle { height: 34px; }
+.sorting, .sorting * { cursor: grabbing !important; user-select: none; }
+.dragging { position: relative; z-index: 5; opacity: 0.95; transform: scale(1.015); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55), 0 0 0 2px var(--teal) !important; transition: transform 0.15s, box-shadow 0.15s; }
+.sorting > :not(.dragging) { transition: transform 0.2s; }
+@media (max-width: 720px) {
+  .trow:has(> .drag-handle) { grid-template-columns: 26px 52px 1fr; gap: 12px; }
+  .trow.wide-img:has(> .drag-handle) { grid-template-columns: 26px 90px 1fr; }
+  .trow.wide-img:has(> .drag-handle) img, .trow.wide-img:has(> .drag-handle) .ph { width: 90px; height: 52px; }
+  .trow:has(> .drag-handle) .trow-actions { grid-column: 2 / -1; }
+  .drag-handle { width: 26px; }
+}
+body:has(.sorting) .tip { display: none; }

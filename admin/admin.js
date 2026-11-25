@@ -84,6 +84,7 @@
     eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>',
+    grip: '<circle cx="9" cy="6" r="1.4"/><circle cx="15" cy="6" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="9" cy="18" r="1.4"/><circle cx="15" cy="18" r="1.4"/>',
     eyeOff: '<path d="M3 3l18 18"/><path d="M10.6 5.1A10.7 10.7 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4"/><path d="M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.8 9.8 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
   };
   function icon(name) {
@@ -570,6 +571,7 @@
           h(
             "div",
             { class: "trow" + (t.hidden ? " is-hidden" : ""), "data-dk": "teachers:" + t.id },
+            dragHandle(),
             t.photo ? imgWithFallback(t.photo) : h("div", { class: "ph" }, t.emoji || "🎵"),
             h(
               "div",
@@ -580,8 +582,6 @@
             h(
               "div",
               { class: "trow-actions" },
-              h("button", { class: "icon-btn", title: "Вище", disabled: pos === 0, onclick: () => moveTeacher(i, list, pos, -1) }, "↑"),
-              h("button", { class: "icon-btn", title: "Нижче", disabled: pos === list.length - 1, onclick: () => moveTeacher(i, list, pos, 1) }, "↓"),
               h("button", { class: "icon-btn act", title: "Редагувати", "aria-label": "Редагувати", onclick: () => editTeacher(i) }, icon("edit")),
               h("button", { class: "icon-btn act", title: t.hidden ? "Показати на сайті" : "Сховати з сайту", "aria-label": t.hidden ? "Показати" : "Сховати", onclick: () => { t.hidden = !t.hidden; changed(); } }, icon(t.hidden ? "eyeOff" : "eye")),
               h("button", { class: "icon-btn danger", title: "Видалити", onclick: () => deleteTeacher(i) }, "✕")
@@ -590,6 +590,14 @@
         );
       });
       if (!list.length) rows.appendChild(h("p", { class: "muted" }, "Поки немає карток."));
+      sortable(rows, ".trow", (from, to) => {
+        const arr = state.content.teachers;
+        const idx = list.map((x) => x.i);
+        const items = idx.map((k) => arr[k]);
+        moveItem(items, from, to);
+        idx.forEach((k, n) => (arr[k] = items[n]));
+        changed();
+      });
       view.appendChild(
         h(
           "div",
@@ -600,13 +608,68 @@
       );
     });
   }
-  function moveTeacher(index, list, pos, dir) {
-    const other = list[pos + dir];
-    if (!other) return;
-    const arr = state.content.teachers;
-    [arr[index], arr[other.i]] = [arr[other.i], arr[index]];
-    changed();
+
+  // ── drag & drop reordering (mouse and touch), by the ⠿ handle ──
+  function dragHandle(what) {
+    return h("button", { class: "drag-handle", type: "button", title: "Перетягніть, щоб змінити порядок" + (what ? " " + what : ""), "aria-label": "Перетягнути" }, icon("grip"));
   }
+  function moveItem(arr, from, to) {
+    const [x] = arr.splice(from, 1);
+    arr.splice(to, 0, x);
+  }
+  function sortable(container, cardSel, onDone) {
+    container.addEventListener("pointerdown", (e) => {
+      const handle = e.target.closest(".drag-handle");
+      if (!handle || !container.contains(handle) || e.button > 0) return;
+      const card = handle.closest(cardSel);
+      if (!card || card.parentElement !== container) return;
+      e.preventDefault();
+      const cards = () => [...container.children].filter((c) => c.matches(cardSel));
+      const from = cards().indexOf(card);
+      const scroller = $("app");
+      let lastY = e.clientY, lastX = e.clientX, raf = 0;
+      card.classList.add("dragging");
+      document.querySelectorAll(".tip").forEach((t) => (t.hidden = true));
+      container.classList.add("sorting");
+      const place = () => {
+        const list = cards();
+        const cur = list.indexOf(card);
+        for (const other of list) {
+          if (other === card) continue;
+          const r = other.getBoundingClientRect();
+          if (lastX < r.left || lastX > r.right || lastY < r.top || lastY > r.bottom) continue;
+          const oi = list.indexOf(other);
+          if (oi < cur) other.before(card); else other.after(card);
+          break;
+        }
+      };
+      const tick = () => {
+        // scroll the content panel when dragging near its top or bottom
+        const box = scroller.getBoundingClientRect();
+        const top = Math.max(box.top, 0), bottom = Math.min(box.bottom, window.innerHeight);
+        if (lastY < top + 70) { scroller.scrollTop -= 14; window.scrollBy(0, -14); }
+        else if (lastY > bottom - 110) { scroller.scrollTop += 14; window.scrollBy(0, 14); }
+        place();
+        raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+      const move = (ev) => { lastX = ev.clientX; lastY = ev.clientY; };
+      const up = () => {
+        cancelAnimationFrame(raf);
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", up);
+        window.removeEventListener("pointercancel", up);
+        card.classList.remove("dragging");
+        container.classList.remove("sorting");
+        const to = cards().indexOf(card);
+        if (to !== from) onDone(from, to);
+      };
+      window.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", up);
+      window.addEventListener("pointercancel", up);
+    });
+  }
+
 
   // ── deleting needs two confirmations, in the admin's own window ──
   function askDelete(what, onYes) {
@@ -794,6 +857,7 @@
       const plans = (state.content.prices[grp] = state.content.prices[grp] || []);
       const wrap = h("div", { class: "plans" });
       plans.forEach((p, i) => wrap.appendChild(planEditor(plans, p, i)));
+      sortable(wrap, ".plan", (from, to) => { moveItem(plans, from, to); changed(); });
       view.appendChild(
         h(
           "div",
@@ -826,8 +890,7 @@
         h(
           "div",
           { class: "trow-actions" },
-          h("button", { class: "icon-btn", title: "Лівіше", disabled: i === 0, onclick: () => { [plans[i - 1], plans[i]] = [plans[i], plans[i - 1]]; changed(); } }, "←"),
-          h("button", { class: "icon-btn", title: "Правіше", disabled: i === plans.length - 1, onclick: () => { [plans[i + 1], plans[i]] = [plans[i], plans[i + 1]]; changed(); } }, "→"),
+          dragHandle(),
           h("button", { class: "icon-btn", title: p.hidden ? "Показати" : "Сховати", onclick: () => { p.hidden = !p.hidden; changed(); } }, p.hidden ? "◌" : "◉"),
           h("button", { class: "icon-btn danger", title: "Видалити", onclick: () => askDelete(`картку цін «${(p.title && p.title.ru) || ""} ${p.badge || ""}»`.replace(" »", "»"), () => { plans.splice(i, 1); changed(); }) }, "✕")
         )
@@ -1197,6 +1260,7 @@
         h(
           "div",
           { class: "trow wide-img" + (r.hidden ? " is-hidden" : ""), "data-dk": "rooms:" + r.id },
+          dragHandle(),
           r.photo ? imgWithFallback(r.photo) : h("div", { class: "ph" }, r.emoji || "🎵"),
           h(
             "div",
@@ -1207,8 +1271,6 @@
           h(
             "div",
             { class: "trow-actions" },
-            h("button", { class: "icon-btn", title: "Вище", disabled: i === 0, onclick: () => { [H.rooms[i - 1], H.rooms[i]] = [H.rooms[i], H.rooms[i - 1]]; changed(); } }, "↑"),
-            h("button", { class: "icon-btn", title: "Нижче", disabled: i === H.rooms.length - 1, onclick: () => { [H.rooms[i + 1], H.rooms[i]] = [H.rooms[i], H.rooms[i + 1]]; changed(); } }, "↓"),
             h("button", { class: "icon-btn act", title: "Редагувати", "aria-label": "Редагувати", onclick: () => editRoom(i) }, icon("edit")),
             h("button", { class: "icon-btn act", title: r.hidden ? "Показати на сайті" : "Сховати з сайту", "aria-label": r.hidden ? "Показати" : "Сховати", onclick: () => { r.hidden = !r.hidden; changed(); } }, icon(r.hidden ? "eyeOff" : "eye")),
             h("button", { class: "icon-btn danger", title: "Видалити", onclick: () => askDelete(`зал «${ru.name || "без назви"}»`, () => { H.rooms.splice(i, 1); changed(); }) }, "✕")
@@ -1217,6 +1279,7 @@
       );
     });
     if (!H.rooms.length) rows.appendChild(h("p", { class: "muted" }, "Поки немає залів."));
+    sortable(rows, ".trow", (from, to) => { moveItem(H.rooms, from, to); changed(); });
     view.appendChild(h("div", { class: "group" }, h("div", { class: "group-head" }, h("h3", null, "Картки залів"), h("button", { class: "btn btn-teal btn-small", onclick: () => editRoom(-1) }, "+ Додати зал")), rows));
 
     // rent prices
@@ -1235,8 +1298,7 @@
             h(
               "div",
               { class: "trow-actions" },
-              h("button", { class: "icon-btn", title: "Лівіше", disabled: i === 0, onclick: () => { [H.prices[i - 1], H.prices[i]] = [H.prices[i], H.prices[i - 1]]; changed(); } }, "←"),
-              h("button", { class: "icon-btn", title: "Правіше", disabled: i === H.prices.length - 1, onclick: () => { [H.prices[i + 1], H.prices[i]] = [H.prices[i], H.prices[i + 1]]; changed(); } }, "→"),
+              dragHandle(),
               h("button", { class: "icon-btn", title: p.hidden ? "Показати" : "Сховати", onclick: () => { p.hidden = !p.hidden; changed(); } }, p.hidden ? "◌" : "◉"),
               h("button", { class: "icon-btn danger", title: "Видалити", onclick: () => askDelete(`ціну оренди «${(p.title && p.title.ru) || ""}»`, () => { H.prices.splice(i, 1); changed(); }) }, "✕")
             )
@@ -1252,6 +1314,7 @@
         )
       );
     });
+    sortable(grid, ".plan", (from, to) => { moveItem(H.prices, from, to); changed(); });
     view.appendChild(
       h(
         "div",
@@ -2003,7 +2066,7 @@
   const TAB_NAMES = { events: "Події", teachers: "Викладачі", prices: "Ціни", halls: "Зали", about: "Про студію", cert: "Сертифікат", gallery: "Галерея", history: "Історія змін" };
   const TAB_TIPS = {
     events: "Подія з'являється на сайті сама в день початку і зникає після завершення. Публікувати вдруге не треба.",
-    teachers: "Порядок карток тут такий самий, як на сайті. Стрілками можна міняти місцями.",
+    teachers: "Порядок карток тут такий самий, як на сайті. Щоб поміняти місцями, перетягніть картку за ⠿ зліва.",
     prices: "Позначте тариф як «Популярний», і він буде виділений на сайті.",
     halls: "Приховані зали лишаються тут, але на сайті їх не видно.",
     about: "Тексти можна заповнити лише російською. Інші мови візьмуть переклад або російський текст.",
