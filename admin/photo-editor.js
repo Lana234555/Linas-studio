@@ -43,6 +43,9 @@
       bright: 100,
       contrast: 100,
       sat: 100,
+      clarity: 0, // -100..100 (local sharpness; minus = softer)
+      grain: 0, // 0..100
+      shadows: 0, // -100..100 (plus = lighter shadows)
     };
 
     return new Promise((resolve) => {
@@ -102,6 +105,43 @@
         c.drawImage(img, (-img.naturalWidth * s) / 2, (-img.naturalHeight * s) / 2, img.naturalWidth * s, img.naturalHeight * s);
         c.restore();
       }
+      // pixel effects on a region of a canvas (device pixels): shadows, clarity, grain
+      function applyFx(c, x, y, w, h) {
+        x = Math.max(0, Math.round(x)); y = Math.max(0, Math.round(y));
+        w = Math.min(c.canvas.width - x, Math.round(w)); h = Math.min(c.canvas.height - y, Math.round(h));
+        if (w < 2 || h < 2 || (!st.clarity && !st.grain && !st.shadows)) return;
+        const id = c.getImageData(x, y, w, h);
+        const d = id.data;
+        let blur = null;
+        if (st.clarity) {
+          const t = document.createElement("canvas");
+          t.width = w; t.height = h;
+          const tc = t.getContext("2d");
+          const r = Math.max(1, Math.min(w, h) * 0.006);
+          tc.filter = `blur(${r.toFixed(2)}px)`;
+          tc.drawImage(c.canvas, x, y, w, h, 0, 0, w, h);
+          blur = tc.getImageData(0, 0, w, h).data;
+        }
+        const sh = st.shadows / 100, cl = st.clarity / 100 * (st.clarity > 0 ? 1.1 : 1), gr = st.grain / 100 * 70;
+        const lut = new Float32Array(256);
+        for (let v = 0; v < 256; v++) { const q = 1 - v / 255; lut[v] = sh * 110 * q * q * (v / 255 + 0.15); }
+        const gs = Math.max(1, Math.round(Math.min(w, h) / 700)); // grain size grows with the picture
+        for (let yy = 0; yy < h; yy++) {
+          for (let xx = 0; xx < w; xx++) {
+            const i = (yy * w + xx) * 4;
+            let r = d[i], g = d[i + 1], b = d[i + 2];
+            if (blur) { r += cl * (r - blur[i]); g += cl * (g - blur[i + 1]); b += cl * (b - blur[i + 2]); }
+            if (sh) { const L = Math.max(0, Math.min(255, (r * 0.3 + g * 0.59 + b * 0.11) | 0)); const a = lut[L]; r += a; g += a; b += a; }
+            if (gr) {
+              let n = (((xx / gs) | 0) * 374761393 + ((yy / gs) | 0) * 668265263) ^ 0x5bd1e995;
+              n = Math.imul(n ^ (n >>> 13), 1274126177); n ^= n >>> 16;
+              const a = ((n & 1023) / 1023 - 0.5) * gr; r += a; g += a; b += a;
+            }
+            d[i] = r; d[i + 1] = g; d[i + 2] = b; // clamped automatically
+          }
+        }
+        c.putImageData(id, x, y);
+      }
       function draw() {
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         const bw = canvas.width / dpr;
@@ -110,6 +150,7 @@
         ctx.fillStyle = "#050505";
         ctx.fillRect(0, 0, bw, bh);
         paint(ctx, 1, F.x, F.y, F.w, F.h);
+        applyFx(ctx, F.x * dpr, F.y * dpr, F.w * dpr, F.h * dpr);
         // dim outside the frame
         ctx.fillStyle = "rgba(0,0,0,0.62)";
         ctx.beginPath();
@@ -183,16 +224,17 @@
       }
       drawAspects();
 
-      function slider(label, key, min, max) {
-        const val = el("span", { class: "pe-val" }, st[key] + "%");
+      function slider(label, key, min, max, signed) {
+        const fmt = (v) => (signed ? (v > 0 ? "+" : "") + v : v + "%");
+        const val = el("span", { class: "pe-val" }, fmt(st[key]));
         const input = el("input", { type: "range", min: String(min), max: String(max), step: "1", value: String(st[key]) });
         input.addEventListener("input", () => {
           st[key] = Number(input.value);
-          val.textContent = st[key] + "%";
+          val.textContent = fmt(st[key]);
           draw();
         });
         slider.all = slider.all || [];
-        slider.all.push(() => { input.value = String(st[key]); val.textContent = st[key] + "%"; });
+        slider.all.push(() => { input.value = String(st[key]); val.textContent = fmt(st[key]); });
         return el("label", { class: "pe-slider" }, el("span", null, label), input, val);
       }
 
@@ -226,7 +268,8 @@
               el("button", { type: "button", class: "pe-chip", title: "Віддзеркалити зліва направо", onclick: () => { st.flip = !st.flip; draw(); } }, "⇋ Віддзеркалити")
             )
           ),
-          el("div", { class: "pe-group pe-filters" }, el("span", { class: "pe-label" }, "Колір"), slider("Яскравість", "bright", 50, 150), slider("Контраст", "contrast", 50, 150), slider("Насиченість", "sat", 0, 200))
+          el("div", { class: "pe-group pe-filters" }, el("span", { class: "pe-label" }, "Колір"), slider("Яскравість", "bright", 50, 150), slider("Контраст", "contrast", 50, 150), slider("Насиченість", "sat", 0, 200)),
+          el("div", { class: "pe-group pe-filters" }, el("span", { class: "pe-label" }, "Деталі"), slider("Чіткість", "clarity", -100, 100, true), slider("Тіні", "shadows", -100, 100, true), slider("Зернистість", "grain", 0, 100, true))
         ),
         el(
           "div",
@@ -240,7 +283,7 @@
       const overlay = el("div", { class: "pe-overlay" }, box);
 
       function reset() {
-        Object.assign(st, { aspect: opts.aspect === undefined ? aspects[0][1] : opts.aspect, zoom: 1, ox: 0, oy: 0, rot: 0, flip: false, bright: 100, contrast: 100, sat: 100 });
+        Object.assign(st, { aspect: opts.aspect === undefined ? aspects[0][1] : opts.aspect, zoom: 1, ox: 0, oy: 0, rot: 0, flip: false, bright: 100, contrast: 100, sat: 100, clarity: 0, grain: 0, shadows: 0 });
         (slider.all || []).forEach((f) => f());
         drawAspects();
         layout();
@@ -259,6 +302,7 @@
         c.fillStyle = "#000";
         c.fillRect(0, 0, outW, outH);
         paint(c, outW / F.w, 0, 0, outW, outH);
+        applyFx(c, 0, 0, outW, outH);
         const dataUrl = out.toDataURL("image/jpeg", 0.86);
         finish({ dataUrl, base64: dataUrl.split(",")[1] });
       }
