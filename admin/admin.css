@@ -811,24 +811,6 @@ body {
       linear-gradient(150deg, #161a19 0%, #131312 50%, #17150f 100%);
     background-attachment: fixed;
   }
-  /* active tab = exactly the same gradient as the panel, so it melts into the background */
-  .tab.active, .tab.active::before, .tab.active::after {
-    background:
-      radial-gradient(1100px 700px at 15% 0%, rgba(0, 196, 179, 0.14), transparent 60%),
-      radial-gradient(900px 700px at 95% 100%, rgba(212, 160, 23, 0.11), transparent 60%),
-      linear-gradient(150deg, #161a19 0%, #131312 50%, #17150f 100%);
-    background-attachment: fixed;
-  }
-  .tab.active::before, .tab.active::after { box-shadow: none; border-radius: 0; }
-  .tab.active::before {
-    -webkit-mask: radial-gradient(circle at 0 0, transparent 21.5px, #000 22px);
-    mask: radial-gradient(circle at 0 0, transparent 21.5px, #000 22px);
-  }
-  .tab.active::after {
-    -webkit-mask: radial-gradient(circle at 0 100%, transparent 21.5px, #000 22px);
-    mask: radial-gradient(circle at 0 100%, transparent 21.5px, #000 22px);
-  }
-  @keyframes pill-in { from { opacity: 0.4; } to { opacity: 1; } }
   /* no shadow between menu and panel: it made the active tab look like a separate block */
   .topbar { box-shadow: none; }
 }
@@ -888,3 +870,16 @@ body {
   .drag-handle { width: 26px; }
 }
 body:has(.sorting) .tip { display: none; }
+
+/* ══ Menu selection: soft pill inside the menu, no blue frame ══ */
+@media (min-width: 900px) {
+  .tab { border-radius: 16px; margin-right: 18px; border: 1px solid transparent; transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
+  .tab:hover { background: rgba(255, 255, 255, 0.04); }
+  .tab.active, .tab.active:hover {
+    background: linear-gradient(90deg, rgba(0, 196, 179, 0.16), rgba(0, 196, 179, 0.05));
+    border-color: rgba(0, 196, 179, 0.25); color: var(--teal); animation: none;
+  }
+  .tab.active::before, .tab.active::after { content: none; }
+}
+.tab:focus { outline: none; }
+.tab:focus-visible { outline: 2px solid rgba(0, 196, 179, 0.6); outline-offset: 2px; }
