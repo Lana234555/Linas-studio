@@ -1120,3 +1120,12 @@ body {
   }
   .sp-card { background: rgba(18, 20, 20, 0.45); border-color: rgba(255, 255, 255, 0.08); }
 }
+
+/* photo cards: draft label inside the image (not clipped), date fully visible */
+.photo.has-draft[data-draft]::after {
+  top: 0; left: 0; right: 0; max-width: none; border-radius: 0; box-shadow: none;
+  text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 5px 10px;
+}
+.photo.has-draft .photo-new { top: 34px; }
+.photo.has-draft, .photos .photo.has-draft { margin-top: 0; }
+.photo-added { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; text-align: center; flex: 1 1 auto; }
