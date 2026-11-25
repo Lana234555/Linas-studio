@@ -129,6 +129,7 @@
       gallery: {
         chip: "Галерея",
         title_html: "Жизнь <em>студии в фото</em>",
+        more: "Больше фото",
       },
       cert: {
         from: "от",
@@ -323,6 +324,7 @@
       gallery: {
         chip: "Gallery",
         title_html: "Studio <em>life in photos</em>",
+        more: "More photos",
       },
       cert: {
         from: "from",
@@ -517,6 +519,7 @@
       gallery: {
         chip: "Галерэя",
         title_html: "Жыццё <em>студыі ў фота</em>",
+        more: "Больш фота",
       },
       cert: {
         from: "ад",
@@ -711,6 +714,7 @@
       gallery: {
         chip: "Galeria",
         title_html: "Życie <em>studia w zdjęciach</em>",
+        more: "Więcej zdjęć",
       },
       cert: {
         from: "od",
