@@ -607,11 +607,37 @@
     [arr[index], arr[other.i]] = [arr[other.i], arr[index]];
     changed();
   }
+
+  // ── deleting needs two confirmations, in the admin's own window ──
+  function askDelete(what, onYes) {
+    const old = document.getElementById("delAsk");
+    if (old) old.remove();
+    const close = () => ov.remove();
+    const box = h("div", { class: "del-box" });
+    const ov = h("div", { class: "del-overlay", id: "delAsk", onclick: (e) => { if (e.target === ov) close(); } }, box);
+    const step1 = () => box.replaceChildren(
+      h("div", { class: "del-ico" }, "🗑"),
+      h("h3", null, "Видалити " + what + "?"),
+      h("p", { class: "muted" }, "Крок 1 з 2. Після публікації це зникне з сайту."),
+      h("div", { class: "del-actions" },
+        h("button", { class: "btn btn-ghost", type: "button", onclick: close }, "Ні, залишити"),
+        h("button", { class: "btn btn-danger", type: "button", onclick: step2 }, "Так, видалити")));
+    const step2 = () => box.replaceChildren(
+      h("div", { class: "del-ico warn" }, "⚠"),
+      h("h3", null, "Точно видалити?"),
+      h("p", { class: "muted" }, "Крок 2 з 2. " + what.charAt(0).toUpperCase() + what.slice(1) + " буде видалено. До публікації це ще можна повернути кнопкою «Скасувати» внизу."),
+      h("div", { class: "del-actions" },
+        h("button", { class: "btn btn-ghost", type: "button", onclick: close }, "Ні, залишити"),
+        h("button", { class: "btn btn-danger solid", type: "button", onclick: () => { close(); onYes(); toast("Видалено. На сайті зникне після публікації."); } }, "Видалити остаточно")));
+    step1();
+    document.body.appendChild(ov);
+    const b = box.querySelector(".btn-ghost");
+    if (b) b.focus();
+  }
+
   function deleteTeacher(i) {
     const name = (state.content.teachers[i].text.ru || {}).name || "цю картку";
-    if (!confirm(`Видалити «${name}»? Після публікації картка зникне з сайту.`)) return;
-    state.content.teachers.splice(i, 1);
-    changed();
+    askDelete(`картку «${name}»`, () => { state.content.teachers.splice(i, 1); changed(); });
   }
 
   function editTeacher(index, section) {
@@ -803,7 +829,7 @@
           h("button", { class: "icon-btn", title: "Лівіше", disabled: i === 0, onclick: () => { [plans[i - 1], plans[i]] = [plans[i], plans[i - 1]]; changed(); } }, "←"),
           h("button", { class: "icon-btn", title: "Правіше", disabled: i === plans.length - 1, onclick: () => { [plans[i + 1], plans[i]] = [plans[i], plans[i + 1]]; changed(); } }, "→"),
           h("button", { class: "icon-btn", title: p.hidden ? "Показати" : "Сховати", onclick: () => { p.hidden = !p.hidden; changed(); } }, p.hidden ? "◌" : "◉"),
-          h("button", { class: "icon-btn danger", title: "Видалити", onclick: () => { if (confirm("Видалити цю картку цін?")) { plans.splice(i, 1); changed(); } } }, "✕")
+          h("button", { class: "icon-btn danger", title: "Видалити", onclick: () => askDelete(`картку цін «${(p.title && p.title.ru) || ""} ${p.badge || ""}»`.replace(" »", "»"), () => { plans.splice(i, 1); changed(); }) }, "✕")
         )
       ),
       h(
@@ -991,11 +1017,7 @@
                   {
                     class: "icon-btn danger",
                     title: "Видалити фото",
-                    onclick: () => {
-                      if (!confirm("Видалити це фото з галереї?")) return;
-                      g.photos = g.photos.filter((x) => x !== p);
-                      changed();
-                    },
+                    onclick: () => askDelete("це фото з галереї", () => { g.photos = g.photos.filter((x) => x !== p); changed(); }),
                   },
                   "✕"
                 )
@@ -1189,7 +1211,7 @@
             h("button", { class: "icon-btn", title: "Нижче", disabled: i === H.rooms.length - 1, onclick: () => { [H.rooms[i + 1], H.rooms[i]] = [H.rooms[i], H.rooms[i + 1]]; changed(); } }, "↓"),
             h("button", { class: "icon-btn act", title: "Редагувати", "aria-label": "Редагувати", onclick: () => editRoom(i) }, icon("edit")),
             h("button", { class: "icon-btn act", title: r.hidden ? "Показати на сайті" : "Сховати з сайту", "aria-label": r.hidden ? "Показати" : "Сховати", onclick: () => { r.hidden = !r.hidden; changed(); } }, icon(r.hidden ? "eyeOff" : "eye")),
-            h("button", { class: "icon-btn danger", title: "Видалити", onclick: () => { if (confirm(`Видалити «${ru.name || "цей зал"}»? Після публікації картка зникне з сайту.`)) { H.rooms.splice(i, 1); changed(); } } }, "✕")
+            h("button", { class: "icon-btn danger", title: "Видалити", onclick: () => askDelete(`зал «${ru.name || "без назви"}»`, () => { H.rooms.splice(i, 1); changed(); }) }, "✕")
           )
         )
       );
@@ -1216,7 +1238,7 @@
               h("button", { class: "icon-btn", title: "Лівіше", disabled: i === 0, onclick: () => { [H.prices[i - 1], H.prices[i]] = [H.prices[i], H.prices[i - 1]]; changed(); } }, "←"),
               h("button", { class: "icon-btn", title: "Правіше", disabled: i === H.prices.length - 1, onclick: () => { [H.prices[i + 1], H.prices[i]] = [H.prices[i], H.prices[i + 1]]; changed(); } }, "→"),
               h("button", { class: "icon-btn", title: p.hidden ? "Показати" : "Сховати", onclick: () => { p.hidden = !p.hidden; changed(); } }, p.hidden ? "◌" : "◉"),
-              h("button", { class: "icon-btn danger", title: "Видалити", onclick: () => { if (confirm("Видалити цю ціну оренди?")) { H.prices.splice(i, 1); changed(); } } }, "✕")
+              h("button", { class: "icon-btn danger", title: "Видалити", onclick: () => askDelete(`ціну оренди «${(p.title && p.title.ru) || ""}»`, () => { H.prices.splice(i, 1); changed(); }) }, "✕")
             )
           ),
           h(
@@ -1521,7 +1543,7 @@
               { class: "trow-actions" },
               h("button", { class: "icon-btn act", title: "Редагувати", "aria-label": "Редагувати", onclick: () => editEvent(i) }, icon("edit")),
               h("button", { class: "icon-btn act", "aria-label": "Копіювати", title: "Копіювати (наприклад, для наступного такого ж івенту)", onclick: () => { const c = clone(e); c.id = "e" + Date.now().toString(36); c.hidden = true; events.push(c); changed(); toast("Копію створено як чернетку."); } }, icon("copy")),
-              h("button", { class: "icon-btn danger", title: "Видалити", onclick: () => { if (confirm(`Видалити подію «${ru.title || "без назви"}»?`)) { events.splice(i, 1); changed(); } } }, "✕")
+              h("button", { class: "icon-btn danger", title: "Видалити", onclick: () => askDelete(`подію «${ru.title || "без назви"}»`, () => { events.splice(i, 1); changed(); }) }, "✕")
             )
           )
         );
@@ -2290,6 +2312,8 @@
   });
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
+    const da = document.getElementById("delAsk");
+    if (da) { da.remove(); return; }
     const pv = $("previewOverlay");
     if (pv) { pv.querySelector(".pv-actions .btn-ghost").click(); return; }
     if (!$("modal").hidden) softCloseModal();
