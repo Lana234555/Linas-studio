@@ -588,11 +588,7 @@ textarea.short { min-height: 80px; }
 .tab, .side-link, .sp-stat, .sp-chip, .btn { transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease; }
 .tab .tab-ico { transition: color 0.25s ease, transform 0.25s ease; }
 .tab:hover .tab-ico { transform: scale(1.08); }
-@media (min-width: 900px) {
-  .tab.active::before, .tab.active::after { animation: fade-in 0.25s ease; }
-  .tab.active { animation: pill-in 0.3s cubic-bezier(0.22, 0.8, 0.3, 1); }
-}
-@keyframes pill-in { from { background-color: rgba(19, 19, 18, 0); transform: translateX(-6px); } to { background-color: var(--panel); transform: none; } }
+
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 .modal:not([hidden]) { animation: fade-in 0.2s ease; }
 .modal:not([hidden]) .modal-box { animation: view-in 0.3s cubic-bezier(0.22, 0.8, 0.3, 1); }
@@ -889,4 +885,19 @@ body:has(.sorting) .tip { display: none; }
   .tab.active::after { box-shadow: 8px -8px 0 8px #151918; }
 }
 .tab:focus { outline: none; }
-.tab:focus-visible { outline: none; text-decoration: underline; text-decoration-color: var(--teal); text-underline-offset: 6px; }
+.tab:focus-visible { outline: none; }
+
+/* ══ Tab switch: the tab slides out of the panel from right to left, no fading leftovers ══ */
+@media (min-width: 900px) {
+  .tab, .tab.active, .tab.active:hover { transition: color 0.2s ease; animation: none; }
+  .tab.active, .tab.active:hover {
+    background: linear-gradient(#151918, #151918) no-repeat right center / 100% 100%;
+  }
+  .tab.active::before, .tab.active::after { animation: none; }
+  .tab.active.tab-slide { animation: tab-slide 0.34s cubic-bezier(0.22, 0.8, 0.3, 1); }
+  .tab.active.tab-slide::before, .tab.active.tab-slide::after { animation: tab-corners 0.34s ease; }
+}
+@keyframes tab-slide { from { background-size: 0% 100%; } to { background-size: 100% 100%; } }
+@keyframes tab-corners { 0% { opacity: 0; } 40% { opacity: 1; } }
+.view-enter { animation: view-soft 0.28s ease; }
+@keyframes view-soft { from { opacity: 0.25; transform: translateY(6px); } to { opacity: 1; transform: none; } }

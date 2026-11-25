@@ -2157,7 +2157,13 @@
       void v.offsetWidth;
       v.classList.add("view-enter");
     }
-    document.querySelectorAll(".tab").forEach((b) => b.classList.toggle("active", b.dataset.tab === state.tab));
+    document.querySelectorAll(".tab").forEach((b) => {
+      b.classList.toggle("active", b.dataset.tab === state.tab);
+      b.classList.remove("tab-slide");
+      // slide-in only when the person switches tabs, not when the page opens
+      if (switched && render._booted && b.dataset.tab === state.tab) { void b.offsetWidth; b.classList.add("tab-slide"); }
+    });
+    render._booted = true;
     const y = window.scrollY;
     if (state.tab === "events") renderEvents();
     if (state.tab === "teachers") renderTeachers();
