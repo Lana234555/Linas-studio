@@ -1101,8 +1101,14 @@
       h(
         "div",
         { class: "upload-box" },
-        h("span", { class: "btn btn-teal file-btn" }, "+ Додати фото", fileInput),
-        h("span", { class: "drop-hint" }, "або перетягніть фото з папки сюди чи прямо на тег (можна багато одразу)"),
+        h(
+          "div",
+          { class: "drop-zone" },
+          h("span", { class: "dz-icon", "aria-hidden": "true" }, "⇩"),
+          h("span", { class: "dz-text" }, h("strong", {}, "Перетягніть фото сюди"), h("span", {}, "можна багато одразу, або прямо на потрібний тег")),
+          h("span", { class: "dz-or" }, "або"),
+          h("span", { class: "btn btn-teal file-btn" }, "+ Вибрати фото", fileInput)
+        ),
         h(
           "div",
           { class: "check-list" },
