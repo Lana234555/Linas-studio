@@ -1042,3 +1042,32 @@ body.files-dragging .tags-group .upload-box { border: 1px dashed var(--teal) !im
 body.files-dragging .drop-zone { background: rgba(0, 196, 179, 0.12); }
 .upload-box.drop-over .drop-zone { background: rgba(0, 196, 179, 0.22); border-style: solid; box-shadow: 0 0 0 4px rgba(0, 196, 179, 0.2); }
 @media (max-width: 560px) { .drop-zone .dz-or { display: none; } .drop-zone .file-btn { flex: 1 1 100%; text-align: center; } }
+
+/* ══ Richer gradient background (panel stays flat #151918 next to the menu) ══ */
+body {
+  background:
+    radial-gradient(700px 500px at 10% -5%, rgba(0, 196, 179, 0.28), transparent 65%),
+    radial-gradient(650px 520px at 105% 30%, rgba(212, 160, 23, 0.20), transparent 65%),
+    radial-gradient(800px 600px at 40% 115%, rgba(0, 140, 128, 0.24), transparent 65%),
+    linear-gradient(160deg, #0d1a18 0%, #0a0c0c 50%, #15110a 100%);
+  background-attachment: fixed;
+}
+@media (min-width: 900px) {
+  body {
+    background:
+      radial-gradient(600px 600px at -80px -100px, rgba(212, 160, 23, 0.32), transparent 70%),
+      radial-gradient(800px 700px at 105% 110%, rgba(0, 196, 179, 0.30), transparent 70%),
+      radial-gradient(500px 400px at 100% -10%, rgba(0, 196, 179, 0.18), transparent 70%),
+      #070808;
+    background-attachment: fixed;
+  }
+  body::before {
+    background:
+      linear-gradient(90deg, #151918 0px, #151918 300px, rgba(21, 25, 24, 0) 560px),
+      radial-gradient(760px 520px at 50% -10%, rgba(0, 196, 179, 0.34), transparent 62%),
+      radial-gradient(640px 560px at 100% 40%, rgba(212, 160, 23, 0.26), transparent 62%),
+      radial-gradient(820px 560px at 55% 110%, rgba(0, 170, 160, 0.30), transparent 62%),
+      radial-gradient(480px 400px at 42% 55%, rgba(212, 160, 23, 0.10), transparent 70%),
+      linear-gradient(150deg, #151918 0%, #121615 45%, #17140d 100%);
+  }
+}
