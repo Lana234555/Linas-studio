@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Адмінка · Lina's Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Alice&family=Geologica:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-logo"><span class="brand-note">♫</span></span>
+      <span class="brand-text">
+        <span class="brand-name">Lina's Studio</span>
+        <span class="brand-sub">адмінка сайту</span>
+      </span>
+    </div>
+    <nav class="tabs" id="tabs" hidden>
+      <button class="tab active" data-tab="events"><svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M8 2.5v4M16 2.5v4M3 9.5h18"/><path d="M12 12.5l1.1 2.2 2.4.3-1.8 1.6.5 2.4-2.2-1.2-2.2 1.2.5-2.4-1.8-1.6 2.4-.3z"/></svg><span>Події</span></button>
+      <button class="tab" data-tab="teachers"><svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M17.5 4.5v8.2"/><circle cx="16" cy="13" r="1.8"/><path d="M17.5 4.5l3 1"/></svg><span>Викладачі</span></button>
+      <button class="tab" data-tab="prices"><svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12.6V4.5A1.5 1.5 0 0 1 4.5 3h8.1l8.4 8.4a1.5 1.5 0 0 1 0 2.1l-7 7a1.5 1.5 0 0 1-2.1 0z"/><circle cx="8" cy="8" r="1.6"/></svg><span>Ціни</span></button>
+      <button class="tab" data-tab="halls"><svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V9l9-5.5L21 9v12"/><path d="M9 21v-6h6v6"/><path d="M3 21h18"/></svg><span>Зали</span></button>
+      <button class="tab" data-tab="about"><svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".6" fill="currentColor"/></svg><span>Про студію</span></button>
+      <button class="tab" data-tab="cert"><svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12.5h18"/><path d="M12 8c-1.5-3.5-5.5-4-5.5-1.5S10 8 12 8zM12 8c1.5-3.5 5.5-4 5.5-1.5S14 8 12 8z"/></svg><span>Сертифікат</span></button>
+      <button class="tab" data-tab="gallery"><svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="9.5" r="1.8"/><path d="M21 16l-5.5-5.5L5 20"/></svg><span>Галерея</span></button>
+      <button class="tab" data-tab="history"><svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/><path d="M12 7.5V12l3 2"/></svg><span>Історія змін</span></button>
+    </nav>
+    <div class="topbar-right" id="topbarRight" hidden>
+      <a class="link side-link" href="../" target="_blank" rel="noopener"><svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg><span>Відкрити сайт</span></a>
+      <button class="link side-link" id="logoutBtn"><svg class="tab-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5"/><path d="M5 12h11"/></svg><span>Вийти</span></button>
+    </div>
+  </header>
+
+  <main id="app">
+    <section class="login" id="loginView" hidden>
+      <div class="chip">Вхід</div>
+      <h1>Керування <em>сайтом</em></h1>
+      <p class="muted">Зміни зберігаються прямо в репозиторій сайту на GitHub і з'являються на linasmusicgroup.org приблизно за 1–2 хвилини.</p>
+      <label class="field">
+        <span>Ключ доступу GitHub</span>
+        <input type="password" id="tokenInput" placeholder="github_pat_…" autocomplete="off" />
+      </label>
+      <button class="btn btn-teal" id="loginBtn">Увійти →</button>
+      <p class="error" id="loginError" hidden></p>
+      <details class="help">
+        <summary>Як отримати ключ (один раз, 2 хвилини)</summary>
+        <ol>
+          <li>Відкрийте <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a> (увійдіть у свій GitHub).</li>
+          <li><b>Token name</b>: наприклад «Адмінка сайту». <b>Expiration</b>: на ваш вибір (наприклад, 1 рік).</li>
+          <li><b>Repository access</b> → <b>Only select repositories</b> → виберіть <b>linas-studio</b>.</li>
+          <li><b>Permissions</b> → <b>Repository permissions</b> → <b>Contents</b> → <b>Read and write</b>.</li>
+          <li>Натисніть <b>Generate token</b>, скопіюйте ключ і вставте його сюди.</li>
+        </ol>
+        <p class="muted">Ключ зберігається лише в цьому браузері. Нікому його не пересилайте.</p>
+      </details>
+    </section>
+
+    <section id="loadingView" class="loading" hidden>Завантажую контент…</section>
+
+    <section id="eventsView" class="view" hidden></section>
+    <section id="teachersView" class="view" hidden></section>
+    <section id="pricesView" class="view" hidden></section>
+    <section id="hallsView" class="view" hidden></section>
+    <section id="aboutView" class="view" hidden></section>
+    <section id="certView" class="view" hidden></section>
+    <section id="galleryView" class="view" hidden></section>
+    <section id="historyView" class="view" hidden></section>
+  </main>
+
+  <aside class="side-panel" id="sidePanel" hidden></aside>
+
+  <div class="savebar" id="savebar" hidden>
+    <span id="saveStatus">Немає змін</span>
+    <div class="savebar-actions">
+      <button class="btn btn-ghost" id="previewBtn"><span class="lg">Попередній перегляд</span><span class="sm">👁 Перегляд</span></button>
+      <button class="btn btn-ghost" id="discardBtn"><span class="lg">Скасувати зміни</span><span class="sm">Скасувати</span></button>
+      <button class="btn btn-teal" id="publishBtn"><span class="lg">Опублікувати на сайті</span><span class="sm">Опублікувати</span></button>
+    </div>
+  </div>
+
+  <div class="modal" id="modal" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script>window.__LINA_PREVIEW_PAGE = "../preview.html";</script>
+  <script src="photo-editor.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

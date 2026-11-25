@@ -1,0 +1,818 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lina's Music Studio Варшава — Уроки вокала, гитары и фортепиано</title>
+    <meta name="description" content="Музыкальная студия в Варшаве: уроки вокала, гитары, укулеле и фортепиано. Профессиональные педагоги, дети и взрослые. Пробный урок от 70 zł. Аренда репетиционных залов." />
+    <meta name="keywords" content="уроки вокала Варшава, музыкальная студия Варшава, уроки гитары Варшава, уроки фортепиано Варшава, вокальная студия, nauka śpiewu Warszawa, szkoła muzyczna Warszawa" />
+    <link rel="canonical" href="https://linasmusicgroup.org/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://linasmusicgroup.org/" />
+    <meta property="og:title" content="Lina's Music Studio — Вокал и инструменты в Варшаве" />
+    <meta property="og:description" content="Профессиональные уроки вокала, гитары и фортепиано в Варшаве. Опытные педагоги, аренда залов. Пробный урок от 70 zł." />
+    <meta property="og:image" content="https://linasmusicgroup.org/hero-concert.jpg" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:site_name" content="Lina's Music Studio" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Lina's Music Studio — Вокал и инструменты в Варшаве" />
+    <meta name="twitter:description" content="Уроки вокала, гитары и фортепиано в Варшаве. Запишись на пробный урок." />
+    <meta name="twitter:image" content="https://linasmusicgroup.org/hero-concert.jpg" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "MusicSchool",
+      "name": "Lina's Music Studio",
+      "url": "https://linasmusicgroup.org",
+      "description": "Профессиональная музыкальная студия в Варшаве: уроки вокала, гитары, укулеле и фортепиано.",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Aleja Prymasa Tysiąclecia 66",
+        "addressLocality": "Warszawa",
+        "addressCountry": "PL"
+      },
+      "email": "linasvokalstudio@gmail.com",
+      "priceRange": "70–300 zł",
+      "image": "https://linasmusicgroup.org/hero-concert.jpg",
+      "founder": { "@type": "Person", "name": "Lina Poverga" },
+      "sameAs": ["https://www.instagram.com/linas_music_studio"]
+    }
+    </script>
+    <link rel="icon" type="image/png" href="logo lina's.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Alice&family=Geologica:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="preview-assets/styles.css" />
+  </head>
+  <body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+
+
+    <!-- NAV -->
+    <nav id="mainNav">
+      <div class="nav-inner">
+      <a href="#" class="nav-brand">
+        <img
+          src="logo lina's.png"
+          alt="Logo"
+          style="height: 40px; width: auto; object-fit: contain;"
+        />
+        <span class="nav-brand-fb">Lina's Studio</span>
+      </a>
+      <div class="nav-center">
+        <ul class="nav-links">
+          <li><a href="#founder" data-i18n="nav.about">О студии</a></li>
+          <li><a href="#vocal" data-i18n="nav.vocal">Вокал</a></li>
+          <li><a href="#pricing" data-i18n="nav.pricing">Цены</a></li>
+          <li>
+            <a href="#instruments" data-i18n="nav.instruments">Инструменты</a>
+          </li>
+          <li><a href="#halls" data-i18n="nav.halls">Залы</a></li>
+          <li data-afisha-link hidden><a href="#afisha" class="nav-afisha" data-i18n="content.ev.ui.nav">Афиша</a></li>
+          <li><a href="#contact" data-i18n="nav.contact">Контакты</a></li>
+        </ul>
+      </div>
+      <div class="nav-right">
+        <div class="lang-switcher" id="langSwitcher">
+          <button class="lang-select-btn" id="langSelectBtn" onclick="toggleLangMenu()">
+            <span id="langSelectLabel">RU</span>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 3.5L5 6.5L8 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <ul class="lang-dropdown" id="langDropdown">
+            <li onclick="selectLang('ru', 'RU')">Русский</li>
+            <li onclick="selectLang('en', 'EN')">English</li>
+            <li onclick="selectLang('pl', 'PL')">Polski</li>
+          </ul>
+        </div>
+        <button
+          class="nav-hamburger"
+          id="navHamburger"
+          onclick="toggleMenu()"
+          aria-label="Меню"
+        >
+          <span></span><span></span><span></span>
+        </button>
+        <a
+          href="#contact"
+          class="btn-pill btn-teal"
+          style="font-size: 0.78rem; padding: 8px 18px"
+          data-i18n="nav.cta"
+          >Пробный урок →</a
+        >
+      </div>
+      </div>
+    </nav>
+
+    <!-- MOBILE MENU -->
+    <div class="mobile-menu" id="mobileMenu">
+      <div class="mobile-menu-topbar">
+        <span class="mobile-menu-logo">Lina's Studio</span>
+        <button class="mobile-menu-x" onclick="toggleMenu()">✕</button>
+      </div>
+      <a href="#founder" onclick="toggleMenu()" data-i18n="nav.about"
+        >О студии</a
+      >
+      <a href="#vocal" onclick="toggleMenu()" data-i18n="nav.vocal">Вокал</a>
+      <a href="#pricing" onclick="toggleMenu()" data-i18n="nav.pricing">Цены</a>
+      <a href="#instruments" onclick="toggleMenu()" data-i18n="nav.instruments"
+        >Инструменты</a
+      >
+      <a href="#halls" onclick="toggleMenu()" data-i18n="nav.halls">Залы</a>
+      <a href="#afisha" onclick="toggleMenu()" data-afisha-link hidden data-i18n="content.ev.ui.nav">Афиша</a>
+      <a href="#contact" onclick="toggleMenu()" data-i18n="nav.contact"
+        >Контакты</a
+      >
+    </div>
+
+    <!-- HERO -->
+    <section class="hero">
+    <!-- Music note decorations -->
+    <div class="music-deco" aria-hidden="true">
+      <span class="mn" style="left:4%;top:8%;font-size:4.5rem;--d:0s;--r:-15deg">𝄞</span>
+      <span class="mn" style="left:18%;top:22%;font-size:3rem;--d:1.2s;--r:10deg">♩</span>
+      <span class="mn" style="left:32%;top:5%;font-size:3.5rem;--d:2.4s;--r:-8deg">♪</span>
+      <span class="mn" style="left:48%;top:14%;font-size:2.5rem;--d:0.6s;--r:20deg">♫</span>
+      <span class="mn" style="left:62%;top:3%;font-size:5rem;--d:3.1s;--r:-12deg">𝄢</span>
+      <span class="mn" style="left:76%;top:18%;font-size:3.2rem;--d:1.8s;--r:5deg">♩</span>
+      <span class="mn" style="left:88%;top:7%;font-size:2.8rem;--d:2.9s;--r:-20deg">♬</span>
+
+      <span class="mn" style="left:8%;top:38%;font-size:3.6rem;--d:0.9s;--r:14deg">♫</span>
+      <span class="mn" style="left:23%;top:52%;font-size:5.5rem;--d:2.2s;--r:-6deg">𝄞</span>
+      <span class="mn" style="left:40%;top:44%;font-size:2.6rem;--d:3.5s;--r:18deg">♪</span>
+      <span class="mn" style="left:55%;top:60%;font-size:4rem;--d:1s;--r:-10deg">♩</span>
+      <span class="mn" style="left:70%;top:40%;font-size:3rem;--d:4s;--r:8deg">♬</span>
+      <span class="mn" style="left:85%;top:55%;font-size:4.8rem;--d:0.4s;--r:-18deg">𝄢</span>
+      <span class="mn" style="left:93%;top:35%;font-size:3.2rem;--d:2.7s;--r:22deg">♫</span>
+
+      <span class="mn" style="left:2%;top:70%;font-size:3.8rem;--d:1.5s;--r:-9deg">♩</span>
+      <span class="mn" style="left:15%;top:82%;font-size:4rem;--d:3.8s;--r:12deg">𝄞</span>
+      <span class="mn" style="left:30%;top:75%;font-size:3.2rem;--d:0.3s;--r:-16deg">♪</span>
+      <span class="mn" style="left:45%;top:88%;font-size:5rem;--d:2.6s;--r:7deg">𝄢</span>
+      <span class="mn" style="left:60%;top:78%;font-size:2.8rem;--d:1.1s;--r:-22deg">♬</span>
+      <span class="mn" style="left:75%;top:90%;font-size:3.5rem;--d:3.3s;--r:15deg">♫</span>
+      <span class="mn" style="left:90%;top:72%;font-size:3rem;--d:0.7s;--r:-5deg">♩</span>
+    </div>
+      <div class="hero-bg"><img src="hero-concert.jpg" alt="Concert" /></div>
+      <div id="dotGrid"></div>
+      <div class="hero-inner">
+        <div class="hero-left">
+          <div class="hero-chip reveal" data-i18n="hero.chip">
+            Музыкальная студия · Варшава · с 2020 года
+          </div>
+          <h1 class="hero-h1 reveal" data-i18n-html="hero.h1">
+            Развивай<br />свой <em>голос</em><br />с нами
+          </h1>
+          <p class="hero-sub reveal" data-i18n="hero.sub">
+            Вокал, инструменты, живые концерты и творческое сообщество. Растим и
+            вдохновляем музыкантов любого уровня уже 5 лет.
+          </p>
+          <div class="hero-cta reveal">
+            <a href="#contact" class="btn-hero-primary">
+              <span class="btn-hero-bg"></span>
+              <span class="btn-hero-text" data-i18n="hero.cta1"
+                >Пробный урок</span
+              >
+              <span class="btn-hero-arrow">→</span>
+            </a>
+            <a href="#vocal" class="btn-pill-outline" data-i18n="hero.cta2"
+              >Наши преподаватели</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRUSTED -->
+    <div class="trusted">
+      <div class="trusted-marquee-wrap">
+        <div class="trusted-marquee-track"><span class="tlogo">Pop</span><span class="tlogo-sep">·</span><span class="tlogo">Jazz</span><span class="tlogo-sep">·</span><span class="tlogo">Soul</span><span class="tlogo-sep">·</span><span class="tlogo">Folk</span><span class="tlogo-sep">·</span><span class="tlogo">Rock</span><span class="tlogo-sep">·</span><span class="tlogo">Opera</span><span class="tlogo-sep">·</span><span class="tlogo">R&amp;B</span><span class="tlogo-sep">·</span><span class="tlogo">Musical</span><span class="tlogo-sep">·</span><span class="tlogo">Extreme</span><span class="tlogo-sep">·</span><span class="tlogo">Pop</span><span class="tlogo-sep">·</span><span class="tlogo">Jazz</span><span class="tlogo-sep">·</span><span class="tlogo">Soul</span><span class="tlogo-sep">·</span><span class="tlogo">Folk</span><span class="tlogo-sep">·</span><span class="tlogo">Rock</span><span class="tlogo-sep">·</span><span class="tlogo">Opera</span><span class="tlogo-sep">·</span><span class="tlogo">R&amp;B</span><span class="tlogo-sep">·</span><span class="tlogo">Musical</span><span class="tlogo-sep">·</span><span class="tlogo">Extreme</span><span class="tlogo-sep">·</span></div>
+      </div>
+    </div>
+
+    <!-- FOUNDER -->
+    <div class="bg-dark anim-section" id="founder" style="position:relative;overflow:hidden">
+      <div class="mn-section" aria-hidden="true">
+        <span class="mn" style="left:3%;top:12%;font-size:5rem;--d:0.3s;--r:-12deg">𝄞</span>
+        <span class="mn" style="left:91%;top:8%;font-size:3.5rem;--d:1.7s;--r:14deg">♬</span>
+        <span class="mn" style="left:50%;top:80%;font-size:4rem;--d:2.5s;--r:-6deg">♫</span>
+        <span class="mn" style="left:78%;top:55%;font-size:3rem;--d:0.9s;--r:20deg">𝄢</span>
+        <span class="mn" style="left:15%;top:70%;font-size:3.8rem;--d:3.2s;--r:-18deg">♩</span>
+        <span class="mn mn-m" style="left:35%;top:18%;font-size:3.2rem;--d:1.1s;--r:9deg">♪</span>
+        <span class="mn mn-m" style="left:60%;top:30%;font-size:4.5rem;--d:2.8s;--r:-20deg">𝄞</span>
+        <span class="mn mn-m" style="left:8%;top:45%;font-size:3rem;--d:0.6s;--r:16deg">♩</span>
+        <span class="mn mn-m" style="left:82%;top:38%;font-size:3.8rem;--d:3.9s;--r:-7deg">♫</span>
+        <span class="mn mn-m" style="left:42%;top:55%;font-size:2.8rem;--d:1.5s;--r:22deg">♬</span>
+        <span class="mn mn-m" style="left:67%;top:72%;font-size:4.2rem;--d:0.2s;--r:-13deg">𝄢</span>
+        <span class="mn mn-m" style="left:22%;top:88%;font-size:3.5rem;--d:2.1s;--r:5deg">♪</span>
+        <span class="mn mn-m" style="left:55%;top:92%;font-size:3rem;--d:3.3s;--r:-18deg">♩</span>
+        <span class="mn mn-m" style="left:88%;top:82%;font-size:3.8rem;--d:1.8s;--r:11deg">𝄞</span>
+        <span class="mn mn-m" style="left:30%;top:35%;font-size:4rem;--d:4.1s;--r:-4deg">♫</span>
+      </div>
+      <div class="wrap">
+        <div class="section">
+          <div class="founder-grid">
+            <div class="founder-photo reveal">
+              <img
+                src="photo/site/founder.jpg"
+                alt="Лина Поверга"
+                data-content="founder-photo"
+              />
+              <div class="founder-photo-overlay"></div>
+              <div class="founder-badge" data-content="founder-badge">
+                <div class="founder-badge-title" data-i18n="about.founderTitle">Основатель студии</div>
+                <div class="founder-badge-val" data-i18n="about.founderVal">
+                  Lina's Music Studio · Варшава · 2020
+                </div>
+              </div>
+            </div>
+            <div class="founder-text reveal">
+              <div class="chip" data-i18n="about.chip">О студии</div>
+              <div data-content="founder-body">
+              <h2 data-i18n-html="about.h2_html">Лина Поверга —<br /><em>создатель студии</em></h2>
+              <p data-i18n="about.p1">
+                Профессиональная вокалистка, автор песен и преподаватель
+                современного вокала. Наставник преподавателей вокала и автор
+                вокальных курсов.
+              </p>
+              <p data-i18n="about.p2">
+                Музыкальное образование: артист, инструменталист, дирижёр
+                оркестра, преподаватель вокала. Сценический опыт более 20 лет.
+                Поёт и преподаёт: поп, джаз, соул, фолк, рок, экстрим, опера.
+              </p>
+              <p data-i18n="about.p3">
+                Жюри музыкальных конкурсов. Ивент-менеджер с 5-летним опытом
+                работы с артистами.
+              </p>
+              <div class="founder-stats">
+                <div class="fstat">
+                  <div class="fstat-num">5+</div>
+                  <div class="fstat-label" data-i18n="about.stat1">
+                    лет студии
+                  </div>
+                </div>
+                <div class="fstat">
+                  <div class="fstat-num" style="color: var(--gold)">20+</div>
+                  <div class="fstat-label" data-i18n="about.stat2">
+                    лет на сцене
+                  </div>
+                </div>
+                <div class="fstat">
+                  <div class="fstat-num">500+</div>
+                  <div class="fstat-label" data-i18n="about.stat3">
+                    учеников
+                  </div>
+                </div>
+              </div>
+              <div class="founder-tags">
+                <span class="ftag">Поп</span><span class="ftag">Джаз</span
+                ><span class="ftag">Соул</span> <span class="ftag">Фолк</span
+                ><span class="ftag">Рок</span><span class="ftag">Опера</span
+                ><span class="ftag">Экстрим</span>
+              </div>
+              <div class="vid-links">
+                <a
+                  href="https://youtu.be/Vx3nzS7va9E"
+                  target="_blank"
+                  class="vlink"
+                   data-i18n="about.vidStudio">▶︎ Видео студии</a
+                >
+                <a
+                  href="https://youtu.be/SR2O4he66WY"
+                  target="_blank"
+                  class="vlink"
+                   data-i18n="about.vidConcert">▶︎ Концерт</a
+                >
+                <a
+                  href="https://www.youtube.com/shorts/eAMj4xuMc4o"
+                  target="_blank"
+                  class="vlink"
+                  >▶︎ Поп</a
+                >
+                <a
+                  href="https://youtube.com/shorts/cJypggrLK9s?feature=share"
+                  target="_blank"
+                  class="vlink"
+                  >▶︎ Опера</a
+                >
+                <a
+                  href="https://youtube.com/shorts/guZ1A7CkUnk?feature=share"
+                  target="_blank"
+                  class="vlink"
+                  >▶︎ Рок</a
+                >
+                <a
+                  href="https://youtube.com/shorts/Y99iUkq7AjA?feature=share"
+                  target="_blank"
+                  class="vlink"
+                  >▶︎ Соул</a
+                >
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- VOCAL TEACHERS -->
+    <div class="bg-dark2" id="vocal">
+      <div class="wrap">
+        <div class="section">
+          <div class="chip" data-i18n="vocal.chip">Вокал</div>
+          <h2 class="section-title" data-i18n-html="vocal.title_html">Преподаватели <em>вокала</em></h2>
+          <p
+            style="
+              color: var(--muted);
+              font-size: 0.9rem;
+              margin-bottom: 36px;
+              max-width: 500px;
+            "
+            data-i18n="vocal.sub"
+          >
+            Три уровня преподавателей для любого этапа вашего музыкального пути
+          </p>
+
+          <div class="filter-tabs">
+            <button class="ftab active" onclick="filterTeachers('all', this)" data-i18n="vocal.filterAll">
+              Все
+            </button>
+            <button class="ftab" onclick="filterTeachers('basic', this)">
+              Basic
+            </button>
+            <button class="ftab" onclick="filterTeachers('pro', this)">
+              Pro
+            </button>
+            <button class="ftab" onclick="filterTeachers('top', this)">
+              Top
+            </button>
+          </div>
+
+          <div class="teachers-grid" data-content="teachers-vocal"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRICING -->
+    <div class="bg-dark" id="pricing">
+      <div class="wrap">
+        <div class="section">
+          <div class="pricing-section-header" style="margin-bottom: 24px">
+            <div>
+              <div class="chip" data-i18n="vocal.pricingChip">
+                Цены на вокал
+              </div>
+              <h2 class="section-title" data-i18n-html="vocal.pricingTitle_html">Прайс-лист <em>вокал</em></h2>
+            </div>
+          </div>
+
+          <div class="pricing-cards-row plans-4" data-content="prices-vocal">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- INSTRUMENT TEACHERS -->
+    <div class="bg-dark2 anim-section" id="instruments" style="position:relative;overflow:hidden">
+      <div class="mn-section" aria-hidden="true">
+        <span class="mn" style="left:6%;top:20%;font-size:4.5rem;--d:1s;--r:10deg">♪</span>
+        <span class="mn" style="left:88%;top:15%;font-size:5rem;--d:0s;--r:-8deg">𝄞</span>
+        <span class="mn" style="left:45%;top:75%;font-size:3.5rem;--d:2.8s;--r:16deg">♩</span>
+        <span class="mn" style="left:70%;top:60%;font-size:4rem;--d:1.5s;--r:-20deg">♬</span>
+        <span class="mn" style="left:20%;top:85%;font-size:3rem;--d:3.6s;--r:8deg">𝄢</span>
+        <span class="mn mn-m" style="left:38%;top:10%;font-size:3.8rem;--d:2.2s;--r:-14deg">♫</span>
+        <span class="mn mn-m" style="left:62%;top:28%;font-size:3.2rem;--d:0.7s;--r:18deg">♩</span>
+        <span class="mn mn-m" style="left:12%;top:50%;font-size:4.2rem;--d:3.1s;--r:-6deg">𝄞</span>
+        <span class="mn mn-m" style="left:80%;top:40%;font-size:3.5rem;--d:1.9s;--r:12deg">♪</span>
+        <span class="mn mn-m" style="left:50%;top:55%;font-size:2.8rem;--d:0.4s;--r:-22deg">𝄢</span>
+        <span class="mn mn-m" style="left:28%;top:65%;font-size:4rem;--d:2.6s;--r:7deg">♬</span>
+        <span class="mn mn-m" style="left:72%;top:82%;font-size:3rem;--d:3.8s;--r:-11deg">♫</span>
+        <span class="mn mn-m" style="left:5%;top:90%;font-size:3.5rem;--d:1.3s;--r:20deg">♩</span>
+        <span class="mn mn-m" style="left:55%;top:92%;font-size:4.5rem;--d:0.9s;--r:-16deg">𝄞</span>
+        <span class="mn mn-m" style="left:92%;top:70%;font-size:3.2rem;--d:4.5s;--r:4deg">♪</span>
+      </div>
+      <div class="wrap">
+        <div class="section">
+          <div class="chip" data-i18n="instruments.chip">Инструменты</div>
+          <h2 class="section-title" data-i18n-html="instruments.title_html">Преподаватели <em>инструментов</em></h2>
+          <p
+            style="
+              color: var(--muted);
+              font-size: 0.9rem;
+              margin-bottom: 44px;
+              max-width: 600px;
+            "
+            data-i18n="instruments.sub"
+          >
+            Гитара, укулеле и фортепиано — занятия для начинающих и
+            продолжающих, дети и взрослые
+          </p>
+
+          <div class="instr-teachers-grid" data-content="teachers-instruments"></div>
+          <!-- /instr-teachers-grid -->
+
+          <!-- Instrument Prices -->
+          <div style="margin-top: 64px">
+            <div class="chip" data-i18n="instruments.pricingChip">
+              Цены на инструменты
+            </div>
+            <h3
+              class="section-title"
+              style="
+                font-size: clamp(1.5rem, 2.2vw, 2.2rem);
+                margin-top: 10px;
+                margin-bottom: 28px;
+              "
+              data-i18n-html="instruments.pricingTitle_html"
+            >
+              Прайс-лист <em>инструменты</em>
+            </h3>
+            <div class="pricing-cards-row plans-3" data-content="prices-instruments"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- HALLS -->
+    <div class="bg-dark" id="halls">
+      <div class="wrap">
+        <div class="section">
+          <div class="chip" data-i18n="halls.chip">Аренда залов</div>
+          <h2 class="section-title" data-i18n-html="halls.title_html">4 зала для <em>репетиций</em></h2>
+          <p
+            style="
+              color: var(--muted);
+              font-size: 0.9rem;
+              margin-bottom: 44px;
+              max-width: 520px;
+            "
+            data-i18n="halls.sub"
+            data-content="halls-intro"
+          >
+            Аренда пространства для самостоятельных занятий, репетиций и
+            мероприятий. Фото залов скоро появятся.
+          </p>
+          <div class="halls-grid" data-content="halls"></div>
+
+          <!-- HALL PRICING -->
+          <div class="hall-pricing reveal" style="margin-top: 56px">
+            <div class="chip" style="margin-bottom: 20px" data-i18n="halls.pricingChip">Аренда · Цены</div>
+            <div class="hall-price-grid" data-content="hall-prices"></div>
+
+            <div class="hp-conditions" data-content="hall-conditions"></div>
+          </div>
+
+          <div style="text-align: center; margin-top: 40px">
+            <a
+              href="#contact"
+              class="btn-pill btn-teal"
+              data-i18n="halls.bookBtn"
+              >Забронировать зал →</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- AFISHA: upcoming events from content.js (edited in /admin/, tab «Події») -->
+    <div class="bg-dark2 anim-section afisha" id="afisha" hidden>
+      <div class="wrap">
+        <div class="section">
+          <div class="chip" data-afisha="chip">Афиша</div>
+          <h2 class="section-title" data-afisha="title">Ближайшие <em>события</em></h2>
+          <div class="afisha-grid" data-content="events"></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+    </div>
+
+    <!-- CERT -->
+    <div class="bg-dark2" id="cert">
+      <div class="wrap">
+        <div class="section">
+          <div class="cert-grid">
+            <div class="cert-visual reveal">
+              <img class="cert-img" data-content="cert-image" src="photo/gift-certificate.jpg" alt="Lina's Music Studio — Gift Certificate" loading="lazy" width="1600" height="740" />
+            </div>
+            <div class="reveal">
+              <div class="chip" data-i18n="cert.chip">Подарок</div>
+              <h2 class="section-title" data-i18n-html="cert.title_html">Подари<br /><em>музыку</em></h2>
+              <p
+                style="
+                  color: var(--muted);
+                  line-height: 1.8;
+                  font-size: 0.92rem;
+                  margin-top: 8px;
+                  margin-bottom: 10px;
+                "
+              >
+                <span data-content="cert-p1" data-i18n="cert.p1">Сертификат на занятия — идеальный подарок для тех, кто мечтает
+                петь, играть или открыть для себя мир музыки.</span>
+              </p>
+              <p
+                style="
+                  color: var(--muted);
+                  line-height: 1.8;
+                  font-size: 0.92rem;
+                  margin-bottom: 20px;
+                "
+              >
+                <span data-content="cert-p2" data-i18n="cert.p2">Действует для любого направления: вокал, инструменты,
+                мастер-классы.</span>
+              </p>
+              <div class="cert-price">
+                <span class="cert-from" data-i18n="cert.from">от</span>
+                <span class="cert-num" data-content="cert-price">120</span>
+                <span class="cert-cur" data-content="cert-cur">PLN</span>
+              </div>
+              <a
+                href="#contact"
+                class="btn-pill btn-teal"
+                data-i18n="cert.btn"
+                >Получить сертификат →</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTACTS -->
+    <div class="bg-dark" id="contact">
+      <div class="wrap">
+        <div class="section">
+          <div class="contact-grid">
+            <div>
+              <div class="chip" data-i18n="contact.chip">Контакты</div>
+              <h2 class="section-title" data-i18n-html="contact.title_html">
+                Начни своё<br /><em>путешествие</em>
+              </h2>
+              <p
+                style="
+                  color: var(--muted);
+                  line-height: 1.75;
+                  font-size: 0.9rem;
+                  margin-top: 10px;
+                  max-width: 340px;
+                "
+              >
+                <span data-i18n="contact.sub">Запишись на пробный урок или задай любой вопрос — мы с радостью
+                ответим и поможем выбрать направление.</span>
+              </p>
+              <div class="contact-details">
+                <div class="contact-item">
+                  <div class="ci-icon">📍</div>
+                  <div>
+                    <div class="ci-label" data-i18n="contact.addressLabel">Адрес</div>
+                    <div class="ci-val" data-i18n-html="contact.cityVal">
+                      <a href="https://maps.app.goo.gl/wKpDDY1Lx38wNLuT8" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;">Aleja Prymasa Tysiąclecia 66, Warszawa</a>
+                    </div>
+                  </div>
+                </div>
+                <div class="contact-item">
+                  <div class="ci-icon">
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <defs>
+                        <radialGradient id="ig1" cx="30%" cy="107%" r="150%">
+                          <stop offset="0%" stop-color="#ffd600" />
+                          <stop offset="50%" stop-color="#ff0069" />
+                          <stop offset="100%" stop-color="#9c27b0" />
+                        </radialGradient>
+                      </defs>
+                      <rect
+                        x="2"
+                        y="2"
+                        width="20"
+                        height="20"
+                        rx="6"
+                        fill="url(#ig1)"
+                      />
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="4.5"
+                        stroke="white"
+                        stroke-width="1.8"
+                        fill="none"
+                      />
+                      <circle cx="17.5" cy="6.5" r="1.2" fill="white" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="ci-label">Instagram</div>
+                    <a
+                      href="https://www.instagram.com/linas_music_studio?igsh=MWpycjZiZ3Awdnp3Mw=="
+                      target="_blank"
+                      class="ci-val"
+                      >@linas_music_studio</a
+                    >
+                  </div>
+                </div>
+                <div class="contact-item">
+                  <div class="ci-icon">
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <rect width="24" height="24" rx="6" fill="#FF0000" />
+                      <path
+                        d="M19.8 8.2s-.2-1.4-.8-2c-.7-.8-1.6-.8-2-.8C14.8 5.3 12 5.3 12 5.3s-2.8 0-5 .1c-.4 0-1.3 0-2 .8-.6.6-.8 2-.8 2S4 9.8 4 11.3v1.4c0 1.5.2 3 .2 3s.2 1.4.8 2c.7.8 1.7.7 2.2.8C8.6 18.7 12 18.7 12 18.7s2.8 0 5-.1c.4 0 1.3 0 2-.8.6-.6.8-2 .8-2s.2-1.5.2-3v-1.4c0-1.5-.2-3.2-.2-3.2z"
+                        fill="white"
+                      />
+                      <path d="M10 15V9l5.5 3-5.5 3z" fill="#FF0000" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="ci-label">YouTube</div>
+                    <a
+                      href="https://www.youtube.com/channel/UCX8FXuPro8TniGT2qJDRTTQ"
+                      target="_blank"
+                      class="ci-val"
+                      >Lina's Music Group</a>
+                  </div>
+                </div>
+                <div class="contact-item">
+                  <div class="ci-icon">
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <rect width="24" height="24" rx="6" fill="#229ED9" />
+                      <path
+                        d="M18.9 6.3L16 17.6c-.2.9-.8 1.1-1.6.7l-3.1-2.3-1.5 1.4c-.2.2-.4.3-.7.3l.3-3.2 6.4-5.8c.3-.2 0-.4-.3-.2L6.5 13.4 3.5 12.4c-.9-.3-.9-.9.2-1.3l14.4-5.6c.8-.3 1.5.2 1.3 1.3-.1 0-.4.5-.5.5z"
+                        fill="white"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="ci-label">Telegram</div>
+                    <a href="https://t.me/linas_music_studio" target="_blank" class="ci-val">@linas_music_studio</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h3
+                style="
+                  font-family: &quot;Alice&quot;, serif;
+                  font-size: 1.55rem;
+                  color: var(--white);
+                  margin-bottom: 22px;
+                  line-height: 1.3;
+                "
+                data-i18n-html="contact.formTitle_html"
+              >
+                Запишись на<br /><em
+                  style="font-style: italic; color: var(--teal)"
+                  >пробный урок</em
+                >
+              </h3>
+              <p class="book-how" data-i18n-html="contact.bookingSub">
+                Чтобы записаться на занятие или забронировать зал, <b>напишите нам в Instagram или Telegram</b>. Ответим, подберём преподавателя и удобное время.
+              </p>
+              <div class="book-btns">
+                <a class="book-btn book-ig" href="https://www.instagram.com/linas_music_studio?igsh=MWpycjZiZ3Awdnp3Mw==" target="_blank" rel="noopener">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="6" stroke="white" stroke-width="2"/><circle cx="12" cy="12" r="4.3" stroke="white" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.3" fill="white"/></svg>
+                  <span><span class="book-btn-t" data-i18n="contact.writeIg">Написать в Instagram</span><span class="book-btn-s">@linas_music_studio</span></span>
+                  <span class="book-btn-arrow">→</span>
+                </a>
+                <a class="book-btn book-tg" href="https://t.me/linas_music_studio" target="_blank" rel="noopener">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.5 4.5L17.3 19c-.2 1-.9 1.2-1.8.8l-3.4-2.6-1.7 1.6c-.2.2-.4.3-.8.3l.3-3.6 6.6-6c.3-.3-.1-.4-.4-.2l-8.2 5.2-3.5-1.1c-.8-.3-.8-.8.2-1.2L19.2 3.4c.7-.3 1.4.2 1.3 1.1z" fill="white"/></svg>
+                  <span><span class="book-btn-t" data-i18n="contact.writeTg">Написать в Telegram</span><span class="book-btn-s">@linas_music_studio</span></span>
+                  <span class="book-btn-arrow">→</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GALLERY -->
+    <div class="bg-dark anim-section" id="gallery" style="position:relative;overflow:hidden">
+      <div class="mn-section" aria-hidden="true">
+        <span class="mn" style="left:5%;top:10%;font-size:4rem;--d:1.4s;--r:8deg">♬</span>
+        <span class="mn" style="left:92%;top:25%;font-size:5rem;--d:0.2s;--r:-14deg">𝄞</span>
+        <span class="mn" style="left:40%;top:80%;font-size:3.5rem;--d:2.2s;--r:20deg">♫</span>
+        <span class="mn" style="left:68%;top:50%;font-size:4.5rem;--d:3.4s;--r:-9deg">𝄢</span>
+        <span class="mn" style="left:18%;top:45%;font-size:3rem;--d:1s;--r:15deg">♩</span>
+        <span class="mn mn-m" style="left:32%;top:15%;font-size:3.8rem;--d:2.7s;--r:-16deg">♪</span>
+        <span class="mn mn-m" style="left:58%;top:22%;font-size:4.2rem;--d:0.5s;--r:11deg">♩</span>
+        <span class="mn mn-m" style="left:78%;top:12%;font-size:3rem;--d:3.5s;--r:-21deg">♫</span>
+        <span class="mn mn-m" style="left:10%;top:68%;font-size:4rem;--d:1.2s;--r:6deg">𝄞</span>
+        <span class="mn mn-m" style="left:45%;top:55%;font-size:3.5rem;--d:2s;--r:-12deg">♬</span>
+        <span class="mn mn-m" style="left:82%;top:65%;font-size:3.2rem;--d:0.8s;--r:18deg">♪</span>
+        <span class="mn mn-m" style="left:25%;top:30%;font-size:4.5rem;--d:3.9s;--r:-5deg">𝄢</span>
+        <span class="mn mn-m" style="left:62%;top:72%;font-size:3.8rem;--d:1.6s;--r:14deg">♩</span>
+        <span class="mn mn-m" style="left:50%;top:90%;font-size:3rem;--d:4.2s;--r:-19deg">♫</span>
+        <span class="mn mn-m" style="left:88%;top:88%;font-size:4rem;--d:0.4s;--r:9deg">𝄞</span>
+      </div>
+      <div class="wrap">
+        <div class="section">
+          <div class="chip" data-i18n="gallery.chip">Галерея</div>
+          <h2 class="section-title" data-i18n-html="gallery.title_html">Жизнь <em>студии в фото</em></h2>
+          <div class="gallery-tags" data-content="gallery-tags"></div>
+          <div class="gallery-masonry" data-content="gallery-photos"></div>
+          <div class="gallery-more-wrap"><button class="gallery-more" id="galleryMoreBtn" data-i18n="gallery.more">Больше фото</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIGHTBOX -->
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true">
+      <button class="lb-close" id="lbClose" aria-label="Закрити">✕</button>
+      <button class="lb-arrow lb-prev" id="lbPrev" aria-label="Назад">‹</button>
+      <div class="lb-img-wrap">
+        <img id="lbImg" src="" alt="" />
+      </div>
+      <button class="lb-arrow lb-next" id="lbNext" aria-label="Вперед">
+        ›
+      </button>
+      <div class="lb-counter" id="lbCounter"></div>
+    </div>
+
+   <!-- FOOTER -->
+<footer>
+  <div class="footer-container">
+    <div class="footer-top">
+      <!-- Logo -->
+      <div class="footer-logo">
+        <img src="logo lina's.png" alt="Logo" style="height: 40px; width: auto; object-fit: contain;" />
+        <span class="footer-bt">Lina's Studio</span>
+      </div>
+
+      <!-- Nav links - 2 columns -->
+      <nav class="footer-nav">
+        <a href="#founder" data-i18n="nav.about">О студии</a>
+        <a href="#vocal" data-i18n="nav.vocal">Вокал</a>
+        <a href="#pricing" data-i18n="nav.pricing">Цены</a>
+        <a href="#instruments" data-i18n="nav.instruments">Инструменты</a>
+        <a href="#halls" data-i18n="nav.halls">Залы</a>
+        <a href="#afisha" data-afisha-link hidden data-i18n="content.ev.ui.nav">Афиша</a>
+        <a href="#contact" data-i18n="nav.contact">Контакты</a>
+      </nav>
+
+      <!-- Right - contacts + support block -->
+      <div class="footer-right">
+        <div class="footer-contact-item">
+          <a href="mailto:linasvokalstudio@gmail.com">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+            linasvokalstudio@gmail.com
+          </a>
+        </div>
+        <div class="footer-contact-item">
+          <a href="https://maps.app.goo.gl/wKpDDY1Lx38wNLuT8" target="_blank" rel="noopener">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.3 7 13 7 13s7-7.7 7-13c0-3.9-3.1-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            Aleja Prymasa Tysiąclecia 66, Warszawa
+          </a>
+        </div>
+        <a href="https://t.me/linas_music_studio" target="_blank" rel="noopener" class="footer-support-block" data-i18n="footer.support">Поддержка</a>
+      </div>
+    </div>
+
+    <!-- Footer bottom - centered copyright -->
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2026 Lina's Music Group</p>
+      <a href="https://drive.google.com/file/d/1ODDDwAyZwdaShwk2uDD9bV_Wu2lE3vna/view?usp=drivesdk" target="_blank" rel="noopener" class="footer-collab-link" data-i18n="footer.collab">Условия сотрудничества</a>
+    </div>
+  </div>
+</footer>
+
+<!-- FIXED SUPPORT BUTTON -->
+<a href="https://t.me/linas_music_studio" target="_blank" rel="noopener" class="support-btn" title="Нужна помощь?">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+  </svg>
+</a>
+<script src="config.js"></script>
+<script src="preview-assets/i18n.js"></script>
+<script src="content.js"></script>
+<script src="content-render.js"></script>
+<script src="events-render.js"></script>
+<script src="preview-assets/script.js"></script>
+</body>
+</html>
