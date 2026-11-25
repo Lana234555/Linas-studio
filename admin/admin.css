@@ -1120,27 +1120,3 @@ body {
   }
   .sp-card { background: rgba(18, 20, 20, 0.45); border-color: rgba(255, 255, 255, 0.08); }
 }
-
-/* ══ Velvet: soft sheen + fine pile on the emerald menu and buttons ══ */
-@media (min-width: 900px) {
-  .topbar {
-    background:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 160px 160px,
-      radial-gradient(120% 55% at 20% 0%, rgba(120, 255, 190, 0.16), transparent 60%),
-      radial-gradient(90% 60% at 100% 55%, rgba(0, 0, 0, 0.35), transparent 70%),
-      radial-gradient(80% 45% at 30% 100%, rgba(60, 200, 140, 0.10), transparent 70%),
-      linear-gradient(180deg, #0d4a30 0%, #08331f 45%, #052216 100%);
-    background-blend-mode: soft-light, normal, normal, normal, normal;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), inset -1px 0 0 rgba(255, 255, 255, 0.03);
-  }
-}
-.btn-teal, .file-btn, .view-switch button.on, .tag-chip.on {
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 120px 120px,
-    radial-gradient(120% 90% at 30% 0%, rgba(255, 255, 255, 0.22), transparent 60%),
-    linear-gradient(180deg, #17b075 0%, #0f8a59 55%, #0a6e46 100%) !important;
-  background-blend-mode: soft-light, normal, normal;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 -2px 6px rgba(0, 0, 0, 0.25), 0 4px 14px rgba(0, 96, 57, 0.35);
-  border-color: transparent !important;
-}
-.btn-teal:hover, .file-btn:hover { filter: brightness(1.08); }
