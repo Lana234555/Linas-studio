@@ -809,7 +809,6 @@ body {
       radial-gradient(1100px 700px at 15% 0%, rgba(0, 196, 179, 0.14), transparent 60%),
       radial-gradient(900px 700px at 95% 100%, rgba(212, 160, 23, 0.11), transparent 60%),
       linear-gradient(150deg, #161a19 0%, #131312 50%, #17150f 100%);
-    background-attachment: fixed;
   }
   /* no shadow between menu and panel: it made the active tab look like a separate block */
   .topbar { box-shadow: none; }
@@ -871,15 +870,23 @@ body {
 }
 body:has(.sorting) .tip { display: none; }
 
-/* ══ Menu selection: soft pill inside the menu, no blue frame ══ */
+/* ══ Menu selection: rounded "tab" that flows into the panel (one solid colour, works in every browser) ══ */
 @media (min-width: 900px) {
-  .tab { border-radius: 16px; margin-right: 18px; border: 1px solid transparent; transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
-  .tab:hover { background: rgba(255, 255, 255, 0.04); }
-  .tab.active, .tab.active:hover {
-    background: linear-gradient(90deg, rgba(0, 196, 179, 0.16), rgba(0, 196, 179, 0.05));
-    border-color: rgba(0, 196, 179, 0.25); color: var(--teal); animation: none;
+  /* the panel is flat #151918 near the menu, so the active tab blends in with no seam */
+  body::before {
+    background:
+      linear-gradient(90deg, #151918 0px, #151918 300px, rgba(21, 25, 24, 0) 620px),
+      radial-gradient(1100px 700px at 15% 0%, rgba(0, 196, 179, 0.14), transparent 60%),
+      radial-gradient(900px 700px at 95% 100%, rgba(212, 160, 23, 0.11), transparent 60%),
+      linear-gradient(150deg, #161a19 0%, #131312 50%, #17150f 100%);
   }
-  .tab.active::before, .tab.active::after { content: none; }
+  .tab { border-radius: 999px 0 0 999px; transition: color 0.2s; }
+  .tab:hover { background: transparent; color: var(--white); }
+  .tab:hover .tab-ico { color: var(--teal); }
+  .tab.active, .tab.active:hover { background: #151918; color: var(--teal); }
+  .tab.active::before, .tab.active::after { content: ""; background: transparent; -webkit-mask: none; mask: none; }
+  .tab.active::before { box-shadow: 8px 8px 0 8px #151918; }
+  .tab.active::after { box-shadow: 8px -8px 0 8px #151918; }
 }
 .tab:focus { outline: none; }
-.tab:focus-visible { outline: 2px solid rgba(0, 196, 179, 0.6); outline-offset: 2px; }
+.tab:focus-visible { outline: none; text-decoration: underline; text-decoration-color: var(--teal); text-underline-offset: 6px; }
