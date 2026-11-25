@@ -85,6 +85,8 @@
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>',
     grip: '<circle cx="9" cy="6" r="1.4"/><circle cx="15" cy="6" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="9" cy="18" r="1.4"/><circle cx="15" cy="18" r="1.4"/>',
+    tiles: '<rect x="4" y="4" width="7" height="7" rx="1.8"/><rect x="13" y="4" width="7" height="7" rx="1.8"/><rect x="4" y="13" width="7" height="7" rx="1.8"/><rect x="13" y="13" width="7" height="7" rx="1.8"/>',
+    list: '<rect x="3.5" y="5" width="5" height="4" rx="1.2"/><rect x="3.5" y="15" width="5" height="4" rx="1.2"/><path d="M11.5 7h9M11.5 17h9"/>',
     eyeOff: '<path d="M3 3l18 18"/><path d="M10.6 5.1A10.7 10.7 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4"/><path d="M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.8 9.8 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
   };
   function icon(name) {
@@ -970,27 +972,39 @@
       h("div", { class: "group" }, h("div", { class: "group-head" }, h("h3", null, "Теги"), h("button", { class: "btn btn-teal btn-small", onclick: () => editTag(null) }, "+ Новий тег")), tagList)
     );
 
-    // upload
+    // upload: one photo → editor; many photos → quick batch (auto-resized, editable later with ✎)
     const fileInput = h("input", { type: "file", accept: "image/*", multiple: true });
     fileInput.addEventListener("change", async () => {
       const files = Array.from(fileInput.files || []);
       if (!files.length) return;
       fileInput.value = "";
-      let added = 0;
-      for (let i = 0; i < files.length; i++) {
-        const f = files[i];
-        const title = files.length > 1 ? `Фото ${i + 1} з ${files.length}` : "Нове фото";
+      if (files.length === 1) {
         try {
-          const path = await addPendingImage(f, "gallery", "", 1600, title);
-          if (!path) continue;
-          g.photos.unshift({ src: path, tags: state.uploadTags.slice() });
-          added++;
-          changed();
-        } catch (e) {
-          toast(f.name + ": " + e.message, true);
-        }
+          const path = await addPendingImage(files[0], "gallery", "", 1600, "Нове фото");
+          if (path) {
+            g.photos.unshift({ src: path, tags: state.uploadTags.slice() });
+            toast("Фото додано. Його видно лише тут, поки ви не натиснете «Опублікувати на сайті».");
+            changed();
+          }
+        } catch (e) { toast(files[0].name + ": " + e.message, true); }
+        return;
       }
-      if (added) toast(`Додано ${added} фото. Їх видно лише тут, поки ви не натиснете «Опублікувати на сайті».`);
+      const added = [];
+      for (let i = 0; i < files.length; i++) {
+        progress.show(`Додаю фото ${i + 1} з ${files.length}…`, i / files.length);
+        try {
+          const res = await resizeToJpeg(files[i], PHOTO_KINDS.gallery.maxSide);
+          const path = newPath("gallery", "");
+          state.pending[path] = Object.assign(res, { orig: res.dataUrl });
+          added.push({ src: path, tags: state.uploadTags.slice() });
+        } catch (e) { toast(files[i].name + ": " + e.message, true); }
+      }
+      progress.hide();
+      if (!added.length) return;
+      g.photos = added.concat(g.photos);
+      state.gallerySel = new Set(added.map((x) => x.src)); // ready for tagging
+      state.galleryFilter = "all";
+      toast(`Додано ${added.length} фото, вони вже виділені. Позначте їм теги на панелі «Вибрано» або змініть кожне кнопкою ✎.`);
       changed();
     });
     view.appendChild(
@@ -998,7 +1012,7 @@
         "div",
         { class: "upload-box" },
         h("span", { class: "btn btn-teal file-btn" }, "+ Додати фото", fileInput),
-        h("span", { class: "muted" }, "Нові фото отримають теги:"),
+        h("span", { class: "muted" }, "Можна вибрати одразу багато фото (10, 30, 40…). Нові фото отримають теги:"),
         h(
           "div",
           { class: "check-list" },
@@ -1021,74 +1035,151 @@
       )
     );
 
-    // filter + grid
+    // filter + view switch
+    const sel = (state.gallerySel = state.gallerySel || new Set());
+    [...sel].forEach((src) => { if (!g.photos.some((p) => p.src === src)) sel.delete(src); });
+    const shown = g.photos.filter((p) => {
+      if (state.galleryFilter === "all") return true;
+      if (state.galleryFilter === "__none") return !(p.tags || []).length;
+      return (p.tags || []).includes(state.galleryFilter);
+    });
+    const mode = state.galleryMode || (state.galleryMode = (() => { try { return localStorage.getItem("linaGalleryMode") || "tiles"; } catch (e) { return "tiles"; } })());
+    const setMode = (m) => { state.galleryMode = m; try { localStorage.setItem("linaGalleryMode", m); } catch (e) {} renderGallery(); };
     const filterOpts = [["all", "Усі фото"], ["__none", "Без тегів"]].concat(g.tags.map((t) => [t.id, (t.label && t.label.ru) || t.id]));
-    view.appendChild(h("div", { class: "filter-row" }, h("span", { class: "muted" }, "Показати:"), select(filterOpts, state.galleryFilter, (v) => { state.galleryFilter = v; renderGallery(); })));
-    const grid = h("div", { class: "photos" });
-    g.photos
-      .filter((p) => {
-        if (state.galleryFilter === "all") return true;
-        if (state.galleryFilter === "__none") return !(p.tags || []).length;
-        return (p.tags || []).includes(state.galleryFilter);
-      })
-      .forEach((p) => {
-        p.tags = p.tags || [];
-        grid.appendChild(
+    const allShownSel = shown.length > 0 && shown.every((p) => sel.has(p.src));
+    view.appendChild(
+      h(
+        "div",
+        { class: "filter-row" },
+        h("span", { class: "muted" }, "Показати:"),
+        select(filterOpts, state.galleryFilter, (v) => { state.galleryFilter = v; renderGallery(); }),
+        h("button", { class: "btn btn-ghost btn-small sel-all", onclick: () => { shown.forEach((p) => (allShownSel ? sel.delete(p.src) : sel.add(p.src))); renderGallery(); } }, allShownSel ? "Зняти виділення" : "Вибрати всі"),
+        h(
+          "div",
+          { class: "view-switch", role: "group", "aria-label": "Вигляд" },
+          h("button", { class: mode === "tiles" ? "on" : "", title: "Великі плитки", "aria-label": "Великі плитки", onclick: () => setMode("tiles") }, icon("tiles")),
+          h("button", { class: mode === "list" ? "on" : "", title: "Списком", "aria-label": "Списком", onclick: () => setMode("list") }, icon("list"))
+        )
+      )
+    );
+
+    // bulk bar for selected photos
+    if (sel.size) {
+      const selPhotos = g.photos.filter((p) => sel.has(p.src));
+      view.appendChild(
+        h(
+          "div",
+          { class: "bulk-bar" },
+          h("strong", null, `Вибрано: ${sel.size}`),
+          h("span", { class: "muted" }, "Натисніть тег, щоб додати його всім вибраним (ще раз — зняти):"),
           h(
             "div",
-            { class: "photo", "data-dk": "gallery:" + p.src },
+            { class: "bulk-tags" },
+            g.tags.map((tag) => {
+              const n = selPhotos.filter((p) => (p.tags || []).includes(tag.id)).length;
+              const all = n === selPhotos.length;
+              return h(
+                "button",
+                {
+                  class: "ptag big" + (all ? " on" : n ? " part" : ""),
+                  title: all ? "Зняти цей тег з усіх вибраних" : "Додати цей тег усім вибраним",
+                  onclick: () => {
+                    selPhotos.forEach((p) => {
+                      p.tags = p.tags || [];
+                      if (all) p.tags = p.tags.filter((x) => x !== tag.id);
+                      else if (!p.tags.includes(tag.id)) p.tags = p.tags.concat(tag.id);
+                    });
+                    changed();
+                  },
+                },
+                (all ? "✓ " : n ? "◐ " : "+ ") + tagLabel(tag.id)
+              );
+            })
+          ),
+          h(
+            "div",
+            { class: "bulk-actions" },
+            h("button", { class: "btn btn-ghost btn-small", onclick: () => { sel.clear(); renderGallery(); } }, "Зняти виділення"),
+            h("button", { class: "btn btn-ghost btn-small danger-ghost", onclick: () => askDelete(`${sel.size} вибраних фото`, () => { g.photos = g.photos.filter((p) => !sel.has(p.src)); sel.clear(); changed(); }) }, "Видалити вибрані")
+          )
+        )
+      );
+    }
+
+    const grid = h("div", { class: "photos mode-" + mode });
+    shown.forEach((p) => {
+      p.tags = p.tags || [];
+      const isSel = sel.has(p.src);
+      grid.appendChild(
+        h(
+          "div",
+          { class: "photo" + (isSel ? " selected" : ""), "data-dk": "gallery:" + p.src },
+          h(
+            "div",
+            { class: "photo-img" },
             imgWithFallback(p.src),
             h(
+              "label",
+              { class: "photo-check", title: isSel ? "Зняти виділення" : "Виділити" },
+              h("input", { type: "checkbox", checked: isSel, onchange: (e) => { if (e.target.checked) sel.add(p.src); else sel.delete(p.src); renderGallery(); } }),
+              h("span", null, "✓")
+            )
+          ),
+          h(
+            "div",
+            { class: "photo-body" },
+            h(
               "div",
-              { class: "photo-body" },
-              h(
-                "div",
-                { class: "photo-tags" },
-                g.tags.map((tag) =>
-                  h(
-                    "button",
-                    {
-                      class: "ptag" + (p.tags.includes(tag.id) ? " on" : ""),
-                      title: p.tags.includes(tag.id) ? "Зняти тег" : "Додати тег",
-                      onclick: () => {
-                        p.tags = p.tags.includes(tag.id) ? p.tags.filter((x) => x !== tag.id) : p.tags.concat(tag.id);
-                        changed();
-                      },
+              { class: "photo-tags" },
+              g.tags.map((tag) =>
+                h(
+                  "button",
+                  {
+                    class: "ptag" + (p.tags.includes(tag.id) ? " on" : ""),
+                    title: p.tags.includes(tag.id) ? "Зняти тег" : "Додати тег",
+                    onclick: () => {
+                      p.tags = p.tags.includes(tag.id) ? p.tags.filter((x) => x !== tag.id) : p.tags.concat(tag.id);
+                      changed();
                     },
-                    tagLabel(tag.id)
-                  )
+                  },
+                  tagLabel(tag.id)
                 )
+              )
+            ),
+            h(
+              "div",
+              { class: "photo-foot" },
+              h(
+                "button",
+                {
+                  class: "icon-btn",
+                  title: "Редагувати фото (обрізати, наблизити, повернути)",
+                  "aria-label": "Редагувати фото",
+                  onclick: async () => {
+                    const np = await reeditImage(p.src, "gallery", "");
+                    if (np) { if (sel.delete(p.src)) sel.add(np); p.src = np; changed(); }
+                  },
+                },
+                icon("edit")
               ),
+              state.pending[p.src] ? h("span", { class: "new-mark" }, "нове") : null,
+              h("span", { class: "foot-gap" }),
               h(
-                "div",
-                { class: "photo-foot" },
-                state.pending[p.src] ? h("span", { class: "new-mark" }, "нове") : h("span"),
-                h(
-                  "button",
-                  {
-                    class: "icon-btn",
-                    title: "Редагувати фото (обрізати, наблизити, повернути)",
-                    onclick: async () => {
-                      const np = await reeditImage(p.src, "gallery", "");
-                      if (np) { p.src = np; changed(); }
-                    },
-                  },
-                  "✎"
-                ),
-                h(
-                  "button",
-                  {
-                    class: "icon-btn danger",
-                    title: "Видалити фото",
-                    onclick: () => askDelete("це фото з галереї", () => { g.photos = g.photos.filter((x) => x !== p); changed(); }),
-                  },
-                  "✕"
-                )
+                "button",
+                {
+                  class: "icon-btn danger",
+                  title: "Видалити фото",
+                  "aria-label": "Видалити фото",
+                  onclick: () => askDelete("це фото з галереї", () => { g.photos = g.photos.filter((x) => x !== p); sel.delete(p.src); changed(); }),
+                },
+                "✕"
               )
             )
           )
-        );
-      });
+        )
+      );
+    });
+    if (!shown.length) grid.appendChild(h("p", { class: "muted" }, "Тут поки немає фото."));
     view.appendChild(grid);
   }
 
