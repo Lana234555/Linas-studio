@@ -984,3 +984,18 @@ select:hover { border-color: var(--teal-border); }
 .photo-new { position: absolute; top: 10px; right: 10px; padding: 5px 12px; border-radius: 999px; background: var(--gold); color: #1a1405; font-size: 0.76rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35); pointer-events: none; }
 .photo-added { font-size: 0.78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .photo-foot { min-width: 0; }
+
+/* ══ Gallery: drag photos from a folder ══ */
+.drop-hint { flex-basis: 100%; display: flex; flex-direction: column; gap: 4px; }
+.drop-hint strong { font-family: inherit; font-size: 1rem; color: var(--white); font-weight: 600; }
+.drop-hint span { font-size: 0.85rem; color: var(--muted); }
+.upload-box { transition: border-color 0.15s, background-color 0.15s, transform 0.15s; }
+.tag-chip { transition: border-color 0.15s, background-color 0.15s, transform 0.15s; }
+.tag-drop-new { border-style: dashed !important; color: var(--muted); }
+body.files-dragging .upload-box, body.files-dragging .tag-chip { border-color: var(--teal) !important; border-style: dashed !important; }
+body.files-dragging .tag-drop-new { color: var(--teal); }
+.upload-box.drop-over, .tag-chip.drop-over { background: rgba(0, 196, 179, 0.16) !important; border-color: var(--teal) !important; border-style: solid !important; transform: scale(1.03); color: var(--teal); }
+.upload-box.drop-over { transform: none; box-shadow: 0 0 0 3px rgba(0, 196, 179, 0.25); }
+.new-tag-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.new-tag-row input { flex: 1; min-width: 200px; }
+.small-note { font-size: 0.8rem; margin-top: 6px; }

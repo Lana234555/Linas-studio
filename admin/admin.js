@@ -943,10 +943,10 @@
     const tagList = h("div", { class: "tag-list" });
     g.tags.forEach((tag) => {
       const count = g.photos.filter((p) => (p.tags || []).includes(tag.id)).length;
-      tagList.appendChild(
+      tagList.appendChild(dropTarget(
         h(
           "span",
-          { class: "tag-chip" },
+          { class: "tag-chip", title: "Можна перетягнути сюди фото з папки — вони додадуться в цей тег" },
           (tag.label && tag.label.ru) || tag.id,
           h("span", { class: "count" }, String(count)),
           h("button", { title: "Перейменувати", onclick: () => editTag(tag) }, "✎"),
@@ -965,27 +965,34 @@
             },
             "✕"
           )
-        )
-      );
+        ), (files) => handleFiles(files, tag.id)
+      ));
     });
+    tagList.appendChild(dropTarget(h("span", { class: "tag-chip tag-drop-new" }, "＋ Новий тег — перетягніть фото сюди"), (files) => handleFiles(files, "")));
     view.appendChild(
       h("div", { class: "group" }, h("div", { class: "group-head" }, h("h3", null, "Теги"), h("button", { class: "btn btn-teal btn-small", onclick: () => editTag(null) }, "+ Новий тег")), tagList)
     );
 
     // upload: one photo → editor; many photos → quick batch (auto-resized, editable later with ✎)
     const fileInput = h("input", { type: "file", accept: "image/*", multiple: true });
-    fileInput.addEventListener("change", async () => {
+    fileInput.addEventListener("change", () => {
       const files = Array.from(fileInput.files || []);
-      if (!files.length) return;
       fileInput.value = "";
+      handleFiles(files);
+    });
+    // files from the button or dragged in from a folder; tagId: undefined = use the choice above
+    async function handleFiles(files, tagId) {
+      files = files.filter((f) => /^image\//.test(f.type) || /\.(jpe?g|png|webp|heic|gif)$/i.test(f.name));
+      if (!files.length) { toast("Тут можна залишати тільки фото.", true); return; }
+      const useTag = tagId === undefined ? state.uploadTag : tagId;
       if (files.length === 1) {
         try {
           const path = await addPendingImage(files[0], "gallery", "", 1600, "Нове фото");
           if (path) {
-            const ph = { src: path, tags: state.uploadTag ? [state.uploadTag] : [], added: new Date().toISOString() };
+            const ph = { src: path, tags: useTag ? [useTag] : [], added: new Date().toISOString() };
             g.photos.unshift(ph);
             changed();
-            afterUpload([ph]);
+            afterUpload([ph], useTag);
           }
         } catch (e) { toast(files[0].name + ": " + e.message, true); }
         return;
@@ -997,24 +1004,46 @@
           const res = await resizeToJpeg(files[i], PHOTO_KINDS.gallery.maxSide);
           const path = newPath("gallery", "");
           state.pending[path] = Object.assign(res, { orig: res.dataUrl });
-          added.push({ src: path, tags: state.uploadTag ? [state.uploadTag] : [], added: new Date().toISOString() });
+          added.push({ src: path, tags: useTag ? [useTag] : [], added: new Date().toISOString() });
         } catch (e) { toast(files[i].name + ": " + e.message, true); }
       }
       progress.hide();
       if (!added.length) return;
       g.photos = added.concat(g.photos);
-      if (!state.uploadTag) state.galleryFilter = "all";
+      if (!useTag) state.galleryFilter = "all";
       changed();
-      afterUpload(added);
-    });
+      afterUpload(added, useTag);
+    }
+    // drag-and-drop helper: highlight while files hover, call onFiles on drop
+    function dropTarget(el, onFiles) {
+      let depth = 0;
+      const isFiles = (e) => e.dataTransfer && Array.from(e.dataTransfer.types || []).includes("Files");
+      el.addEventListener("dragenter", (e) => { if (!isFiles(e)) return; e.preventDefault(); e.stopPropagation(); depth++; el.classList.add("drop-over"); });
+      el.addEventListener("dragover", (e) => { if (!isFiles(e)) return; e.preventDefault(); e.stopPropagation(); e.dataTransfer.dropEffect = "copy"; });
+      el.addEventListener("dragleave", (e) => { if (!isFiles(e)) return; e.stopPropagation(); if (--depth <= 0) { depth = 0; el.classList.remove("drop-over"); } });
+      el.addEventListener("drop", (e) => { if (!isFiles(e)) return; e.preventDefault(); e.stopPropagation(); depth = 0; el.classList.remove("drop-over"); document.body.classList.remove("files-dragging"); onFiles(Array.from(e.dataTransfer.files || [])); });
+      return el;
+    }
     // after upload: photos already have the chosen tag, or we ask which tag to give them
-    function afterUpload(list) {
+    function afterUpload(list, useTag) {
       const n = list.length;
-      const word = n === 1 ? "фото" : "фото";
-      if (state.uploadTag || !g.tags.length) {
-        toast(state.uploadTag ? `Додано ${n} ${word} у тег «${tagLabel(state.uploadTag)}». Їх видно лише тут, поки ви не натиснете «Опублікувати на сайті».` : `Додано ${n} ${word}.`);
+      const word = "фото";
+      if (useTag) {
+        toast(`Додано ${n} ${word} у тег «${tagLabel(useTag)}». Їх видно лише тут, поки ви не натиснете «Опублікувати на сайті».`);
         return;
       }
+      let newName = "";
+      const makeTag = () => {
+        const name = newName.trim();
+        if (!name) { toast("Напишіть назву нового тегу.", true); return; }
+        const ex = g.tags.find((t) => ((t.label && t.label.ru) || "").toLowerCase() === name.toLowerCase());
+        if (ex) return apply(ex.id);
+        let id = slugify(name) || "tag", k = 2;
+        const base = id;
+        while (g.tags.some((x) => x.id === id) || id === "all") id = base + "-" + k++;
+        g.tags.push({ id, label: { ru: name, en: name, pl: name } });
+        apply(id);
+      };
       const apply = (id) => {
         list.forEach((ph) => (ph.tags = id ? [id] : []));
         closeModal();
@@ -1029,14 +1058,22 @@
           h("h3", null, `Додано ${n} ${word}`),
           h("p", { class: "muted" }, "До якого тегу (події) їх додати? Одне фото — один тег."),
           h("div", { class: "pick-tags" }, g.tags.map((t) => h("button", { class: "btn btn-teal", onclick: () => apply(t.id) }, tagLabel(t.id)))),
+          h(
+            "div",
+            { class: "new-tag-row" },
+            h("input", { type: "text", placeholder: "Або новий тег, наприклад «Кемп 2026»", oninput: (e) => (newName = e.target.value), onkeydown: (e) => { if (e.key === "Enter") makeTag(); } }),
+            h("button", { class: "btn btn-ghost", onclick: makeTag }, "+ Створити тег і додати")
+          ),
+          h("p", { class: "muted small-note" }, "Назву англійською й польською можна потім поправити кнопкою ✎ біля тегу."),
           h("div", { class: "modal-actions" }, h("button", { class: "btn btn-ghost", onclick: () => apply("") }, "Просто додати всі фото без тегу"))
         )
       );
     }
-    view.appendChild(
+    view.appendChild(dropTarget(
       h(
         "div",
         { class: "upload-box" },
+        h("div", { class: "drop-hint" }, h("strong", null, "Перетягніть фото з папки сюди"), h("span", null, "або на потрібний тег вище — тоді вони одразу підуть у нього")),
         h("span", { class: "btn btn-teal file-btn" }, "+ Додати фото", fileInput),
         h("span", { class: "muted" }, "Можна вибрати одразу багато фото (10, 30, 40…). Куди їх додати:"),
         h(
@@ -1052,7 +1089,7 @@
           )
         )
       )
-    );
+    , (files) => handleFiles(files)));
 
     // filter + view switch
     const sel = (state.gallerySel = state.gallerySel || new Set());
@@ -1180,7 +1217,9 @@
       );
     });
     if (!shown.length) grid.appendChild(h("p", { class: "muted" }, "Тут поки немає фото."));
-    view.appendChild(grid);    if (render._booted) markDrafts(); // keep draft marks after filter/selection redraws
+    view.appendChild(grid);    if (!view._drop) { view._drop = true; dropTarget(view, (files) => state.tab === "gallery" && view._handle(files)); }
+    view._handle = handleFiles;
+    if (render._booted) markDrafts(); // keep draft marks after filter/selection redraws
   }
 
   // a photo counts as "new" for 24 hours after it was added
@@ -1196,6 +1235,15 @@
     const time = d.toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit" });
     return `${date} о ${time}`;
   }
+
+  (function () {
+    let n = 0;
+    const isFiles = (e) => e.dataTransfer && Array.from(e.dataTransfer.types || []).includes("Files");
+    window.addEventListener("dragenter", (e) => { if (isFiles(e)) { n++; document.body.classList.add("files-dragging"); } });
+    window.addEventListener("dragleave", (e) => { if (isFiles(e) && --n <= 0) { n = 0; document.body.classList.remove("files-dragging"); } });
+    window.addEventListener("dragover", (e) => { if (isFiles(e)) e.preventDefault(); });
+    window.addEventListener("drop", (e) => { if (isFiles(e)) { e.preventDefault(); n = 0; document.body.classList.remove("files-dragging"); } });
+  })();
 
   function editTag(tag) {
     const g = state.content.gallery;
