@@ -274,8 +274,33 @@
       img.src = src;
     });
   }
+  // iPhone photos (HEIC/HEIF): Safari opens them itself, other browsers need a converter (loaded only when needed)
+  const isHeic = (f) => /image\/hei[cf]/i.test(f.type || "") || /\.hei[cf]$/i.test(f.name || "");
+  let heicLib = null;
+  function loadHeicLib() {
+    if (window.heic2any) return Promise.resolve(window.heic2any);
+    if (!heicLib) heicLib = new Promise((resolve, reject) => {
+      const sc = document.createElement("script");
+      sc.src = (window.LINA_VENDOR_BASE || "vendor/") + "heic2any.min.js";
+      sc.onload = () => (window.heic2any ? resolve(window.heic2any) : reject(new Error("no heic2any")));
+      sc.onerror = () => { heicLib = null; reject(new Error("Не вдалося завантажити перетворювач HEIC")); };
+      document.head.appendChild(sc);
+    });
+    return heicLib;
+  }
+  async function openAnyImage(file) {
+    try {
+      return await loadImage(await readFile(file));
+    } catch (e) {
+      if (!isHeic(file)) throw e;
+      const conv = await loadHeicLib();
+      let out = await conv({ blob: file, toType: "image/jpeg", quality: 0.92 });
+      if (Array.isArray(out)) out = out[0];
+      return loadImage(await readFile(out));
+    }
+  }
   async function resizeToJpeg(file, maxSide) {
-    const img = await loadImage(await readFile(file));
+    const img = await openAnyImage(file);
     const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
     const w = Math.round(img.naturalWidth * scale);
     const hgt = Math.round(img.naturalHeight * scale);
@@ -719,7 +744,7 @@
     function drawPhoto() {
       photoBox.innerHTML = "";
       photoBox.appendChild(t.photo ? imgWithFallback(t.photo) : h("div", { class: "ph" }, t.emoji || "🎵"));
-      const input = h("input", { type: "file", accept: "image/*" });
+      const input = h("input", { type: "file", accept: "image/*,.heic,.heif" });
       input.addEventListener("change", async () => {
         const file = input.files[0];
         if (!file) return;
@@ -974,7 +999,7 @@
     );
 
     // upload: one photo → editor; many photos → quick batch (auto-resized, editable later with ✎)
-    const fileInput = h("input", { type: "file", accept: "image/*", multiple: true });
+    const fileInput = h("input", { type: "file", accept: "image/*,.heic,.heif", multiple: true });
     fileInput.addEventListener("change", () => {
       const files = Array.from(fileInput.files || []);
       fileInput.value = "";
@@ -1305,7 +1330,7 @@
       box.innerHTML = "";
       const cur = get();
       box.appendChild(cur ? imgWithFallback(cur) : h("div", { class: "ph" }, emoji || "🖼"));
-      const input = h("input", { type: "file", accept: "image/*" });
+      const input = h("input", { type: "file", accept: "image/*,.heic,.heif" });
       input.addEventListener("change", async () => {
         const file = input.files[0];
         if (!file) return;
@@ -1797,7 +1822,7 @@
     function drawPhoto() {
       photoBox.innerHTML = "";
       photoBox.appendChild(e.image ? imgWithFallback(e.image) : h("div", { class: "ph" }, "🎤"));
-      const input = h("input", { type: "file", accept: "image/*" });
+      const input = h("input", { type: "file", accept: "image/*,.heic,.heif" });
       input.addEventListener("change", async () => {
         const file = input.files[0];
         if (!file) return;
