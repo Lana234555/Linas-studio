@@ -982,7 +982,7 @@
         try {
           const path = await addPendingImage(files[0], "gallery", "", 1600, "Нове фото");
           if (path) {
-            const ph = { src: path, tags: state.uploadTag ? [state.uploadTag] : [] };
+            const ph = { src: path, tags: state.uploadTag ? [state.uploadTag] : [], added: new Date().toISOString() };
             g.photos.unshift(ph);
             changed();
             afterUpload([ph]);
@@ -997,7 +997,7 @@
           const res = await resizeToJpeg(files[i], PHOTO_KINDS.gallery.maxSide);
           const path = newPath("gallery", "");
           state.pending[path] = Object.assign(res, { orig: res.dataUrl });
-          added.push({ src: path, tags: state.uploadTag ? [state.uploadTag] : [] });
+          added.push({ src: path, tags: state.uploadTag ? [state.uploadTag] : [], added: new Date().toISOString() });
         } catch (e) { toast(files[i].name + ": " + e.message, true); }
       }
       progress.hide();
@@ -1129,6 +1129,7 @@
             { class: "photo-img" },
             imgWithFallback(p.src),
             h("span", { class: "photo-tag" + (p.tags.length ? "" : " none") }, p.tags.length ? tagLabel(p.tags[0]) : "Без тегу"),
+            isFreshPhoto(p) ? h("span", { class: "photo-new" }, "Нове") : null,
             h(
               "label",
               { class: "photo-check", title: isSel ? "Зняти виділення" : "Виділити" },
@@ -1161,7 +1162,7 @@
                 },
                 icon("edit")
               ),
-              state.pending[p.src] ? h("span", { class: "new-mark" }, "нове") : null,
+              p.added ? h("span", { class: "photo-added", title: "Додано " + fmtAdded(p.added, true) }, "Додано " + fmtAdded(p.added)) : null,
               h("span", { class: "foot-gap" }),
               h(
                 "button",
@@ -1180,6 +1181,20 @@
     });
     if (!shown.length) grid.appendChild(h("p", { class: "muted" }, "Тут поки немає фото."));
     view.appendChild(grid);    if (render._booted) markDrafts(); // keep draft marks after filter/selection redraws
+  }
+
+  // a photo counts as "new" for 24 hours after it was added
+  function isFreshPhoto(p) {
+    if (!p.added) return !!state.pending[p.src];
+    return Date.now() - new Date(p.added).getTime() < 24 * 3600e3;
+  }
+  function fmtAdded(iso, long) {
+    const d = new Date(iso);
+    if (isNaN(d)) return "";
+    if (long) return d.toLocaleString("uk-UA", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    const date = d.toLocaleDateString("uk-UA", { day: "2-digit", month: "2-digit" });
+    const time = d.toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit" });
+    return `${date} о ${time}`;
   }
 
   function editTag(tag) {

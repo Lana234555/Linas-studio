@@ -979,3 +979,8 @@ select:hover { border-color: var(--teal-border); }
 .check input[type=radio] { accent-color: var(--teal); }
 .after-upload .pick-tags { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 6px; }
 .after-upload .pick-tags .btn { font-size: 1rem; padding: 12px 22px; }
+
+/* ══ Gallery: «Нове» for 24 hours + date/time of adding ══ */
+.photo-new { position: absolute; top: 10px; right: 10px; padding: 5px 12px; border-radius: 999px; background: var(--gold); color: #1a1405; font-size: 0.76rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35); pointer-events: none; }
+.photo-added { font-size: 0.78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.photo-foot { min-width: 0; }
