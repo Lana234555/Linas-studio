@@ -1129,3 +1129,5 @@ body {
 .photo.has-draft .photo-new { top: 34px; }
 .photo.has-draft, .photos .photo.has-draft { margin-top: 0; }
 .photo-added { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; text-align: center; flex: 1 1 auto; }
+.photo.has-draft[data-draft]::after { content: "◷ " attr(data-draft); background: rgba(12, 12, 11, 0.82); color: var(--gold); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border-bottom: 1px solid rgba(212, 160, 23, 0.45); }
+.photo.has-draft.is-unsaved[data-draft]::after { content: "✎ " attr(data-draft); }
