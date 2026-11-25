@@ -2523,7 +2523,7 @@
       updateSavebar();
     } catch (e) {
       $("loadingView").hidden = true;
-      showLogin(e.status === 401 ? "Ключ недійсний або прострочений. Створіть новий." : e.status === 404 ? "Немає доступу до репозиторію linas-studio. Перевірте налаштування ключа." : "Помилка: " + e.message);
+      showLogin(e.status === 401 ? "Ключ доступу прострочений. Відкрийте «Перший вхід або новий користувач» і збережіть новий ключ з тією ж поштою та паролем." : e.status === 404 ? "Немає доступу до репозиторію linas-studio. Перевірте налаштування ключа." : "Помилка: " + e.message);
     }
   }
   function showLogin(err) {
@@ -2538,14 +2538,115 @@
     $("loginError").textContent = err || "";
   }
 
-  $("loginBtn").addEventListener("click", () => {
-    const tok = $("tokenInput").value.trim();
-    if (!tok) return;
+  // ── Email + password login ──
+  // The GitHub key is stored in admin/users.json encrypted (AES-GCM) with a key derived from
+  // email + password (PBKDF2-SHA256), so the site needs no server and the key never sits in the repo in plain text.
+  const USERS_PATH = "admin/users.json";
+  const KDF_ITER = 310000;
+  const enc = new TextEncoder();
+  const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+  const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+  const normEmail = (e) => String(e || "").trim().toLowerCase();
+  async function deriveKey(email, pass, salt) {
+    const base = await crypto.subtle.importKey("raw", enc.encode(normEmail(email) + "\n" + pass), "PBKDF2", false, ["deriveKey"]);
+    return crypto.subtle.deriveKey({ name: "PBKDF2", salt, iterations: KDF_ITER, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+  }
+  async function emailId(email) {
+    return b64(await crypto.subtle.digest("SHA-256", enc.encode("lina-admin:" + normEmail(email))));
+  }
+  async function fetchUsers(withToken) {
+    if (window.__DEMO_USERS) return { sha: null, users: window.__DEMO_USERS };
+    const headers = { Accept: "application/vnd.github+json" };
+    if (withToken) headers.Authorization = "Bearer " + withToken;
+    const res = await fetch("https://api.github.com/repos/" + OWNER + "/" + REPO + "/contents/" + USERS_PATH + "?ref=" + BRANCH, { headers, cache: "no-store" });
+    if (res.status === 404) return { sha: null, users: [] };
+    if (!res.ok) {
+      // public API limit reached: fall back to the published copy of the file
+      const r2 = await fetch("users.json?" + Date.now(), { cache: "no-store" });
+      if (!r2.ok) throw new Error("users " + res.status);
+      return { sha: null, users: (await r2.json()).users || [] };
+    }
+    const j = await res.json();
+    const text = new TextDecoder().decode(unb64(j.content.replace(/\s/g, "")));
+    return { sha: j.sha, users: JSON.parse(text).users || [] };
+  }
+  async function unlock(email, pass) {
+    const { users } = await fetchUsers();
+    const id = await emailId(email);
+    const u = users.find((x) => x.id === id);
+    if (!u) return null;
+    try {
+      const key = await deriveKey(email, pass, unb64(u.salt));
+      const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv: unb64(u.iv) }, key, unb64(u.data));
+      return new TextDecoder().decode(plain);
+    } catch (e) {
+      return null;
+    }
+  }
+  async function saveUser(token, email, pass) {
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const key = await deriveKey(email, pass, salt);
+    const data = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, enc.encode(token));
+    const entry = { id: await emailId(email), salt: b64(salt), iv: b64(iv), data: b64(data), added: new Date().toISOString() };
+    if (window.__DEMO_USERS) { window.__DEMO_USERS = window.__DEMO_USERS.filter((x) => x.id !== entry.id).concat(entry); return; }
+    const cur = await fetchUsers(token);
+    const users = cur.users.filter((x) => x.id !== entry.id).concat(entry);
+    const body = JSON.stringify({ note: "Encrypted admin logins. Each entry opens only with its own email and password.", users }, null, 2) + "\n";
+    const bytes = enc.encode(body);
+    let bin = ""; bytes.forEach((c) => (bin += String.fromCharCode(c)));
+    const res = await fetch("https://api.github.com/repos/" + OWNER + "/" + REPO + "/contents/" + USERS_PATH, {
+      method: "PUT",
+      headers: { Accept: "application/vnd.github+json", Authorization: "Bearer " + token, "Content-Type": "application/json" },
+      body: JSON.stringify(Object.assign({ message: "Адмінка: вхід за поштою [адмінка]", content: btoa(bin), branch: BRANCH }, cur.sha ? { sha: cur.sha } : {})),
+    });
+    if (!res.ok) { const e = new Error("save " + res.status); e.status = res.status; throw e; }
+  }
+  function busy(btn, on, text) {
+    if (on) { btn.dataset.t = btn.textContent; btn.textContent = text; btn.disabled = true; }
+    else { btn.textContent = btn.dataset.t || btn.textContent; btn.disabled = false; }
+  }
+  $("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = $("emailInput").value, pass = $("passInput").value;
+    if (!email || !pass) return;
+    $("loginError").hidden = true;
+    busy($("loginBtn"), true, "Перевіряю…");
+    let tok = null;
+    try { tok = await unlock(email, pass); } catch (err) { showLogin("Не вдалося перевірити вхід. Перевірте інтернет і спробуйте ще раз."); busy($("loginBtn"), false); return; }
+    busy($("loginBtn"), false);
+    if (!tok) { showLogin("Невірна пошта або пароль."); return; }
     state.token = tok;
-    try { localStorage.setItem(TOKEN_KEY, tok); } catch (e) {}
+    try { localStorage.setItem(TOKEN_KEY, tok); } catch (err) {}
+    $("passInput").value = "";
     start();
   });
-  $("tokenInput").addEventListener("keydown", (e) => e.key === "Enter" && $("loginBtn").click());
+  $("setupForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const tok = $("tokenInput").value.trim(), email = $("setupEmail").value, p1 = $("setupPass").value, p2 = $("setupPass2").value;
+    const err = (m) => { $("setupError").textContent = m; $("setupError").hidden = !m; };
+    err("");
+    if (p1.length < 8) return err("Пароль має бути не коротший за 8 символів.");
+    if (p1 !== p2) return err("Паролі не збігаються.");
+    busy($("setupBtn"), true, "Зберігаю…");
+    try {
+      if (!window.__DEMO_USERS) {
+        const r = await fetch("https://api.github.com/repos/" + OWNER + "/" + REPO, { headers: { Authorization: "Bearer " + tok, Accept: "application/vnd.github+json" } });
+        if (!r.ok) throw Object.assign(new Error("repo"), { status: r.status });
+      }
+      await saveUser(tok, email, p1);
+    } catch (ex) {
+      busy($("setupBtn"), false);
+      return err(ex.status === 401 ? "Ключ GitHub недійсний або прострочений." : ex.status === 404 || ex.status === 403 ? "Ключ не має доступу на запис до репозиторію linas-studio." : "Не вдалося зберегти: " + ex.message);
+    }
+    busy($("setupBtn"), false);
+    $("setupForm").reset();
+    $("setupBox").open = false;
+    state.token = tok;
+    try { localStorage.setItem(TOKEN_KEY, tok); } catch (ex) {}
+    toast("Готово! Далі входьте з поштою " + normEmail(email) + " і паролем.");
+    start();
+  });
   $("logoutBtn").addEventListener("click", () => {
     if (isDirty() && !confirm("Є неопубліковані зміни. Вони залишаться чернеткою в цьому браузері й відновляться, коли ви знову увійдете. Вийти?")) return;
     try { localStorage.removeItem(TOKEN_KEY); } catch (e) {}

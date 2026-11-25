@@ -40,22 +40,40 @@
       <div class="chip">Вхід</div>
       <h1>Керування <em>сайтом</em></h1>
       <p class="muted">Зміни зберігаються прямо в репозиторій сайту на GitHub і з'являються на linasmusicgroup.org приблизно за 1–2 хвилини.</p>
-      <label class="field">
-        <span>Ключ доступу GitHub</span>
-        <input type="password" id="tokenInput" placeholder="github_pat_…" autocomplete="off" />
-      </label>
-      <button class="btn btn-teal" id="loginBtn">Увійти →</button>
+      <form id="loginForm" class="login-form" autocomplete="on">
+        <label class="field">
+          <span>Пошта</span>
+          <input type="email" id="emailInput" placeholder="name@gmail.com" autocomplete="username" required />
+        </label>
+        <label class="field">
+          <span>Пароль</span>
+          <input type="password" id="passInput" placeholder="••••••••" autocomplete="current-password" required />
+        </label>
+        <button class="btn btn-teal" id="loginBtn" type="submit">Увійти →</button>
+      </form>
       <p class="error" id="loginError" hidden></p>
-      <details class="help">
-        <summary>Як отримати ключ (один раз, 2 хвилини)</summary>
-        <ol>
-          <li>Відкрийте <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a> (увійдіть у свій GitHub).</li>
-          <li><b>Token name</b>: наприклад «Адмінка сайту». <b>Expiration</b>: на ваш вибір (наприклад, 1 рік).</li>
-          <li><b>Repository access</b> → <b>Only select repositories</b> → виберіть <b>linas-studio</b>.</li>
-          <li><b>Permissions</b> → <b>Repository permissions</b> → <b>Contents</b> → <b>Read and write</b>.</li>
-          <li>Натисніть <b>Generate token</b>, скопіюйте ключ і вставте його сюди.</li>
-        </ol>
-        <p class="muted">Ключ зберігається лише в цьому браузері. Нікому його не пересилайте.</p>
+      <details class="help" id="setupBox">
+        <summary>Перший вхід або новий користувач</summary>
+        <p class="muted">Один раз вставте ключ доступу GitHub і придумайте пошту та пароль. Далі заходьте тільки з поштою й паролем, з будь-якого пристрою.</p>
+        <form id="setupForm" autocomplete="off">
+          <label class="field"><span>Ключ доступу GitHub</span><input type="password" id="tokenInput" placeholder="github_pat_…" autocomplete="off" required /></label>
+          <label class="field"><span>Пошта для входу</span><input type="email" id="setupEmail" placeholder="name@gmail.com" autocomplete="off" required /></label>
+          <label class="field"><span>Пароль (мінімум 8 символів)</span><input type="password" id="setupPass" autocomplete="new-password" minlength="8" required /></label>
+          <label class="field"><span>Пароль ще раз</span><input type="password" id="setupPass2" autocomplete="new-password" minlength="8" required /></label>
+          <button class="btn btn-teal" id="setupBtn" type="submit">Зберегти вхід і увійти</button>
+        </form>
+        <p class="error" id="setupError" hidden></p>
+        <details class="help help-inner">
+          <summary>Як отримати ключ GitHub (2 хвилини)</summary>
+          <ol>
+            <li>Відкрийте <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a> (увійдіть у свій GitHub).</li>
+            <li><b>Token name</b>: наприклад «Адмінка сайту». <b>Expiration</b>: на ваш вибір (наприклад, 1 рік).</li>
+            <li><b>Repository access</b> → <b>Only select repositories</b> → виберіть <b>linas-studio</b>.</li>
+            <li><b>Permissions</b> → <b>Repository permissions</b> → <b>Contents</b> → <b>Read and write</b>.</li>
+            <li>Натисніть <b>Generate token</b>, скопіюйте ключ і вставте його сюди.</li>
+          </ol>
+          <p class="muted">Ключ зберігається на сайті лише в зашифрованому вигляді, відкрити його можна тільки вашим паролем.</p>
+        </details>
       </details>
     </section>
 

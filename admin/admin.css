@@ -1131,3 +1131,11 @@ body {
 .photo-added { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; text-align: center; flex: 1 1 auto; }
 .photo.has-draft[data-draft]::after { content: "◷ " attr(data-draft); background: rgba(12, 12, 11, 0.82); color: var(--gold); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border-bottom: 1px solid rgba(212, 160, 23, 0.45); }
 .photo.has-draft.is-unsaved[data-draft]::after { content: "✎ " attr(data-draft); }
+
+/* email + password login */
+.login-form { display: flex; flex-direction: column; }
+.login-form .btn { align-self: flex-start; padding: 12px 28px; }
+.login .field input { width: 100%; }
+.help-inner { margin-top: 14px; background: transparent; }
+#setupForm .btn { margin-top: 4px; }
+.demo-login-hint { margin-top: 12px; font-size: 0.85rem; }
