@@ -1207,7 +1207,6 @@
             { class: "photo-img" },
             imgWithFallback(p.src),
             h("span", { class: "photo-tag" + (p.tags.length ? "" : " none") }, p.tags.length ? tagLabel(p.tags[0]) : "Без тегу"),
-            isFreshPhoto(p) ? h("span", { class: "photo-new" }, "Нове") : null,
             h(
               "label",
               { class: "photo-check", title: isSel ? "Зняти виділення" : "Виділити" },
