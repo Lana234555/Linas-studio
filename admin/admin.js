@@ -2548,7 +2548,7 @@
       state.lastPublished = { date: new Date().toISOString(), sha: commit.sha };
       state.history = null;
       try { localStorage.removeItem(PREVIEW_KEY); } catch (e) {}
-      toast("Опубліковано! Сайт оновиться приблизно за 1–2 хвилини.");
+      watchLive(serializeContent(state.content));
       render();
       return true;
     } catch (e) {
@@ -2557,9 +2557,47 @@
       toast(e.status === 401 || e.status === 403 ? "GitHub не дозволив запис. Перевірте, що ключ має доступ Contents: Read and write." : "Не вдалося опублікувати: " + e.message, true);
     } finally {
       btn.innerHTML = '<span class="lg">Опублікувати на сайті</span><span class="sm">Опублікувати</span>';
-      setTimeout(() => progress.hide(), 1500);
+      if (!liveWatch.on) setTimeout(() => { if (!liveWatch.on) progress.hide(); }, 1500);
       updateSavebar();
     }
+  }
+
+  // ── after publishing: watch the live site until the new content.js is served ──
+  // GitHub Pages rebuilds the site in about a minute; the site loads content.js with a
+  // cache-busting query, so the change is visible to visitors as soon as this check sees it.
+  const liveWatch = { on: false, t: 0 };
+  function watchLive(expected) {
+    clearTimeout(liveWatch.t);
+    liveWatch.on = true;
+    const norm = (x) => x.replace(/\s+/g, "");
+    const want = norm(expected);
+    const started = Date.now();
+    const LIMIT = 5 * 60 * 1000;
+    let lastCheck = -99;
+    const tick = async () => {
+      const sec = Math.round((Date.now() - started) / 1000);
+      const clock = Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0");
+      progress.show("Опубліковано. Сайт оновлюється… " + clock + " (зазвичай близько хвилини, можна працювати далі)", null);
+      let ok = false;
+      if (window.__DEMO_CONTENT) ok = sec >= 4;
+      else if (sec - lastCheck >= 4) {
+        lastCheck = sec;
+        try {
+          const r = await fetch("../" + CONTENT_PATH + "?check=" + Date.now(), { cache: "no-store" });
+          ok = r.ok && norm(await r.text()) === want;
+        } catch (e) {}
+      }
+      if (ok) {
+        liveWatch.on = false;
+        progress.show("✓ Зміни вже на сайті! Оновіть сторінку сайту, щоб побачити.", 1);
+        liveWatch.t = setTimeout(() => { if (!liveWatch.on) progress.hide(); }, 6000);
+      } else if (Date.now() - started > LIMIT) {
+        liveWatch.on = false;
+        progress.hide();
+        toast("Сайт ще оновлюється довше, ніж зазвичай. Перевірте його за кілька хвилин.");
+      } else liveWatch.t = setTimeout(tick, 1000);
+    };
+    tick();
   }
 
   // ── preview: the real site in a frame, with the unsaved changes ──
