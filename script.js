@@ -99,59 +99,6 @@ function showPricingTab(id, btn, panelSelector) {
 function showPricing(id, btn) { showPricingTab(id, btn, ".pricing-panel"); }
 function showInstrPricing(id, btn) { showPricingTab(id, btn, ".instr-pricing-panel"); }
 
-const vocalData = {
-  vb: { titleSuffix: "pricing.vocal_basic_suffix", sub: "pricing.vocal_basic_sub", trialVal: "120 zł", singleVal: "170 zł", sub4note: "160 zł|pricing.perLesson", sub4val: "640 zł", sub4disc: "pricing.disc6", sub8note: "150 zł|pricing.perLesson", sub8val: "1200 zł", sub8disc: "pricing.disc12" },
-  vp: { titleSuffix: "pricing.vocal_pro_suffix", sub: "pricing.vocal_pro_sub", trialVal: "120 zł", singleVal: "200 zł", sub4note: "190 zł|pricing.perLesson", sub4val: "760 zł", sub4disc: "pricing.disc5", sub8note: "180 zł|pricing.perLesson", sub8val: "1440 zł", sub8disc: "pricing.disc10" },
-  vt: { titleSuffix: "\u00A0TOP", sub: "pricing.vocal_top_sub", trialVal: "300 zł", singleVal: "400 zł", sub4note: "380 zł|pricing.perLesson", sub4val: "1520 zł", sub4disc: "pricing.disc4", sub8note: "360 zł|pricing.perLesson", sub8val: "2880 zł", sub8disc: "pricing.disc8" }
-};
-const instrData = {
-  ib2: { titleBase: "pricing.instr_basic_title", sub: "pricing.instr_basic_sub", trialVal: "120 zł", singleVal: "170 zł", sub4note: "160 zł|pricing.perLesson", sub4val: "640 zł", sub4disc: "pricing.disc6", sub8note: "150 zł|pricing.perLesson", sub8val: "1200 zł", sub8disc: "pricing.disc12" },
-  ip2: { titleBase: "pricing.instr_pro_title", sub: "pricing.instr_pro_sub", trialVal: "120 zł", singleVal: "200 zł", sub4note: "190 zł|pricing.perLesson", sub4val: "760 zł", sub4disc: "pricing.disc5", sub8note: "180 zł|pricing.perLesson", sub8val: "1440 zł", sub8disc: "pricing.disc10" }
-};
-
-function updateTabVals(panelId, data) {
-  const panel = document.getElementById(panelId);
-  if (!panel) return;
-  const vals = panel.querySelectorAll(".tab-val");
-  vals.forEach(el => { el.style.opacity = "0"; el.style.transform = "translateY(-5px)"; });
-  setTimeout(() => {
-    vals.forEach(el => {
-      let val = data[el.dataset.tv];
-      if (typeof val === "string") {
-        if (val.includes("|")) {
-          val = val.split("|").map(p => (p.startsWith("pricing.") && window.i18n) ? window.i18n.t(p) : p).join("");
-        } else if (val.startsWith("pricing.") && window.i18n) {
-          val = window.i18n.t(val);
-        }
-      }
-      el.textContent = val;
-      el.style.opacity = "1";
-      el.style.transform = "translateY(0)";
-    });
-  }, 180);
-}
-
-let _currentVocalTab = "vb";
-let _currentInstrTab = "ib2";
-
-function showVocalTab(id, btn) {
-  _currentVocalTab = id;
-  btn.closest(".ptabs").querySelectorAll(".ptab").forEach(b => b.classList.remove("active"));
-  btn.classList.add("active");
-  updateTabVals("vocal-panel", vocalData[id]);
-}
-function showInstrTab(id, btn) {
-  _currentInstrTab = id;
-  btn.closest(".ptabs").querySelectorAll(".ptab").forEach(b => b.classList.remove("active"));
-  btn.classList.add("active");
-  updateTabVals("instr-panel", instrData[id]);
-}
-
-window.refreshPricingPanels = function () {
-  updateTabVals("vocal-panel", vocalData[_currentVocalTab]);
-  updateTabVals("instr-panel", instrData[_currentInstrTab]);
-};
-
 // Gallery lightbox
 (function () {
   const lb = document.getElementById("lightbox");
@@ -259,6 +206,14 @@ window.refreshPricingPanels = function () {
     const j = Math.floor(Math.random() * (i + 1));
     [items[i], items[j]] = [items[j], items[i]];
   }
+  // Admin preview: show the new, not yet published photos first
+  if (window.__linaInAdminPreview) {
+    const isNew = (it) => {
+      const im = it.querySelector("img");
+      return !!im && /^data:/.test(im.getAttribute("data-src") || "");
+    };
+    items = items.filter(isNew).concat(items.filter((it) => !isNew(it)));
+  }
   if (items.length) {
     const parent = items[0].parentNode;
     items.forEach((item) => parent.appendChild(item));
@@ -273,7 +228,7 @@ window.refreshPricingPanels = function () {
   let sectionInView = false;
 
   function matches(item, tag) {
-    return tag === "all" || item.dataset.tag === tag;
+    return tag === "all" || (item.dataset.tags || item.dataset.tag || "").split(" ").includes(tag);
   }
 
   function loadImage(item) {
