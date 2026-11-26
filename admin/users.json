@@ -1,0 +1,12 @@
+{
+  "note": "Encrypted admin logins. Each entry opens only with its own email and password.",
+  "users": [
+    {
+      "id": "wYL8wzLXR9kKV7kPp9qAqU1c6giQjjL10dDh7VL6GNM=",
+      "salt": "hO8ohltWyl23cO3epMBP+g==",
+      "iv": "NUn1ChJ02GBQLH2t",
+      "data": "5KwVM1+asZgj2UWH+vTBaOvVFyD+swp56QJMscXtRRA7hY3snOd8GJ652hMSXIrMk+z+Woz3vUUu4FtjcQpaIFrWycT6lXaN7msJ0Fl/JPACugF44l+uXCOgArw6P42nERK2sYb8E0BBgbH8yQ==",
+      "added": "2026-11-26T15:46:05.515Z"
+    }
+  ]
+}
