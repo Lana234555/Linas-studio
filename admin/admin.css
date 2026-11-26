@@ -1139,3 +1139,14 @@ body {
 .help-inner { margin-top: 14px; background: transparent; }
 #setupForm .btn { margin-top: 4px; }
 .demo-login-hint { margin-top: 12px; font-size: 0.85rem; }
+
+/* automatic translation */
+.lang-tabs { flex-wrap: wrap; align-items: center; }
+.tr-bar { display: inline-flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap; }
+.tr-btn { border-color: var(--teal-border); color: var(--teal); }
+.tr-btn:disabled { opacity: 0.6; cursor: progress; }
+.tr-again { background: none; border: 0; padding: 0; color: var(--muted); font-size: 0.8rem; text-decoration: underline; cursor: pointer; }
+.tr-again:hover { color: var(--white); }
+.tr-status { font-size: 0.8rem; color: var(--muted); flex-basis: 100%; text-align: right; }
+.tr-status:empty { display: none; }
+@media (max-width: 560px) { .tr-bar { margin-left: 0; width: 100%; } .tr-status { text-align: left; } }
