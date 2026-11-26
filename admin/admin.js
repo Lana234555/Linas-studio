@@ -33,7 +33,7 @@
   const ALL_TABS = ["events", "teachers", "prices", "halls", "about", "cert", "gallery", "history"];
   const HISTORY_DAYS = 30;
   // Only files inside these folders are ever deleted by the admin
-  const DELETABLE = /^photo\/(gallery|koncert|kvartirnyky|kemp|teachers|events|halls|about|cert)\//;
+  const DELETABLE = /^photo\/(gallery|koncert|kvartirnyky|kemp|teachers|events|halls|about|cert|originals)\//;
 
   const state = {
     token: null,
@@ -193,7 +193,24 @@
     ((c.halls && c.halls.rooms) || []).forEach((r) => r.photo && set.add(r.photo));
     if (c.founder && c.founder.photo) set.add(c.founder.photo);
     if (c.cert && c.cert.image) set.add(c.cert.image);
+    // originals of edited photos (kept so that a later edit can undo or change the earlier one)
+    const pe = c.photoEdits || {};
+    Array.from(set).forEach((p) => pe[p] && pe[p].orig && set.add(pe[p].orig));
     return set;
+  }
+
+  // drop remembered edits of photos that are gone, or whose original is not available
+  function prunePhotoEdits(c) {
+    const pe = c && c.photoEdits;
+    if (!pe) return;
+    const known = state.original ? referencedPaths(state.original) : new Set();
+    const used = referencedPaths(Object.assign({}, c, { photoEdits: {} }));
+    Object.keys(pe).forEach((k) => {
+      const o = pe[k] && pe[k].orig;
+      const have = o && (state.pending[o] || known.has(o) || (state.restoreBlobs || {})[o]);
+      if (!used.has(k) || !have) delete pe[k];
+    });
+    if (!Object.keys(pe).length) delete c.photoEdits;
   }
 
   // ── dirty tracking ──
@@ -234,6 +251,7 @@
     state.content = c;
     state.pending = pending;
     state.restoreBlobs = d.restoreBlobs || {};
+    prunePhotoEdits(state.content);
     state.restoredFrom = d.restoredFrom || null;
     state.draftKeys = d.draftKeys || [];
     state.draftSavedAt = d.savedAt;
@@ -335,13 +353,32 @@
     return res.dataUrl;
   }
   // Opens the editor; returns the new pending path, or null when cancelled.
-  async function editIntoPending(src, folder, baseName, title, extra) {
+  // The untouched original and the editor settings are remembered in content.photoEdits,
+  // so «Редагувати фото» later reopens the original with every slider where it was left.
+  async function editIntoPending(src, folder, baseName, title, extra, prev) {
     const kind = PHOTO_KINDS[folder] || PHOTO_KINDS.gallery;
-    const res = await window.PhotoEditor.open(src, Object.assign({ title, aspects: kind.aspects, aspect: kind.aspect, maxSide: kind.maxSide }, extra || {}));
+    const res = await window.PhotoEditor.open(src, Object.assign({ title, aspects: kind.aspects, aspect: kind.aspect, maxSide: kind.maxSide, settings: prev ? prev.s : null }, extra || {}));
     if (!res) return null;
     const path = newPath(folder, baseName);
+    const settings = res.settings;
+    delete res.settings;
     state.pending[path] = Object.assign(res, { orig: src });
+    let origPath = prev && prev.orig;
+    if (!origPath && /^data:/.test(src)) {
+      origPath = "photo/originals/" + path.split("/").pop();
+      state.pending[origPath] = { dataUrl: src, base64: src.slice(src.indexOf(",") + 1) };
+    }
+    if (origPath) {
+      state.content.photoEdits = state.content.photoEdits || {};
+      state.content.photoEdits[path] = { orig: origPath, s: settings };
+    }
     return path;
+  }
+  async function urlToDataUrl(url) {
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const b = await r.blob();
+    return await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = rej; fr.readAsDataURL(b); });
   }
   async function addPendingImage(file, folder, baseName, maxSide, title) {
     progress.show("Відкриваю фото…", null);
@@ -355,9 +392,15 @@
   }
   // Re-edit a photo that is already in the content (pending or published)
   async function reeditImage(path, folder, baseName) {
-    const src = (state.pending[path] && state.pending[path].orig) || imgUrl(path);
+    const prev = (state.content.photoEdits || {})[path] || null;
     try {
-      return await editIntoPending(src, folder, baseName, "Редагування фото");
+      let src;
+      if (prev && prev.orig) src = imgUrl(prev.orig);
+      else if (state.pending[path] && state.pending[path].orig) src = state.pending[path].orig;
+      else src = imgUrl(path);
+      // a photo published before originals were kept: it becomes the original itself
+      if (!/^data:/.test(src) && !(prev && prev.orig)) src = await urlToDataUrl(src);
+      return await editIntoPending(src, folder, baseName, "Редагування фото", null, prev);
     } catch (e) {
       toast("Не вдалося відкрити фото для редагування: " + e.message, true);
       return null;
@@ -618,30 +661,53 @@
     return jobs;
   }
   function translateBar(tr) {
-    const status = h("span", { class: "tr-status" });
-    const run = async (all, btn) => {
+    const MAIN_LABEL = "🌐 Автопереклад EN · PL";
+    const status = h("span", { class: "tr-status", role: "status" });
+    let hideT = 0, labelT = 0;
+    const say = (text, kind) => {
+      clearTimeout(hideT);
+      status.textContent = text;
+      status.className = "tr-status show" + (kind ? " " + kind : "");
+      hideT = setTimeout(() => (status.className = "tr-status"), 5000);
+    };
+    const run = async (all) => {
       const jobs = trJobs(tr.objs(), all);
-      if (!jobs.length) { status.textContent = all ? "Немає російського тексту для перекладу." : "EN і PL уже заповнені. Щоб оновити, натисніть «заново»."; return; }
+      if (!jobs.length) { say(all ? "Немає російського тексту для перекладу." : "EN і PL уже заповнені. Щоб оновити, натисніть «заново»."); return; }
+      clearTimeout(labelT); clearTimeout(hideT);
+      status.className = "tr-status";
+      bar.classList.add("tr-busy");
       bar.querySelectorAll("button").forEach((b) => (b.disabled = true));
       let done = 0, failed = 0;
       for (const j of jobs) {
-        status.textContent = "Перекладаю… " + done + "/" + jobs.length;
+        label.textContent = "Перекладаю… " + done + "/" + jobs.length;
+        bar.style.setProperty("--tr-p", Math.round((done / jobs.length) * 100) + "%");
         try {
           const t = await translateText(j.src, j.to);
           if (j.key) j.o[j.key] = t; else j.o[j.to] = t;
         } catch (e) { failed++; }
         done++;
       }
+      bar.style.setProperty("--tr-p", "100%");
+      bar.classList.remove("tr-busy");
       bar.querySelectorAll("button").forEach((b) => (b.disabled = false));
-      status.textContent = failed ? "Перекладено " + (done - failed) + " з " + done + ". Частину не вдалося, спробуйте ще раз." : "Готово! Перевірте EN і PL, переклад автоматичний.";
+      if (failed) {
+        label.textContent = "⚠ Не все перекладено";
+        say("Перекладено " + (done - failed) + " з " + done + ". Спробуйте ще раз.", "warn");
+      } else {
+        label.textContent = "✓ Готово";
+        main.classList.add("ok");
+        say("Перевірте EN і PL, переклад автоматичний.");
+      }
+      labelT = setTimeout(() => { label.textContent = MAIN_LABEL; main.classList.remove("ok"); }, 3000);
       if (typeof modalEdited !== "undefined") modalEdited = true;
       tr.redraw();
       updateSavebar();
     };
-    const main = h("button", { class: "btn btn-ghost btn-small tr-btn", type: "button", title: "Перекласти російський текст на англійську й польську (заповнює порожні поля)" }, "🌐 Автопереклад EN · PL");
+    const label = h("span", { class: "tr-label" }, MAIN_LABEL);
+    const main = h("button", { class: "btn btn-ghost btn-small tr-btn", type: "button", title: "Перекласти російський текст на англійську й польську (заповнює порожні поля)" }, h("span", { class: "tr-spin", "aria-hidden": "true" }), label);
     const again = h("button", { class: "link-btn tr-again", type: "button", title: "Перекласти всі поля заново, замінивши наявний EN і PL" }, "заново");
-    main.addEventListener("click", () => run(false, main));
-    again.addEventListener("click", () => run(true, again));
+    main.addEventListener("click", () => run(false));
+    again.addEventListener("click", () => run(true));
     const bar = h("div", { class: "tr-bar" }, main, again, status);
     return bar;
   }
@@ -2478,6 +2544,7 @@
     btn.textContent = "Публікую…";
     progress.show("Готую публікацію…", 0);
     try {
+      prunePhotoEdits(state.content);
       const latest = await fetchContentFile();
       if (latest.sha !== state.contentSha) {
         if (!confirm("Контент на сайті змінився після того, як ви відкрили адмінку (можливо, з іншого пристрою). Опублікувати ваші зміни поверх нього?")) {
@@ -2525,7 +2592,7 @@
       state.lastPublished = { date: new Date().toISOString(), sha: commit.sha };
       state.history = null;
       try { localStorage.removeItem(PREVIEW_KEY); } catch (e) {}
-      toast("Опубліковано! Сайт оновиться приблизно за 1–2 хвилини.");
+      watchLive(serializeContent(state.content));
       render();
       return true;
     } catch (e) {
@@ -2534,9 +2601,47 @@
       toast(e.status === 401 || e.status === 403 ? "GitHub не дозволив запис. Перевірте, що ключ має доступ Contents: Read and write." : "Не вдалося опублікувати: " + e.message, true);
     } finally {
       btn.innerHTML = '<span class="lg">Опублікувати на сайті</span><span class="sm">Опублікувати</span>';
-      setTimeout(() => progress.hide(), 1500);
+      if (!liveWatch.on) setTimeout(() => { if (!liveWatch.on) progress.hide(); }, 1500);
       updateSavebar();
     }
+  }
+
+  // ── after publishing: watch the live site until the new content.js is served ──
+  // GitHub Pages rebuilds the site in about a minute; the site loads content.js with a
+  // cache-busting query, so the change is visible to visitors as soon as this check sees it.
+  const liveWatch = { on: false, t: 0 };
+  function watchLive(expected) {
+    clearTimeout(liveWatch.t);
+    liveWatch.on = true;
+    const norm = (x) => x.replace(/\s+/g, "");
+    const want = norm(expected);
+    const started = Date.now();
+    const LIMIT = 5 * 60 * 1000;
+    let lastCheck = -99;
+    const tick = async () => {
+      const sec = Math.round((Date.now() - started) / 1000);
+      const clock = Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0");
+      progress.show("Опубліковано. Сайт оновлюється… " + clock + " (зазвичай близько хвилини, можна працювати далі)", null);
+      let ok = false;
+      if (window.__DEMO_CONTENT) ok = sec >= 4;
+      else if (sec - lastCheck >= 4) {
+        lastCheck = sec;
+        try {
+          const r = await fetch("../" + CONTENT_PATH + "?check=" + Date.now(), { cache: "no-store" });
+          ok = r.ok && norm(await r.text()) === want;
+        } catch (e) {}
+      }
+      if (ok) {
+        liveWatch.on = false;
+        progress.show("✓ Зміни вже на сайті! Оновіть сторінку сайту, щоб побачити.", 1);
+        liveWatch.t = setTimeout(() => { if (!liveWatch.on) progress.hide(); }, 6000);
+      } else if (Date.now() - started > LIMIT) {
+        liveWatch.on = false;
+        progress.hide();
+        toast("Сайт ще оновлюється довше, ніж зазвичай. Перевірте його за кілька хвилин.");
+      } else liveWatch.t = setTimeout(tick, 1000);
+    };
+    tick();
   }
 
   // ── preview: the real site in a frame, with the unsaved changes ──
