@@ -618,30 +618,53 @@
     return jobs;
   }
   function translateBar(tr) {
-    const status = h("span", { class: "tr-status" });
-    const run = async (all, btn) => {
+    const MAIN_LABEL = "🌐 Автопереклад EN · PL";
+    const status = h("span", { class: "tr-status", role: "status" });
+    let hideT = 0, labelT = 0;
+    const say = (text, kind) => {
+      clearTimeout(hideT);
+      status.textContent = text;
+      status.className = "tr-status show" + (kind ? " " + kind : "");
+      hideT = setTimeout(() => (status.className = "tr-status"), 5000);
+    };
+    const run = async (all) => {
       const jobs = trJobs(tr.objs(), all);
-      if (!jobs.length) { status.textContent = all ? "Немає російського тексту для перекладу." : "EN і PL уже заповнені. Щоб оновити, натисніть «заново»."; return; }
+      if (!jobs.length) { say(all ? "Немає російського тексту для перекладу." : "EN і PL уже заповнені. Щоб оновити, натисніть «заново»."); return; }
+      clearTimeout(labelT); clearTimeout(hideT);
+      status.className = "tr-status";
+      bar.classList.add("tr-busy");
       bar.querySelectorAll("button").forEach((b) => (b.disabled = true));
       let done = 0, failed = 0;
       for (const j of jobs) {
-        status.textContent = "Перекладаю… " + done + "/" + jobs.length;
+        label.textContent = "Перекладаю… " + done + "/" + jobs.length;
+        bar.style.setProperty("--tr-p", Math.round((done / jobs.length) * 100) + "%");
         try {
           const t = await translateText(j.src, j.to);
           if (j.key) j.o[j.key] = t; else j.o[j.to] = t;
         } catch (e) { failed++; }
         done++;
       }
+      bar.style.setProperty("--tr-p", "100%");
+      bar.classList.remove("tr-busy");
       bar.querySelectorAll("button").forEach((b) => (b.disabled = false));
-      status.textContent = failed ? "Перекладено " + (done - failed) + " з " + done + ". Частину не вдалося, спробуйте ще раз." : "Готово! Перевірте EN і PL, переклад автоматичний.";
+      if (failed) {
+        label.textContent = "⚠ Не все перекладено";
+        say("Перекладено " + (done - failed) + " з " + done + ". Спробуйте ще раз.", "warn");
+      } else {
+        label.textContent = "✓ Готово";
+        main.classList.add("ok");
+        say("Перевірте EN і PL, переклад автоматичний.");
+      }
+      labelT = setTimeout(() => { label.textContent = MAIN_LABEL; main.classList.remove("ok"); }, 3000);
       if (typeof modalEdited !== "undefined") modalEdited = true;
       tr.redraw();
       updateSavebar();
     };
-    const main = h("button", { class: "btn btn-ghost btn-small tr-btn", type: "button", title: "Перекласти російський текст на англійську й польську (заповнює порожні поля)" }, "🌐 Автопереклад EN · PL");
+    const label = h("span", { class: "tr-label" }, MAIN_LABEL);
+    const main = h("button", { class: "btn btn-ghost btn-small tr-btn", type: "button", title: "Перекласти російський текст на англійську й польську (заповнює порожні поля)" }, h("span", { class: "tr-spin", "aria-hidden": "true" }), label);
     const again = h("button", { class: "link-btn tr-again", type: "button", title: "Перекласти всі поля заново, замінивши наявний EN і PL" }, "заново");
-    main.addEventListener("click", () => run(false, main));
-    again.addEventListener("click", () => run(true, again));
+    main.addEventListener("click", () => run(false));
+    again.addEventListener("click", () => run(true));
     const bar = h("div", { class: "tr-bar" }, main, again, status);
     return bar;
   }
