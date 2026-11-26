@@ -546,7 +546,106 @@
   }
 
   // small reusable widgets
-  function langTabs(onSwitch, initial) {
+  // ── Automatic translation RU → EN, PL ──
+  // Google's public translate endpoint (no key, allowed from the browser); free MyMemory API as a fallback.
+  const trCache = {};
+  function trChunks(text) {
+    const parts = String(text).split(/(\n+)/);
+    const out = [];
+    let cur = "";
+    const flush = () => { if (cur) out.push(cur); cur = ""; };
+    parts.forEach((p) => {
+      if (/^\n+$/.test(p)) { flush(); out.push(p); return; }
+      p.split(/(?<=[.!?…])\s+/).forEach((sent) => {
+        if ((cur + " " + sent).length > 400) flush();
+        cur = cur ? cur + " " + sent : sent;
+      });
+      flush();
+    });
+    return out;
+  }
+  async function trOne(q, to) {
+    const k = to + "|" + q;
+    if (trCache[k]) return trCache[k];
+    const timed = async (url, ms) => {
+      const ac = new AbortController();
+      const timer = setTimeout(() => ac.abort(), ms);
+      try { return await fetch(url, { signal: ac.signal }); } finally { clearTimeout(timer); }
+    };
+    let res = "";
+    try {
+      const r = await timed("https://translate.googleapis.com/translate_a/t?client=dict-chrome-ex&sl=ru&tl=" + to + "&q=" + encodeURIComponent(q), 8000);
+      if (r.ok) {
+        const j = await r.json();
+        const first = Array.isArray(j) ? j[0] : null;
+        res = Array.isArray(first) ? first[0] : first || "";
+      }
+    } catch (e) {}
+    if (!res) {
+      const r = await timed("https://api.mymemory.translated.net/get?langpair=ru|" + to + "&q=" + encodeURIComponent(q), 8000);
+      const j = await r.json();
+      const t = j && j.responseData && j.responseData.translatedText;
+      if (!t || j.responseStatus != 200 || /MYMEMORY WARNING|QUERY LENGTH LIMIT/i.test(t)) throw new Error("translate");
+      res = t;
+    }
+    const ta = document.createElement("textarea");
+    ta.innerHTML = res;
+    return (trCache[k] = ta.value);
+  }
+  async function translateText(text, to) {
+    const chunks = trChunks(text);
+    const out = [];
+    for (const c of chunks) out.push(/^\s*$/.test(c) ? c : await trOne(c, to));
+    return out.join("").replace(/ +\n/g, "\n");
+  }
+  // objs: list of {ru,en,pl} objects whose values are strings or objects of strings
+  function trJobs(objs, all) {
+    const jobs = [];
+    objs.filter(Boolean).forEach((o) => {
+      LANGS.forEach(([to]) => {
+        if (to === "ru" || !o.ru) return;
+        if (typeof o.ru === "string") {
+          if (o.ru.trim() && (all || !String(o[to] || "").trim())) jobs.push({ o, to, src: o.ru });
+        } else {
+          o[to] = o[to] || {};
+          Object.keys(o.ru).forEach((key) => {
+            const src = o.ru[key];
+            if (typeof src === "string" && src.trim() && (all || !String(o[to][key] || "").trim())) jobs.push({ o: o[to], key, to, src });
+          });
+        }
+      });
+    });
+    return jobs;
+  }
+  function translateBar(tr) {
+    const status = h("span", { class: "tr-status" });
+    const run = async (all, btn) => {
+      const jobs = trJobs(tr.objs(), all);
+      if (!jobs.length) { status.textContent = all ? "Немає російського тексту для перекладу." : "EN і PL уже заповнені. Щоб оновити, натисніть «заново»."; return; }
+      bar.querySelectorAll("button").forEach((b) => (b.disabled = true));
+      let done = 0, failed = 0;
+      for (const j of jobs) {
+        status.textContent = "Перекладаю… " + done + "/" + jobs.length;
+        try {
+          const t = await translateText(j.src, j.to);
+          if (j.key) j.o[j.key] = t; else j.o[j.to] = t;
+        } catch (e) { failed++; }
+        done++;
+      }
+      bar.querySelectorAll("button").forEach((b) => (b.disabled = false));
+      status.textContent = failed ? "Перекладено " + (done - failed) + " з " + done + ". Частину не вдалося, спробуйте ще раз." : "Готово! Перевірте EN і PL, переклад автоматичний.";
+      if (typeof modalEdited !== "undefined") modalEdited = true;
+      tr.redraw();
+      updateSavebar();
+    };
+    const main = h("button", { class: "btn btn-ghost btn-small tr-btn", type: "button", title: "Перекласти російський текст на англійську й польську (заповнює порожні поля)" }, "🌐 Автопереклад EN · PL");
+    const again = h("button", { class: "link-btn tr-again", type: "button", title: "Перекласти всі поля заново, замінивши наявний EN і PL" }, "заново");
+    main.addEventListener("click", () => run(false, main));
+    again.addEventListener("click", () => run(true, again));
+    const bar = h("div", { class: "tr-bar" }, main, again, status);
+    return bar;
+  }
+  function langTabs(onSwitch, initial, tr) {
     const wrap = h("div", { class: "lang-tabs" });
     LANGS.forEach(([code, label]) => {
       const b = h("button", { class: "lang-tab" + (code === initial ? " active" : ""), type: "button", title: LANG_HINT[code] }, label);
@@ -557,6 +656,7 @@
       });
       wrap.appendChild(b);
     });
+    if (tr) wrap.appendChild(translateBar(tr));
     return wrap;
   }
   function select(options, value, onChange) {
@@ -837,7 +937,7 @@
       h("div", { class: "sub-head" }, "Фото"),
       photoBox,
       h("div", { class: "sub-head" }, "Тексти"),
-      langTabs((l) => { lang = l; drawText(); }, lang),
+      langTabs((l) => { lang = l; drawText(); }, lang, { objs: () => [t.text].concat(t.tags, t.videos.map((v) => v.label)), redraw: () => { drawText(); drawTags(); drawVideos(); } }),
       textBox,
       h("div", { class: "sub-head" }, "Теги (жанри, інструменти)", h("button", { class: "btn btn-ghost btn-small", type: "button", onclick: () => { t.tags.push({ ru: "", en: "", pl: "" }); drawTags(); } }, "+ Тег")),
       tagsBox,
@@ -930,7 +1030,7 @@
         field("Бейдж", textInput(p.badge, (v) => { p.badge = v; updateSavebar(); })),
         field("Тривалість", select([["50", "50 хв"], ["30", "30 хв"]], String(p.minutes || 50), (v) => { p.minutes = Number(v); updateSavebar(); }))
       ),
-      langTabs((l) => { lang = l; drawText(); }, lang),
+      langTabs((l) => { lang = l; drawText(); }, lang, { objs: () => [p.title, p.sub], redraw: drawText }),
       textBox,
       h(
         "div",
@@ -1408,7 +1508,7 @@
       });
     }
     draw();
-    return h("div", null, langTabs((l) => { lang = l; draw(); }, lang), box);
+    return h("div", null, langTabs((l) => { lang = l; draw(); }, lang, { objs: () => [textObj], redraw: draw }), box);
   }
   function previewBtn(section) {
     return h("button", { class: "btn btn-ghost btn-small", type: "button", onclick: () => preview(section) }, "👁 Переглянути на сайті");
@@ -1933,7 +2033,7 @@
       h("div", { class: "sub-head" }, "Фото"),
       photoBox,
       h("div", { class: "sub-head" }, "Тексти"),
-      langTabs((l) => { lang = l; drawText(); }, lang),
+      langTabs((l) => { lang = l; drawText(); }, lang, { objs: () => [e.text], redraw: drawText }),
       textBox,
       field("Куди веде кнопка (#contact = розділ «Контакти»; або посилання на квитки)", textInput(e.buttonUrl, (v) => (e.buttonUrl = v.trim()), { placeholder: "#contact" })),
       h("div", { class: "sub-head" }, "Публікація на сайті"),
