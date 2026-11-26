@@ -1163,3 +1163,17 @@ body {
 .tr-status.show { opacity: 1; transform: none; }
 .tr-status.warn { border-color: rgba(212, 160, 23, 0.5); color: var(--gold); }
 @media (max-width: 560px) { .tr-bar { margin-left: 0; width: 100%; } .tr-status { right: auto; left: 0; white-space: normal; max-width: 100%; } }
+
+/* gallery list view: tag on the left, date and actions pushed to the right edge */
+.photos.mode-list .photo-body { gap: 24px; padding: 14px 22px 14px 24px; }
+.photos.mode-list .photo-tagsel { flex: 0 1 340px; max-width: 340px; }
+.photos.mode-list .photo-foot { flex: 1 1 auto; justify-content: flex-end; gap: 12px; }
+.photos.mode-list .photo-foot .photo-added { order: 0; flex: 1 1 auto; text-align: right; padding-right: 8px; }
+.photos.mode-list .photo-foot .icon-btn:not(.danger) { order: 1; }
+.photos.mode-list .photo-foot .foot-gap { display: none; }
+.photos.mode-list .photo-foot .icon-btn.danger { order: 2; }
+@media (max-width: 720px) {
+  .photos.mode-list .photo-body { padding: 12px; gap: 10px; }
+  .photos.mode-list .photo-tagsel { flex: none; max-width: none; }
+  .photos.mode-list .photo-foot .photo-added { text-align: left; }
+}
