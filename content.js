@@ -697,9 +697,94 @@ window.SITE_CONTENT = {
           "en": "Camp",
           "pl": "Obóz"
         }
+      },
+      {
+        "id": "komanda",
+        "label": {
+          "ru": "Команда ",
+          "en": "Team",
+          "pl": "Zespół"
+        }
       }
     ],
     "photos": [
+      {
+        "src": "photo/gallery/20261126-27msm.jpg",
+        "tags": [
+          "komanda"
+        ],
+        "added": "2026-11-26T16:27:28.862Z"
+      },
+      {
+        "src": "photo/gallery/20261126-sf6v0.jpg",
+        "tags": [
+          "komanda"
+        ],
+        "added": "2026-11-26T16:27:15.798Z"
+      },
+      {
+        "src": "photo/gallery/20261126-003nl.jpg",
+        "tags": [
+          "komanda"
+        ],
+        "added": "2026-11-26T16:27:04.951Z"
+      },
+      {
+        "src": "photo/gallery/20261126-ivcfy.jpg",
+        "tags": [
+          "komanda"
+        ],
+        "added": "2026-11-26T16:26:53.117Z"
+      },
+      {
+        "src": "photo/gallery/20261126-dhxmh.jpg",
+        "tags": [
+          "komanda"
+        ],
+        "added": "2026-11-26T16:26:25.615Z"
+      },
+      {
+        "src": "photo/gallery/20261126-rxnwt.jpg",
+        "tags": [
+          "komanda"
+        ],
+        "added": "2026-11-26T16:25:52.543Z"
+      },
+      {
+        "src": "photo/gallery/20261126-k213g.jpg",
+        "tags": [
+          "komanda"
+        ],
+        "added": "2026-11-26T16:25:42.267Z"
+      },
+      {
+        "src": "photo/gallery/20261126-f51ar.jpg",
+        "tags": [
+          "komanda"
+        ],
+        "added": "2026-11-26T16:25:36.373Z"
+      },
+      {
+        "src": "photo/gallery/20261126-h7l5e.jpg",
+        "tags": [
+          "kvartirnyky"
+        ],
+        "added": "2026-11-26T16:24:26.250Z"
+      },
+      {
+        "src": "photo/gallery/20261126-rd2e7.jpg",
+        "tags": [
+          "kvartirnyky"
+        ],
+        "added": "2026-11-26T16:23:42.020Z"
+      },
+      {
+        "src": "photo/gallery/20261126-1x7w7.jpg",
+        "tags": [
+          "kvartirnyky"
+        ],
+        "added": "2026-11-26T16:23:19.979Z"
+      },
       {
         "src": "photo/koncert/koncert-extra-2.jpg",
         "tags": [
