@@ -639,7 +639,39 @@ window.SITE_CONTENT = {
       }
     ]
   },
-  "events": [],
+  "events": [
+    {
+      "id": "emwxqugwg",
+      "date": "2026-11-26T18:05",
+      "endDate": "2026-12-05T23:00",
+      "image": "photo/events/event-20261126-42he4.jpg",
+      "text": {
+        "ru": {
+          "title": "LMS ON STAGE: Главный вечер года",
+          "place": "Lina's Music Studio, Warszawa",
+          "desc": "Раз в год Lina's Music Studio выходит на большую сцену, и в этот раз в свой день рождения! Ученики студии покажут, чего достигли за год, а вместе с ними выступят приглашённые гости. Живая музыка, волнение первых выходов на сцену и праздничная атмосфера. Приходите поддержать артистов и отметить праздник вместе с нами!",
+          "button": "Купить билет"
+        },
+        "en": {
+          "title": "LMS ON STAGE: The main evening of the year",
+          "place": "Lina's Music Studio, Warszawa",
+          "desc": "Once a year, Lina's Music Studio takes to the big stage, and this time on its birthday! Students of the studio will show what they have achieved over the year, and invited guests will perform along with them. Live music, the excitement of the first stage appearances and a festive atmosphere. Come support the artists and celebrate the holiday with us!",
+          "button": "Buy a ticket"
+        },
+        "pl": {
+          "title": "LMS NA SCENIE: Najważniejszy wieczór w roku",
+          "place": "Studio Muzyczne Liny, Warszawa",
+          "desc": "Raz w roku Studio Muzyczne Lina wychodzi na dużą scenę i tym razem w swoje urodziny! Studenci studia pokażą, co udało im się osiągnąć przez ten rok, a wraz z nimi wystąpią zaproszeni goście. Muzyka na żywo, emocje towarzyszące występom na pierwszej scenie i świąteczna atmosfera. Przyjdź, wesprzyj artystów i świętuj z nami święto!",
+          "button": "Kup bilet"
+        }
+      },
+      "buttonUrl": "https://waylight.me/linasmusicgroup#events",
+      "banner": true,
+      "publishFrom": "",
+      "publishUntil": "",
+      "hidden": false
+    }
+  ],
   "gallery": {
     "tags": [
       {
