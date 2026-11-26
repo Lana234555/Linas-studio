@@ -33,7 +33,7 @@
   const ALL_TABS = ["events", "teachers", "prices", "halls", "about", "cert", "gallery", "history"];
   const HISTORY_DAYS = 30;
   // Only files inside these folders are ever deleted by the admin
-  const DELETABLE = /^photo\/(gallery|koncert|kvartirnyky|kemp|teachers|events|halls|about|cert)\//;
+  const DELETABLE = /^photo\/(gallery|koncert|kvartirnyky|kemp|teachers|events|halls|about|cert|originals)\//;
 
   const state = {
     token: null,
@@ -193,7 +193,24 @@
     ((c.halls && c.halls.rooms) || []).forEach((r) => r.photo && set.add(r.photo));
     if (c.founder && c.founder.photo) set.add(c.founder.photo);
     if (c.cert && c.cert.image) set.add(c.cert.image);
+    // originals of edited photos (kept so that a later edit can undo or change the earlier one)
+    const pe = c.photoEdits || {};
+    Array.from(set).forEach((p) => pe[p] && pe[p].orig && set.add(pe[p].orig));
     return set;
+  }
+
+  // drop remembered edits of photos that are gone, or whose original is not available
+  function prunePhotoEdits(c) {
+    const pe = c && c.photoEdits;
+    if (!pe) return;
+    const known = state.original ? referencedPaths(state.original) : new Set();
+    const used = referencedPaths(Object.assign({}, c, { photoEdits: {} }));
+    Object.keys(pe).forEach((k) => {
+      const o = pe[k] && pe[k].orig;
+      const have = o && (state.pending[o] || known.has(o) || (state.restoreBlobs || {})[o]);
+      if (!used.has(k) || !have) delete pe[k];
+    });
+    if (!Object.keys(pe).length) delete c.photoEdits;
   }
 
   // ── dirty tracking ──
@@ -234,6 +251,7 @@
     state.content = c;
     state.pending = pending;
     state.restoreBlobs = d.restoreBlobs || {};
+    prunePhotoEdits(state.content);
     state.restoredFrom = d.restoredFrom || null;
     state.draftKeys = d.draftKeys || [];
     state.draftSavedAt = d.savedAt;
@@ -335,13 +353,32 @@
     return res.dataUrl;
   }
   // Opens the editor; returns the new pending path, or null when cancelled.
-  async function editIntoPending(src, folder, baseName, title, extra) {
+  // The untouched original and the editor settings are remembered in content.photoEdits,
+  // so «Редагувати фото» later reopens the original with every slider where it was left.
+  async function editIntoPending(src, folder, baseName, title, extra, prev) {
     const kind = PHOTO_KINDS[folder] || PHOTO_KINDS.gallery;
-    const res = await window.PhotoEditor.open(src, Object.assign({ title, aspects: kind.aspects, aspect: kind.aspect, maxSide: kind.maxSide }, extra || {}));
+    const res = await window.PhotoEditor.open(src, Object.assign({ title, aspects: kind.aspects, aspect: kind.aspect, maxSide: kind.maxSide, settings: prev ? prev.s : null }, extra || {}));
     if (!res) return null;
     const path = newPath(folder, baseName);
+    const settings = res.settings;
+    delete res.settings;
     state.pending[path] = Object.assign(res, { orig: src });
+    let origPath = prev && prev.orig;
+    if (!origPath && /^data:/.test(src)) {
+      origPath = "photo/originals/" + path.split("/").pop();
+      state.pending[origPath] = { dataUrl: src, base64: src.slice(src.indexOf(",") + 1) };
+    }
+    if (origPath) {
+      state.content.photoEdits = state.content.photoEdits || {};
+      state.content.photoEdits[path] = { orig: origPath, s: settings };
+    }
     return path;
+  }
+  async function urlToDataUrl(url) {
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const b = await r.blob();
+    return await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = rej; fr.readAsDataURL(b); });
   }
   async function addPendingImage(file, folder, baseName, maxSide, title) {
     progress.show("Відкриваю фото…", null);
@@ -355,9 +392,15 @@
   }
   // Re-edit a photo that is already in the content (pending or published)
   async function reeditImage(path, folder, baseName) {
-    const src = (state.pending[path] && state.pending[path].orig) || imgUrl(path);
+    const prev = (state.content.photoEdits || {})[path] || null;
     try {
-      return await editIntoPending(src, folder, baseName, "Редагування фото");
+      let src;
+      if (prev && prev.orig) src = imgUrl(prev.orig);
+      else if (state.pending[path] && state.pending[path].orig) src = state.pending[path].orig;
+      else src = imgUrl(path);
+      // a photo published before originals were kept: it becomes the original itself
+      if (!/^data:/.test(src) && !(prev && prev.orig)) src = await urlToDataUrl(src);
+      return await editIntoPending(src, folder, baseName, "Редагування фото", null, prev);
     } catch (e) {
       toast("Не вдалося відкрити фото для редагування: " + e.message, true);
       return null;
@@ -2501,6 +2544,7 @@
     btn.textContent = "Публікую…";
     progress.show("Готую публікацію…", 0);
     try {
+      prunePhotoEdits(state.content);
       const latest = await fetchContentFile();
       if (latest.sha !== state.contentSha) {
         if (!confirm("Контент на сайті змінився після того, як ви відкрили адмінку (можливо, з іншого пристрою). Опублікувати ваші зміни поверх нього?")) {

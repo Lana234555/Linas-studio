@@ -315,6 +315,11 @@ input[type="datetime-local"] { color-scheme: dark; }
 .pe-btn { width: 34px; height: 34px; flex: none; border-radius: 50%; background: var(--card); color: var(--white); border: 1px solid var(--border2); font-size: 1.1rem; line-height: 1; }
 .pe-btn:hover { border-color: var(--teal); color: var(--teal); }
 .pe-val { min-width: 46px; text-align: right; color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+button.pe-val { min-width: 62px; background: none; border: 0; padding: 2px 0; font-family: inherit; cursor: default; }
+.pe-slider.changed .pe-val { color: var(--teal); cursor: pointer; }
+.pe-slider.changed .pe-val::after { content: " ↺"; }
+.pe-slider.changed .pe-val:hover { color: var(--white); }
+.pe-slider.changed > span:first-child { color: var(--white); }
 .pe-filters { display: grid; grid-template-columns: auto 1fr 1fr 1fr; align-items: center; grid-column: 1 / -1; gap: 10px 18px; }
 .pe-slider { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; font-size: 0.85rem; }
 .pe-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }

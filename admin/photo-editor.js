@@ -33,6 +33,7 @@
     const aspects = opts.aspects || [["Оригінал", null], ["1:1", 1], ["4:3", 4 / 3], ["3:4", 3 / 4], ["16:9", 16 / 9]];
     const maxSide = opts.maxSide || 1600;
 
+    const DEF = { zoom: 1, ox: 0, oy: 0, rot: 0, flip: false, bright: 100, contrast: 100, sat: 100, clarity: 0, grain: 0, shadows: 0 };
     const st = {
       aspect: opts.aspect === undefined ? aspects[0][1] : opts.aspect,
       zoom: 1, // 1 = image just covers the frame
@@ -47,6 +48,14 @@
       grain: 0, // 0..100
       shadows: 0, // -100..100 (plus = lighter shadows)
     };
+    // settings from the previous edit of this photo: the editor reopens exactly as it was saved
+    const prev = opts.settings || null;
+    let startFx = null;
+    if (prev) {
+      Object.keys(DEF).forEach((k) => { if (k !== "ox" && k !== "oy" && prev[k] !== undefined) st[k] = prev[k]; });
+      if (prev.aspect !== undefined) st.aspect = prev.aspect;
+      startFx = { x: prev.fx || 0, y: prev.fy || 0 };
+    }
 
     return new Promise((resolve) => {
       const canvas = el("canvas", { class: "pe-canvas" });
@@ -61,6 +70,8 @@
       let F = { x: 0, y: 0, w: 1, h: 1 };
       let dpr = 1;
       function layout() {
+        const fr = startFx || { x: F.w > 1 ? st.ox / F.w : 0, y: F.h > 1 ? st.oy / F.h : 0 };
+        startFx = null;
         const bw = stage.clientWidth || 600;
         const bh = stage.clientHeight || 420;
         dpr = window.devicePixelRatio || 1;
@@ -77,6 +88,8 @@
           w = hh * a;
         }
         F = { x: (bw - w) / 2, y: (bh - hh) / 2, w, h: hh };
+        st.ox = fr.x * F.w;
+        st.oy = fr.y * F.h;
         clamp();
         draw();
       }
@@ -209,7 +222,8 @@
       }
 
       // controls
-      const zoomInput = el("input", { type: "range", min: "1", max: "5", step: "0.01", value: "1", id: "peZoom" });
+      const zoomInput = el("input", { type: "range", min: "1", max: "5", step: "0.01", value: String(st.zoom), id: "peZoom", title: "Двічі клацніть, щоб повернути 100%" });
+      zoomInput.addEventListener("dblclick", () => setZoom(1));
       zoomInput.addEventListener("input", () => setZoom(Number(zoomInput.value)));
       const zoomLabel = el("span", { class: "pe-val" }, "100%");
 
@@ -226,16 +240,18 @@
 
       function slider(label, key, min, max, signed) {
         const fmt = (v) => (signed ? (v > 0 ? "+" : "") + v : v + "%");
-        const val = el("span", { class: "pe-val" }, fmt(st[key]));
-        const input = el("input", { type: "range", min: String(min), max: String(max), step: "1", value: String(st[key]) });
-        input.addEventListener("input", () => {
-          st[key] = Number(input.value);
-          val.textContent = fmt(st[key]);
-          draw();
-        });
+        const val = el("button", { type: "button", class: "pe-val", title: "Повернути як було спочатку" }, fmt(st[key]));
+        const input = el("input", { type: "range", min: String(min), max: String(max), step: "1", value: String(st[key]), title: "Двічі клацніть, щоб повернути як було спочатку" });
+        const row = el("label", { class: "pe-slider" }, el("span", null, label), input, val);
+        const sync = () => { input.value = String(st[key]); val.textContent = fmt(st[key]); row.classList.toggle("changed", st[key] !== DEF[key]); };
+        const toDefault = (e) => { if (e) e.preventDefault(); st[key] = DEF[key]; sync(); draw(); };
+        input.addEventListener("input", () => { st[key] = Number(input.value); sync(); draw(); });
+        input.addEventListener("dblclick", toDefault);
+        val.addEventListener("click", toDefault);
+        sync();
         slider.all = slider.all || [];
-        slider.all.push(() => { input.value = String(st[key]); val.textContent = fmt(st[key]); });
-        return el("label", { class: "pe-slider" }, el("span", null, label), input, val);
+        slider.all.push(sync);
+        return row;
       }
 
       const box = el(
@@ -274,7 +290,7 @@
         el(
           "div",
           { class: "pe-actions" },
-          el("button", { type: "button", class: "btn btn-ghost", onclick: reset }, "Скинути"),
+          el("button", { type: "button", class: "btn btn-ghost", onclick: reset, title: "Повернути всі налаштування як у початкового фото" }, "Скинути все"),
           el("span", { class: "pe-spacer" }),
           el("button", { type: "button", class: "btn btn-ghost", onclick: () => finish(null) }, "Скасувати"),
           el("button", { type: "button", class: "btn btn-teal", onclick: save }, "Зберегти фото")
@@ -283,7 +299,7 @@
       const overlay = el("div", { class: "pe-overlay" }, box);
 
       function reset() {
-        Object.assign(st, { aspect: opts.aspect === undefined ? aspects[0][1] : opts.aspect, zoom: 1, ox: 0, oy: 0, rot: 0, flip: false, bright: 100, contrast: 100, sat: 100, clarity: 0, grain: 0, shadows: 0 });
+        Object.assign(st, DEF, { aspect: opts.aspect === undefined ? aspects[0][1] : opts.aspect });
         (slider.all || []).forEach((f) => f());
         drawAspects();
         layout();
@@ -304,7 +320,9 @@
         paint(c, outW / F.w, 0, 0, outW, outH);
         applyFx(c, 0, 0, outW, outH);
         const dataUrl = out.toDataURL("image/jpeg", 0.86);
-        finish({ dataUrl, base64: dataUrl.split(",")[1] });
+        const settings = Object.assign({}, st, { fx: F.w ? st.ox / F.w : 0, fy: F.h ? st.oy / F.h : 0 });
+        delete settings.ox; delete settings.oy;
+        finish({ dataUrl, base64: dataUrl.split(",")[1], settings });
       }
       function onKey(e) {
         if (e.key === "Escape") { e.stopImmediatePropagation(); finish(null); }
