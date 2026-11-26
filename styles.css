@@ -533,7 +533,7 @@ body {
 .plan-card {
   border-color: rgba(255,255,255,0.13);
   background: linear-gradient(160deg, rgba(255,255,255,0.09) 0%, rgba(var(--plan-rgb), 0.07) 40%, rgba(12,12,11,0.4) 100%);
-  -webkit-backdrop-filter: blur(22px) saturate(160%); backdrop-filter: blur(22px) saturate(160%);
+  /* no backdrop-filter: Safari draws a dark vertical seam on these cards; the glows behind are already blurred */
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), inset 1px 0 0 rgba(255,255,255,0.05), 0 20px 40px -18px rgba(0,0,0,0.7);
 }
 .plan-card:hover { border-color: rgba(var(--plan-rgb), 0.6); background: linear-gradient(160deg, rgba(255,255,255,0.18) 0%, rgba(var(--plan-rgb), 0.14) 40%, rgba(255,255,255,0.06) 100%); }
@@ -1011,7 +1011,7 @@ footer {
 .teacher-card, .it-card, .hall-card, .event-card, .hp-card, .hp-conditions,
 .contact-item, .instr-single-card, .glass-card, .cert-visual {
   background: linear-gradient(160deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 45%, rgba(12,12,11,0.4) 100%);
-  -webkit-backdrop-filter: blur(20px) saturate(150%); backdrop-filter: blur(20px) saturate(150%);
+  /* no backdrop-filter (Safari seam bug), glows behind are pre-blurred */
   border-color: rgba(255,255,255,0.12);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 18px 36px -18px rgba(0,0,0,0.7);
 }
@@ -1042,7 +1042,7 @@ footer {
   display: flex; flex-direction: column; overflow: hidden;
   border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius);
   background: linear-gradient(160deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 45%, rgba(12,12,11,0.4) 100%);
-  -webkit-backdrop-filter: blur(20px) saturate(150%); backdrop-filter: blur(20px) saturate(150%);
+  /* no backdrop-filter (Safari seam bug) */
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 18px 36px -18px rgba(0,0,0,0.7);
   transition: transform 0.25s, border-color 0.25s, background 0.25s;
 }
